@@ -1,4 +1,4 @@
-\documentclass[11pt, a4paper]{article}
+\documentclass[conference]{IEEEtran}
 
 \begin{document}
 \title{I/O simulation extension for SimGrid framework}
@@ -6,43 +6,40 @@
 \maketitle
 
 \begin{abstract}
-
+	\begin{itemize}
+		\item The I/O bottleneck in HPC and the need of conducting HPC experiments.
+		\item Difficulties in HPC experiments and simulation frameworks.
+		\item Advantages of SimGrid, the missing of the ability to simulate page cache, the goal of this paper.
+	\end{itemize}
 \end{abstract}
 
 	\section{Introduction}
-
-	\section{Related Work}
-
+		\begin{itemize}
+			\item Role of high performance computing nowadays and the demand of HPC experiments.
+			\item Difficulties in conducting high performance computing experiments and the need of simulation frameworks.
+			\item Existing methods, simulators, simulation frameworks. 
+			\item The advantages of SimGrid compared to others. The missing of the ability to simulate page cache in SimGrid.
+			\item The objective of the paper: Add capability to simulate memory read/write, the impact of page cache on I/O in SimGrid.
+		\end{itemize}
+	\section{Related Work}			
+		
 		\subsection{Page cache}
 			\begin{itemize}
-				\item What is page cache? How it works.
-				\item Effects and importance of page cache
-			\end{itemize}					
-				
-		\subsection{ Page cache replacement policies}
-			\begin{itemize}
-				\item Introduce some proposed strategies.
-				\item Some pros and cons of each algorithm if possible.
-			\end{itemize}
-
-		\subsection{Implementation in Linux}
-			\begin{itemize}
-				\item Details of the implemented strategy in Linux.
-				\item Reason for this to be implemented. (implementation complexity, effectiveness, overhead, etc)
-			\end{itemize}
+				\item What is page cache? How it works. Effects and importance of page cache
+				\item Introduce some existing strategies.
+				\item Current implementation in Linux and some reasons for this to be implemented (implementation complexity, effectiveness, overhead, etc)
+			\end{itemize}									
 
 		\subsection{Simulators}
-		Compare pros and cons of some simulators: SimGrid, GridSim (accuracy, simulation time, usability).
-
-		\subsection{Our conclusion}
-
+		Discuss some ecisting methods, simulation frameworks to conduct HPC experiments. Compare pros and cons (accuracy, simulation time, usability) of some simulators (SimGrid, GridSim) .
+			
 	\section{Method}
 
 		\subsection{Principle of the simulator}
 
 			\begin{itemize}
-				\item Objective: Add capability to simulate memory read/write, the impact of page cache on I/O in SimGrid.
 				\item Approach: generalize dirty data, dirty ratio, cache eviction strategy implemented in Linux. 
+				\item Some implemented details of the simulator in SimGrid.
 			\end{itemize}
 
 		\subsection{Implementation}
@@ -78,6 +75,6 @@
 
 		\end{itemize}
 
-	\section{Discussion}
+	\section{Discussion and Future Work}
 
 \end{document}
