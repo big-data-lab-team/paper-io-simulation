@@ -1,6 +1,5 @@
 \documentclass[conference]{IEEEtran}
 
-
 \begin{document}
 \title{I/O simulation extension for SimGrid framework}
 \author{Hoang-Dung Do}
@@ -20,16 +19,16 @@
 		\begin{itemize}
 			\item HPC, the bottleneck in I/O and the demand of HPC experiments. 
 			\item Difficulties in conducting high performance computing experiments and the need of simulation frameworks.
-			\item Existing experiment methods, simulators, simulation frameworks. The advantages of SimGrid compared to others. The missing of the ability to simulate page cache in SimGrid.
+			\item Existing experiment methods, simulators, simulation frameworks. The advantages of SimGrid compared to others \cite{casanova2008, lebre2015}. The missing of the ability to simulate page cache in SimGrid \cite{lebre2015}.
 			\item The objective of the paper: Add capability to simulate I/O with page cache in SimGrid.
 		\end{itemize}
 	\section{Related Work}			
 		
 		\subsection{Page cache}
 			\begin{itemize}
-				\item What is page cache? How it works. Effects and importance of page cache.
+				\item What is page cache? How it works \cite{linuxdev3rd2010}. Effects and importance of page cache.
 				\item Introduce some existing strategies with some highlighted pros and cons.
-				\item Current implementation in Linux and some reasons why it is chosen to be implemented (implementation complexity, effectiveness, overhead, etc)
+				\item Current implementation in Linux and some reasons why it is chosen to be implemented (implementation complexity, effectiveness, overhead, etc) \cite{linuxdev3rd2010}
 			\end{itemize}									
 
 		\subsection{Simulators}
@@ -81,5 +80,8 @@
 		\end{itemize}
 
 	\section{Discussion and Future Work}
+
+\bibliographystyle{plain}
+\bibliography{citation}
 
 \end{document}
