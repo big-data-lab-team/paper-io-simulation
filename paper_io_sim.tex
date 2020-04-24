@@ -1,0 +1,87 @@
+\documentclass[conference]{IEEEtran}
+
+\begin{document}
+\title{I/O simulation extension for SimGrid framework}
+\author{Hoang-Dung Do}
+\maketitle
+
+	\begin{abstract}
+		\begin{itemize}
+			\item The I/O bottleneck in HPC and the need of experiments.
+			\item HPC experiment frameworks and advantages of SimGrid.
+			\item The missing of the ability to simulate page cache, the goal of this paper.
+			\item Principle of the simulator, experiment scenarios and comparisons.
+			\item Brief discussion on results and future work.
+		\end{itemize}
+	\end{abstract}
+
+	\section{Introduction}
+		\begin{itemize}
+			\item HPC, the bottleneck in I/O and the demand of HPC experiments. 
+			\item Difficulties in conducting high performance computing experiments and the need of simulation frameworks.
+			\item Existing experiment methods, simulators, simulation frameworks. The advantages of SimGrid compared to others \cite{casanova2008, lebre2015}. The missing of the ability to simulate page cache in SimGrid \cite{lebre2015}.
+			\item The objective of the paper: Add capability to simulate I/O with page cache in SimGrid.
+		\end{itemize}
+	\section{Related Work}			
+		
+		\subsection{Page cache}
+			\begin{itemize}
+				\item What is page cache? How it works \cite{linuxdev3rd2010}. Effects and importance of page cache.
+				\item Introduce some existing strategies with some highlighted pros and cons.
+				\item Current implementation in Linux and some reasons why it is chosen to be implemented (implementation complexity, effectiveness, overhead, etc) \cite{linuxdev3rd2010}
+			\end{itemize}									
+
+		\subsection{Simulators}
+			\begin{itemize}
+				\item Discuss some existing methods, simulation frameworks to conduct HPC experiments. Compare pros and cons (accuracy, simulation time, usability) of some simulators (SimGrid, GridSim).
+				\item Discuss the pros of SimGrid and the reasons why we chose it to extend.
+			\end{itemize}
+			
+	\section{Method}
+
+		\subsection{Principle of the simulator}
+
+			\begin{itemize}
+				\item Approach: generalize dirty data, dirty ratio, cache eviction strategy implemented in Linux. 
+				\item Some implemented details of the simulator.
+			\end{itemize}
+
+		\subsection{Implementation}
+			\begin{itemize}
+				\item Which features of memory are implemented.
+				\item Level of granularity, how features are implemented.
+				\item Specific implementation details in python and SimGrid.
+			\end{itemize}
+
+		\subsection{Experiments}
+			Describe data, workflow, number of tasks, task details, environment of each experiment.
+	
+			\subsubsection{Expriment 1}
+				A single pipeline running one node.
+			\subsubsection{Expriment 2}
+				Multiple pipelines running in parallel on multiple nodes.
+			\subsubsection{Expriment 3}
+				Same as Experiment 2 but nodes write to a shared file system.
+			\subsubsection{Expriment 4}
+				A real pipeline (for example a pipeline with nighres)
+
+	\section{Results}
+	
+		\begin{itemize}
+
+			\item Quantized results: 
+				\begin{itemize}
+					\item Errors of simulation time and memory used compared to real results.
+					\item Simulation time compared to baseline SimGrid.
+				\end{itemize} 
+
+			\item Ability of the model to generalize trends seen in memory (amount of dirty data, page cache) and disk throughput.
+
+		\end{itemize}
+
+	\section{Discussion and Future Work}
+
+\bibliographystyle{plain}
+\bibliography{citation}
+
+\end{document}
