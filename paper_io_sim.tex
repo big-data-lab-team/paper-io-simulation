@@ -34,6 +34,7 @@
 		\subsection{Simulators}
 			\begin{itemize}
 				\item Discuss some existing methods, simulation frameworks to conduct HPC experiments. Compare pros and cons (accuracy, simulation time, usability) of some simulators (SimGrid, GridSim).
+				\item Related development: RAM energy consumption \cite{gill2019} \cite{ouarnoughi2017} 
 				\item Discuss the pros of SimGrid and the reasons why we chose it to extend.
 			\end{itemize}
 			
@@ -54,7 +55,11 @@
 			\end{itemize}
 
 		\subsection{Experiments}
-			Describe data, workflow, number of tasks, task details, environment of each experiment.
+			For each experiment: 
+			\begin{itemize}
+				\item Describe data, workflow, number of tasks, task details, environment of each experiment.
+				\item Compare the results from real pipeline, baseline SimGrid  and SimGrid with our extension.
+			\end{itemize}
 	
 			\subsubsection{Expriment 1}
 				A single pipeline running one node.
@@ -69,18 +74,20 @@
 	
 		\begin{itemize}
 
-			\item Quantized results: 
+			\item Quantitative results: 
 				\begin{itemize}
 					\item Errors of simulation time and memory used compared to real results.
 					\item Simulation time compared to baseline SimGrid.
 				\end{itemize} 
 
-			\item Ability of the model to generalize trends seen in memory (amount of dirty data, page cache) and disk throughput.
+			\item Ability of the model to generalize memory trends (dirty data, cache used) and disk throughput.
 
 		\end{itemize}
 
 	\section{Discussion and Future Work}
-
+		\begin{itemize}
+			\item Sensitivity of the simulator on the variation of memory and disk bandwidth. 
+		\end{itemize}
 \bibliographystyle{plain}
 \bibliography{citation}
 
