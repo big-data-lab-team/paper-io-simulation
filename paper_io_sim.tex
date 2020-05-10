@@ -35,18 +35,21 @@
 			\begin{itemize}
 				\item Discuss some existing methods, simulation frameworks to conduct HPC experiments. Compare pros and cons (accuracy, simulation time, usability) of some simulators (SimGrid, GridSim).
 				\item Related development: RAM energy consumption \cite{gill2019} \cite{ouarnoughi2017} 
-				\item Discuss the pros of SimGrid and the reasons why we chose it to extend.
+				\item Discuss the pros of SimGrid and the reasons why we chose it to extend. (Section 2.2.2 in \cite{casanova2014})
 			\end{itemize}
 			
 	\section{Method}
-
+		In this section, we discuss our approach to model page cache and the cache eviction strategy implemented in Linux. We also detail the design the simulators in order to generalize page cache as well as the implementation in Python and SimGrid framework. Finally, we describe some experimental scenarios to compare the results of Python simulator, baseline SimGrid simulator and the results from the real pipelines.
 		\subsection{Principle of the simulator}
-
-			\begin{itemize}
-				\item Approach: generalize dirty data, dirty ratio, cache eviction strategy implemented in Linux. 
-				\item Some implemented details of the simulator.
-			\end{itemize}
-
+	
+			In order to make the simulator accurate, we try to simulate simulate page cache and mimic the 2-LRU lists cache eviction algorithm implemented in Linux. Our design also keeps track two LRU lists ans specific system configurations as in Linux kernel. However, maintaining and handling pages, which is in packet level, requires significant implementation overhead and hinders the performance of the simulator. To simplify the model whilst preserving accuracy, in our approach, we consider a sequence of continuously accessed pages of the same file from the same device as a single unit, a \textit{block} of data. The information of a single page in a sequence is representative for other pages the a sequence since they have the same properties including file name, last accessed, dirty or not. Thus, instead of dealing with individual pages, we view a sequence of continuously accessed pages as a block of data. A data block has the information about file name, size, last access and a dirty flag. As a block represents a set of pages in real systems, it can be split if some data needs to be moved between the LRU lists or evicted from cache, but blocks can not be merged as we want to preserve the access times of blocks to maintain the accuracy. 
+			
+			With this data block concept, when a file is accessed by an I/O operation, blocks are added to the top of inactive list if they are not existing in cache, or they are moved to the top of the list that they are kept in with last accesses updated. The lists are balanced after every time the simulator finishes reading or writing a portion of data from/to cache or disk.
+			
+			To simulate flushing and periodical flushing mechanisms, in which dirty data in cache is written to disk, we simply calculate the amount of flushed dirty data. Data flushing is called when the memory required by the application is more than available memory, while periodical flushing is called during CPU time. In flushing, the amount of dirty data to be flushed is calculated based on the amount of required memory, while the flushed amount in periodical flushing is estimated with CPU time. Initially, the blocks in inactive list are flushed first, and the next are dirty blocks in the active list, until the total flushed amount is reached. The flushed blocks are split if needed and become not dirty. The blocks in the inactive list which are not dirty are available for cache eviction. 
+			
+			Similar to flushing and periodical flushing, the amount of evicted data is calculated based on the the amount of memory required by application and the amount of free memory. Then, evicted blocks are deleted from inactive list, and the lists are balanced.
+			
 		\subsection{Implementation}
 			\begin{itemize}
 				\item Which features of memory are implemented.
@@ -58,7 +61,7 @@
 			For each experiment: 
 			\begin{itemize}
 				\item Describe data, workflow, number of tasks, task details, environment of each experiment.
-				\item Compare the results from real pipeline, baseline SimGrid  and SimGrid with our extension.
+				\item How we compare the results from real pipeline, baseline SimGrid  and SimGrid with our extension.
 			\end{itemize}
 	
 			\subsubsection{Expriment 1}
