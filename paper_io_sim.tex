@@ -162,7 +162,7 @@
    					\Output
 						\Desc{rt}{simulated run time after the file is read}
    					\EndOutput
-					\State mem\_required = max(0, 2*fs - mm.cached\_data(fn) - 
+					\State mem\_required = max(0, 2 * fs - mm.cached\_data(fn) - 
 					mm.available\_memory()) 
 					\State mem\_avail = max(0, 2 * fs - mm.cached\_data(fn) - 
 					mm.dirty\_data())
@@ -311,7 +311,7 @@
 			the input as the amount of flushed data and the returned value is the 
 			simulated flushing time. To flush dirty data, IOController simply 
 			traverses the sorted inactive and active list, reduces the dirty data 
-			amount by unmarking dirty blocks until the flushed amount reached 
+			amount by turning off dirty flags until the flushed amount reached 
 			the amount passed in or there is no dirty data left in cache. 
 			Similarly, periodical flushing is the function that simulates data flushing 
 			during CPU time and cache read. However, the flushed data amount is 
