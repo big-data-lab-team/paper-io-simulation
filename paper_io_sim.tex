@@ -63,7 +63,7 @@
 			\end{itemize}
 			
 	\section{Method}
-		In this section, we discuss our approach to model page cache and
+		In this section, we present our approach to model page cache and
 		the cache eviction strategy implemented in Linux. We also detail
 		the design the simulators in order to generalize page cache as well
 		as the implementation in Python and SimGrid framework. Finally, we
@@ -83,15 +83,23 @@
 			dirty data, based on which the kernel controls I/O activities. Therefore, 
 			the idea of our simulator is to simulate the memory, the Linux 
 			page cache with its LRU lists, storage device and imitate the data flushing 
-			and cache eviction algorithm implemented in the kernel. 
+			and cache eviction algorithm implemented in the kernel. \tristan{This paragraph is convoluted, it needs to be rewritten with a straightforward logic.}
 			
 			At the level of detail in our simulator, the simulation models of memory 
 			and storage devices are straightforward when they can be modeled with 
-			predefined capacity and bandwidth. To simulate the cache eviction mechanism 
-			implemented in Linux, our simulator also keeps tracks of page cache 
-			LRU lists as in the kernel. However, instead of dealing with lists pages, we 
+			predefined capacity and bandwidth \tristan{Do you mean ``We
+			model memory as a storage device, with a capacity and a
+			bandwidth''? If that's the case, write this sentence like this,
+			it's more direct and less ambiguous. You should also explain
+			how you calculate read/write time from the bandwidth. And does
+			your model distinguish read and write bandwidths? I think the
+			memory model is one paragraph, not just one sentence in a
+			paragraph that then talks about other things}. To simulate the
+			cache eviction mechanism implemented in Linux, our simulator
+			also keeps tracks of page cache LRU lists as in the kernel.
+			However, instead of dealing with lists pages \tristan{as done by the kernel?}, we 
 			consider a sequence of continuously accessed pages of a file as a single 
-			unit, a block of data. A data block keeps the information about file name, 
+			unit, a block of data \tristan{so is a data block a set of pages? The definition of a data block is unclear.}. A data block keeps the information about file name, 
 			block size, last access and a dirty flag describing whether the data is 
 			dirty or not. 
 			
@@ -111,7 +119,7 @@
 			
 			Having these simulation components, we can generalize I/O activities in
 			our simulator. When the kernel reads and writes data, it simply 
-			reads/writes data from/to disk or cache with predefined disk bandwidth 
+			reads/writes data \tristan{do you mean data blocks?} from/to disk or cache with predefined disk bandwidth 
 			or memory bandwidth. The data blocks are added or updated in page cache 
 			LRU lists accordingly. In flushing and periodical flushing, the kernel 
 			traverses through the inactive and active lists to reduce the amount of 
@@ -126,29 +134,29 @@
 			\end{figure}			
 			
 			We encapsulate our simulation components with kernel-like functionalities 
-			into a layer between user simulated application and storage simulation 
-			component (Figure~\ref{fig:interaction}). Our new layer includes two main
-			classes, the \textbf{\textit{IOController}}, which models the kernel 
-			I/O controlling logic, and the \textbf{\textit{MemoryManager}}, which 
+			into a layer between the simulated application and the simulated storage (Figure~\ref{fig:interaction}). Our new layer includes two main
+			classes, the \emph{IOController}, which models the kernel 
+			I/O controlling logic, and the \emph{MemoryManager}, which 
 			manages page cache LRU lists and stores all necessary information about 
-			memory including capacity, amount of cache, amount of memory used 
-			by applications. Because every node has its own memory, storage devices 
-			and system configurations, there is one IOController object and one 
-			MemoryManager object created for each node. The IOController class 
-			keeps system parameters (dirty{\_}ratio, dirty{\_}background{\_}ratio), 
+			memory including total capacity, current cache size, and current amount of memory used 
+			by applications \tristan{is it exhaustive?}. Because every node has its own memory, storage devices 
+			and system configurations, one IOController object and one 
+			MemoryManager object are created for each node. The IOController class 
+			stores system parameters (dirty{\_}ratio, dirty{\_}background{\_}ratio), 
 			implements necessary I/O control functionalities such as read, write,
-			flushing, and cache evicting. 
+			flushing, and cache eviction. 
 
-			With this layer, user simulated applications send requests to an 
-			IOController of the node where requested data is stored, instead of 
-			sending read/write requests directly to storage model as in simulators 
-			with the current SimGrid version. Based on the memory status in 
+			Simulated applications send requests to an IOController of the
+			node where the requested data is stored, instead of sending
+			read/write requests directly to storage model as in the current
+			SimGrid version. Based on the memory status in 
 			MemoryManager, the IOController orchestrates cache read/write, 
 			disk read/write, flushing and cache eviction to fulfill application 
 			requests. The time for each action is estimated and the total time of 
-			a request is returned to user applications.
+			a request is returned to application.
 			
-			\begin{algorithm}\caption{Read}\label{alg:read}
+			\begin{algorithm}\caption{Read \tristan{Find a more descriptive title. Lines 10, 11 and 13 should fit on a single line. Suggestion: replace cached\_data with cached, available\_memory with avail.
+				Add comments in the code. Line 23: should it be in an else clause? } }\label{alg:read}
 				\small
 				\begin{algorithmic}[1]
 					\Input
@@ -185,13 +193,13 @@
     					\State rt = rt + (fs - mm.cache\_data(fn)) / $r_d$
 					\EndIf					
 					
-					\Return rt
+					\State \Return rt
 					
 				\end{algorithmic}
 			\end{algorithm}			
 			
-			The algorithm to generalize file read is described in 
-			\textit{Algorithm~\ref{alg:read}}. In Linux systems, data can be read in 
+			The algorithm to generalize \tristan{``generalize'' isn't a great word here, I'd simply say ``simulate''} file reads is described in 
+			Algorithm~\ref{alg:read}. In Linux systems, data can be read in 
 			two ways, read from cache with memory bandwidth and read from disk 
 			with disk bandwidth. Because total read time can be seen as a 
 			linear function of the read time in each of these two modes, 
@@ -203,7 +211,8 @@
 			file data cached (line 10). If there is not enough available memory, 
 			dirty data is flushed to disk to make more memory available by calling flush
 			function with the amount of memory needed as the parameter (line 11-12).
-			IOController then evicts old blocks from the inactive list to
+			IOController then evicts old blocks \tristan{I don't see blocks being handled in this algo. It adds to the confusion related to the 
+			lack of a proper definition of blocks.} from the inactive list to
 			accommodate the requested file and flushing time is simulated (line 13-14). 
 			After that, IOController starts estimating file read time by first checking 
 			if a some file data is cached (line 15). If there is cached data, 
@@ -217,7 +226,7 @@
 			and added to the inactive list, disk read time is estimated with disk read 
 			bandwidth and added to total run time (line 23-27). 
 
-			\textit{Algorithm~\ref{alg:write}} describes our
+			Algorithm~\ref{alg:write} describes our
 			generalization of file write. Similar to the file read process,
 			a file can also be written with two different bandwidths,
 			memory bandwidth and disk bandwidth, and thus file write can be
