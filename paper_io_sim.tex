@@ -20,7 +20,7 @@
 \begin{document}
 \title{I/O simulation model with Linux page cache, integration and evaluation in SimGrid framework}
 
-\author{\IEEEauthorblockN{Hoang-Dung Do, Tristan Glatard and Val\'erie Hayot-Sasson
+\author{\IEEEauthorblockN{Hoang-Dung Do, Val\'erie Hayot-Sasson, Tristan Glatard
   }\\
   \IEEEauthorblockA{
     Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada
@@ -227,7 +227,7 @@
 				\begin{algorithmic}[1]
 					\Input
         				\Desc{fn}{file name}
-        				\Desc{fs}{file size}
+        				\Desc{fs}{file size (assumed to fit in memory)}
 						\Desc{rt}{current simulated run time}
 						\Desc{mm}{MemoryManager object}
 						\Desc{$r_m$}{memory read bandwidth}
@@ -236,18 +236,11 @@
    					\Output
 						\Desc{rt}{simulated run time after the file is read}
    					\EndOutput
-					\State req = max(0, 2 * fs - mm.cached(fn) - mm.avail\_mem) 
-					\State avail = max(0, 2 * fs - mm.cached(fn) - mm.dirty)
-					\State rt = rt + mm.flush(req - avail)	
-					\State req = max(0, 2 * fs - mm.cached(fn) - mm.free\_mem)
-					\State mm.evict(req) 
+					\State rt = rt + mm.flush(2*fs - mm.cached(fn) - mm.avail\_mem)
+					\State mm.evict(2*fs - mm.cached(fn) - mm.free\_mem) 
 					\If {mm.cached(fn) $>$ 0}  \Comment{Read file cached data}
     					\State mm.cache\_read(fn) 
-						\If {mm.cached(fn) == fs} \Comment{If all file data is cached}
-    						\State time = mm.cached(fn) / $r_m$
-    						\State mm.periodic\_flush(time) 
-							\State rt = rt + time
-						\EndIf
+						\State rt = rt + mm.cached(fn) / $r_m$
 					\EndIf
 					\If {mm.cached(fn) $<$ fs} \Comment{Read uncached data from disk}
 						\State mm.disk\_read(fs - mm.cached(fn), fn)
