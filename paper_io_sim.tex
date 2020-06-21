@@ -197,10 +197,11 @@
 			\end{itemize}		
 			
 			For periodical flushing, our simulator searches in two page cache 
-			LRU lists and flushes all the expired dirty data block. 
+			LRU lists and flushes all the expired dirty data blocks. 
 			A dirty data block is considered expired if the time from its last access 
 			to current simulated time is longer than the predefined expire time. 
-			Then the flushing time is calculated with total amount of flushed data.
+			The flushing time is calculated by storage simulation model with 
+			total amount of flushed data.
 				
 			Similarly to data flushing, our cache eviction simulation function frees up 
 			the page cache by traversing and deleting least recently used clean 
@@ -269,10 +270,10 @@
 			of the read time with each of these bandwidths, 
 			enabling us to generalize reading process as two separate phases, 
 			cache read and disk read. 
-			In our simulator, when a user simulated application reads a file, 
+			When a user simulated application reads a file, 
 			it sends a file read request to IOController. 
-			First, dirty data is flushed to disk if needed to make the amount of 
-			available memory enough to read the file.
+			First, dirty data is flushed to disk to make more available memory 
+			to read the file if needed.
 			Data flushing function in MemoryManager is called, flushing time is 
 			simulated and added to total run time (line 10).
 			After data is flushed, MemoryManager is asked to evict data 
@@ -281,8 +282,8 @@
 			called to re-access and update this cached data (line 13). 
 			Then, periodical flushing is called to flushed expired dirty data 
 			from cache (line 14).
-			Since periodical flushing and cache read can be concurrent, the longer 
-			time is added to simulated run time (line 15).
+			Since periodical flushing and cache read can be concurrent, the time of 
+			the longer activity between them is added to simulated run time (line 15). 
 			If file is not cached or partially cached, a disk read is required (line 17). 
 			Periodical flushing is called once again, but this time the flushing time is 
 			added to total simulated time since flushing and disk read are time-shared, 
@@ -332,10 +333,10 @@
 			two different bandwidths, memory bandwidth and disk bandwidth. 
 			Files can be written with memory bandwidth before the amount 
 			of dirty data reaches dirty\_ratio. Thus, our algorithm initially checks 
-			the amount of data that can be written with memory write 
+			the amount of file data that can be written with memory write 
 			bandwidth (line 11-12).
 			If this amount is greater than 0, MemoryManager is asked to evict 
-			data from cache if needed and write this amount of data to cache 
+			data from cache if needed and to write this amount of data to cache 
 			(line 14-15).
 			The simulated run time can be added with the longer time of cache write 
 			time and periodical flushing time because these can happen 
