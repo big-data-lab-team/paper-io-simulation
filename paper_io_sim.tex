@@ -77,9 +77,28 @@
 			In our I/O simulation model, we try to simulate the write back page cache 
 			mechanisms including memory I/O, cache eviction and data flushing as we 
 			believe that they are the most important factors that affect the I/O time. 
+			We separate our model into components and encapsulate them in a 
+			kernel-like layer described in Figure~\ref{fig:interaction}. 
+			This layer consists of two main classes, MemoryManager and IOManager.
+			MemoryManager is responsible for memory simulation, which includes 
+			memory I/O, flushing, cache eviction, and exposed its functions 
+			to IOManager. The IOController class models higher abstraction with the 
+			simulation of file read and file write.
+			With this layer, simulated applications can simply request for 
+			file reads and file writes by calling functions of IOManager class 
+			instead of calling directly to storage simulation models.
 
-			Memory is modeled with capacity, read bandwidth and write 
-			bandwidth. When data is read from or written to memory, the actual 
+			\begin{figure}
+   				\centering
+   				\includegraphics[width=0.85\columnwidth]{figures/interaction.pdf}
+   				\caption{The additional layer between user application layer and 
+   				storage simulation models}\label{fig:interaction}
+			\end{figure}	
+
+			\subsubsection{Memory simulation model}
+
+			We model memory with capacity, read bandwidth and write bandwidth. 
+			When data is read from or written to memory, the actual 
 			read/write time is calculated with the amount of data and memory 
 			read/write bandwidth:
 			
@@ -177,13 +196,16 @@
 				\item $w_d$ is the disk write bandwidth
 			\end{itemize}		
 			
-			For periodical flushing, because dirty data can be flushed during CPU time 
-			or cache read with disk write bandwidth, the amount of flushed data is 
-			calculated with disk bandwidth and flushing duration.
+			For periodical flushing, our simulator searches in two page cache 
+			LRU lists and flushes all the expired dirty data blocks. 
+			A dirty data block is considered expired if the time from its last access 
+			to current simulated time is longer than the predefined expire time. 
+			The flushing time is calculated by storage simulation model with 
+			total amount of flushed data.
 				
-			Similarly, our cache eviction simulation function frees up the page cache 
-			by traversing and deleting least recently used clean data blocks 
-			in the inactive list.
+			Similarly to data flushing, our cache eviction simulation function frees up 
+			the page cache by traversing and deleting least recently used clean 
+			data blocks in the inactive list.
 			The amount of evicted data is passed in and data blocks are deleted 
 			from the inactive list until total evicted data reaches the amount 
 			passed in, or there is no clean block left in the list.
@@ -192,15 +214,8 @@
 			Our cache eviction simulation does not add up to the simulated time 
 			since cache eviction time is negligible in real systems.			
 			
-			We encapsulate the models of memory and page cache LRU lists in 
-			\textit{MemoryManager} class. 
-			The functionalities of this class are exposed to the simulation  
-			of I/O activities including file read and file write. 
-			We create \textit{IOController} class which simulates file read and 
-			file write by interacting with the MemoryManager class, 
-			exposing APIs to user simulated applications. 
-			These two class act as an extra layer with kernel-like functionalities as 
-			illustrated in Figure~\ref{fig:interaction}. 
+			\subsubsection{File I/O simulation model}			
+			
 			Simulated applications can simply request for a file read 
 			or file write by calling the APIs of this layer instead of 
 			calling directly to storage simulation models.
@@ -208,13 +223,6 @@
 			one IOController object and one MemoryManager object are created 
 			for each simulated machine.
 			
-			\begin{figure}
-   				\centering
-   				\includegraphics[width=0.85\columnwidth]{figures/interaction.pdf}
-   				\caption{The additional layer between user application layer and 
-   				storage simulation models}\label{fig:interaction}
-			\end{figure}				
-
 			To read or write a file, a simulated application sends a request to the 
 			IOController instance on the node where the requested file is stored.
 			Based on the memory status in MemoryManager, the IOController 
@@ -230,21 +238,23 @@
         				\Desc{fs}{file size (assumed to fit in memory)}
 						\Desc{rt}{current simulated run time}
 						\Desc{mm}{MemoryManager object}
-						\Desc{$r_m$}{memory read bandwidth}
-						\Desc{$r_d$}{disk read bandwidth}
+						\Desc{rm}{memory read bandwidth}
+						\Desc{sm}{storage simulation model}
    					\EndInput
    					\Output
 						\Desc{rt}{simulated run time after the file is read}
    					\EndOutput
-					\State rt = rt + mm.flush(2*fs - mm.cached(fn) - mm.avail\_mem)
+					\State rt = rt + mm.flush(2*fs - mm.cached(fn) - mm.evictable\_mem) 
 					\State mm.evict(2*fs - mm.cached(fn) - mm.free\_mem) 
 					\If {mm.cached(fn) $>$ 0}  \Comment{Read file cached data}
-    					\State mm.cache\_read(fn) 
-						\State rt = rt + mm.cached(fn) / $r_m$
+    					\State mm.cache\_read(fn)  \Comment{Update blocks in LRU lists}
+    					\State pft = mm.periodic\_flush(rt) \Comment{Periodical flushing time}
+						\State rt = rt + max(mm.cached(fn) / rm, pft) \Comment{Add the longer}
 					\EndIf
 					\If {mm.cached(fn) $<$ fs} \Comment{Read uncached data from disk}
+						\State rt = rt + mm.periodic\_flush(rt) \Comment{Another flushing interval}
 						\State mm.disk\_read(fs - mm.cached(fn), fn)
-    					\State rt = rt + (fs - mm.cached(fn)) / $r_d$
+    					\State rt = rt + sm.read(fs - mm.cached(fn))
 					\EndIf					
 					
 					\State \Return rt
@@ -260,27 +270,27 @@
 			of the read time with each of these bandwidths, 
 			enabling us to generalize reading process as two separate phases, 
 			cache read and disk read. 
-			In our simulator, when a user simulated application reads a file, 
+			When a user simulated application reads a file, 
 			it sends a file read request to IOController. 
-			Then, IOController calculates the amount of required memory to read 
-			the file based on the amount of available memory, file size, and 
-			the amount of cached data of that file (line 10). 
-			If there is not enough available memory, dirty data is flushed to disk 
-			to increase the amount of memory available by calling flush function 
-			of MemoryManager with the amount of flushed data, flushing time is 
-			simulated and added to total run time (line 11-12).
+			First, dirty data is flushed to disk to make more available memory 
+			to read the file if needed.
+			Data flushing function in MemoryManager is called, flushing time is 
+			simulated and added to total run time (line 10).
 			After data is flushed, MemoryManager is asked to evict data 
-			from cache to accommodate the requested file (line 13-14). 
+			from cache to accommodate the requested file (line 11). 
 			Next, if file is cached either partially or entirely, MemoryManager is 
-			called to re-access and update this cached data (line 16). 
-			If all file data is cached, periodical flushing is called is to flush 
-			dirty data during the cache read, and time to read from cache is added to 
-			total run time, (line 18-20). 
-			If file is not cached or partially cached, a disk read is required (line 23) 
-			This blocks flushing and makes the cache read time neglectable. 
-			Finally, data is read from disk to cache and managed 
-			by MemoryManager, disk read time is estimated with disk read 
-			bandwidth and added to total run time (line 24-25). 
+			called to re-access and update this cached data (line 13). 
+			Then, periodical flushing is called to flushed expired dirty data 
+			from cache (line 14).
+			Since periodical flushing and cache read can be concurrent, the time of 
+			the longer activity between them is added to simulated run time (line 15). 
+			If file is not cached or partially cached, a disk read is required (line 17). 
+			Periodical flushing is called once again, but this time the flushing time is 
+			added to total simulated time since flushing and disk read are time-shared, 
+			or sequential in other words (line 18).
+			Finally, data is read from disk to cache and managed by MemoryManager, 
+			disk read time estimated by the storage model is added to 
+			total simulated run time (line 19-20). 
 
 			\begin{algorithm}\caption{File write simulation}\label{alg:write}
 				\small
@@ -290,92 +300,60 @@
         				\Desc{fs}{file size}
 						\Desc{rt}{current simulated run time}
 						\Desc{mm}{MemoryManager object}
-						\Desc{$w_m$}{memory write bandwidth}
-						\Desc{$w_d$}{disk write bandwidth}
+						\Desc{wm}{memory write bandwidth}
+						\Desc{sm}{storage simulation model}
    					\EndInput
    					\Output
 						\Desc{rt}{simulated run time after the file is read}
    					\EndOutput
-					\State dirty\_left = $d$ * mm.avail\_mem - mm.dirty
-					\If {dirty\_left $>$ 0}
-   						\State free\_amt = min(fs, $M$) \Comment{$M$ in Equation
-   						~\ref{equa:freeamt}}
-    					\State mm.evict(free\_amt - mm.free\_mem)
-    					\State free\_time = free\_amt / $w_m$
-    					\State mm.write(fn, free\_amt, dirty = free\_amt - free\_time * $w_d$)
-   						\State rt = rt + free\_time
+   					\State pft = mm.periodic\_flush(rt)
+					\State remain\_dirty = dirty\_ratio * mm.avail\_mem - mm.dirty
+					\State mem\_amt = min(fs, remain\_dirty)
+					\If {remain\_dirty $>$ 0} \Comment{Write with memory bandwidth}
+    					\State mm.evict(mem\_amt - mm.free\_mem)
+    					\State mm.write(fn, mem\_amt)
     				\EndIf
-					
-					\If {free\_amt $\geq$ fs}
-						\Return rt
+    				\State rt = rt + max(mem\_amt / wm, pft) \Comment{Concurrent processes}
+					\If {mem\_amt $<$ fs}  \Comment{Write with disk bandwidth}
+						\State mm.flushed(fs - mem\_amt)  \Comment{Concurrent flushing}
+						\State mm.evict(fs - mem\_amt  - mm.free\_mem) 
+						\State mm.write(fn, min(fs - mem\_amt, mm.free\_mem))
+						\State rt = rt + sm.write(fs - mem\_amt)
 					\EndIf
-
-					\State throttled\_amt = fs - free\_amt \Comment{Written with disk bandwidth}
-					\State req = max(0, throttled\_amt  - mm.free\_mem)
-					\State evicted\_amt = min(req, mm.evictable)
-					\State mm.evict(evicted\_amt)
-					\State cached\_amt = min(mm.free\_mem, throttled\_amt)
-					\State mm.write(fn, cached = cached\_amt, dirty = 0)
-					\State rt = rt + throttled\_amt /$w_d$
-
+					
 					\Return rt
 					
 				\end{algorithmic}
 			\end{algorithm}
 
 			Algorithm~\ref{alg:write} describes our simulation of file write. 
+			Initially, periodical flushing is called to flush expired dirty data 
+			at the beginning of the write (line 10).
 			Similar to the file read simulation, a file can also be written with 
 			two different bandwidths, memory bandwidth and disk bandwidth. 
 			Files can be written with memory bandwidth before the amount 
 			of dirty data reaches dirty\_ratio. Thus, our algorithm initially checks 
-			this condition (line 10), and estimates the maximum amount 
-			of data can be written with memory bandwidth with the following 
-			formula:
-			
-			\begin{equation}
-				M = max(0, \frac{(d*C - D)*w_m}{w_m - w_d})\label{equa:freeamt}
-			\end{equation}			 			
-
-			where:
-			\begin{itemize}
-				\item $M$ is the maximum amount of data that can be written with memory 
-				write bandwidth
-				\item $d$ is dirty ratio
-				\item $C$ is the total available memory
-				\item $D$ is the amount of dirty data
-				\item $w_m$ is the memory write bandwidth 
-				\item $w_d$ is the disk write bandwidth			
-			\end{itemize}
-			
-			In this formula, we assume that data is written with with memory 
-			bandwidth until dirty\_ratio is reached, the kernel writes data 
-			to cache and flushes dirty data to disk concurrently. 
-			If file size is smaller than or equal to $M$, the whole file is 
-			written to cache as dirty data with memory bandwidth (line 12). 
-			Otherwise, the remaining file data is written with disk bandwidth (line 20). 
-			Before simulating cache write, MemoryManager is asked to evict 
-			the page cache to accommodate written data (line 13). 
-			Then, data is written to cache as dirty data with memory 
-			bandwidth, and write time is added to total simulated time (line 14-16). 
-			Because cache write and data flushing are concurrent in our algorithm, 
-			the actual amount of written dirty data reduces by the amount 
-			of data during cache write time (line 15). 
-			If not all data is written with memory write bandwidth, the remaining data 
-			is written with disk write bandwidth. This can simulate both cases that 
-			data is written directly to disk, or applications wait for dirty data 
-			to be flushed, and evicted to write new data. 
-			If the amount of free memory is not enough for the remaining file data, 
-			evictable memory is evicted (line 20-23). 
-			Here, the simulator does not guarantee that the amount of free memory 
-			after eviction can accommodate the remaining data. 
-			In the case that free memory is less than remaining data, the amount to be 
-			cached is limited by the amount of free memory (line 24). 
-			However, the kernel still flushes, evicts and writes new data concurrently, 
-			and remaining data is still written to cache with disk write bandwidth.
-			Thus, we can simulate the time to write the remaining data with 
-			disk bandwidth and ask MemoryManager to add clean cached data (line 25). 
-			The simulated time to write width disk bandwidth is added to total 
-			simulated run time and returned to simulated applications (line 26).	
+			the amount of file data that can be written with memory write 
+			bandwidth (line 11-12).
+			If this amount is greater than 0, MemoryManager is asked to evict 
+			data from cache if needed and to write this amount of data to cache 
+			(line 14-15).
+			The simulated run time can be added with the longer time of cache write 
+			time and periodical flushing time because these can happen 
+			concurrently (line 17).
+			The amount of data that is not written with memory bandwidth is written 
+			with disk bandwidth (line 18). 
+			Now, the dirty ratio threshold is reached, we have to flush and evict 
+			data from cache as much as possible so that 
+			the remaining data can be written to cache (line 19-20). 
+			Here, MemoryManager does not guarantee that the amount of flushed 
+			and evicted data is enough for the remaining data. In the case it is 
+			less than the required amount, the remaining data is written to cache 
+			but then can be flushed and evicted right away. Thus, the amount 
+			of remaining data that is written and kept in cache after the write 
+			is limited by the amount free memory (line 21). 
+			Finally, the write time is simulated, added to the total time and 
+			returned to simulated applications (line 22).
 			
 		\subsection{Implementation}
 
