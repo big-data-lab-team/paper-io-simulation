@@ -65,39 +65,34 @@
 	\section{Method}
 		In this section, we present our approach to model file read/write, 
 		I/O in memory, data flushing and cache eviction mechanisms 
-		implemented in Linux. 
+		implemented in the Linux kernel. 
 		We also detail the design the simulators in order to simulate I/O activities 
-		and the implementation in Python and SimGrid framework. 
-		Finally, we describe some experimental scenarios to evaluate our model 
-		with a Python simulator, a baseline SimGrid simulator, a simulator 
-		with SimGrid integrated with our model, and the results from real pipelines.
+		and the implementation in Python and SimGrid framework \tristan{check grammar}. 
+		Finally, we describe experimental scenarios to evaluate our model using real applications and
+		a Python simulator prototype, the current SimGrid simulator, our extension of SimGrid, and the results from real pipelines.
 
 		\subsection{Principle of the simulator}
 	
-			In our I/O simulation model, we try to simulate the write back page cache 
-			mechanisms including memory I/O, cache eviction and data flushing as we 
-			believe that they are the most important factors that affect the I/O time. 
-			We separate our model into components and encapsulate them in a 
-			kernel-like layer described in Figure~\ref{fig:interaction}. 
-			This layer consists of two main classes, MemoryManager and IOManager.
-			MemoryManager is responsible for memory simulation, which includes 
-			memory I/O, flushing, cache eviction, and exposed its functions 
-			to IOManager. The IOController class models higher abstraction with the 
-			simulation of file read and file write.
-			With this layer, simulated applications can simply request for 
-			file reads and file writes by calling functions of IOManager class 
-			instead of calling directly to storage simulation models.
+			Our simulation model simulates the main mechanisms of the
+			write-back page cache including memory I/O, cache eviction and
+			data flushing. We separate our model in two components, the IO
+			Controller and the Memory Manager, which together simulate I/O
+			in the Linux kernel (Figure~\ref{fig:interaction}). The Memory
+			Manager simulates memory I/O, flushing, and cache eviction, whereas the
+			IO Controller simulates file read and file write.
+			Simulated applications can simply request
+			file reads and file writes from the IO Manager
+			instead of calling simulated storage directly.
 
 			\begin{figure}
    				\centering
    				\includegraphics[width=0.85\columnwidth]{figures/interaction.pdf}
-   				\caption{The additional layer between user application layer and 
-   				storage simulation models}\label{fig:interaction}
+   				\caption{Overview of the simulated write-back page cache}\label{fig:interaction}
 			\end{figure}	
 
 			\subsubsection{Memory simulation model}
 
-			We model memory with capacity, read bandwidth and write bandwidth. 
+			We model memory with a capacity, a read bandwidth and a write bandwidth. 
 			When data is read from or written to memory, the actual 
 			read/write time is calculated with the amount of data and memory 
 			read/write bandwidth:
@@ -109,13 +104,17 @@
 			
 			where:
 			\begin{itemize}
-				\item $t_{mr}$ is time to read data from memory
-				\item $t_{mw}$ is time to write data to memory
+				\item $t_{mr}$ is the time to read data from memory
+				\item $t_{mw}$ is the time to write data to memory
 				\item $D$ is the amount of data to read/write
-				\item $r_m$ is memory read bandwidth
-				\item $w_m$ is memory write bandwidth
+				\item $r_m$ is the memory read bandwidth
+				\item $w_m$ is the  memory write bandwidth
 			\end{itemize}						
-			
+
+			\tristan{how about parallel accesses to memory? I think it would be a motivation to simualte memory as a storage device, 
+			and leverage existing bandwidth sharing mechanisms in SimGrid. You could updated Fig 1 to include memory in the storage devices, and 
+			explain in your Python simulator implementation that only a simplistic model of storage device is used (for both disk and memory).}
+
 			We introduce the concept of data block as a unit to represent cached data. 
 			A data block is a subset of pages of a file in page cache that is accessed 
 			at a specific time. Therefore, a block has the information about file name, 
