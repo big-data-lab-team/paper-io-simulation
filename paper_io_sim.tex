@@ -194,6 +194,7 @@
 				\item $A$ is the amount of data to be flushed
 				\item $w_d$ is the disk write bandwidth
 			\end{itemize}		
+			\TG{This is specific to the disk model, your simulator should be independent of it}
 			
 			For periodical flushing, our simulator searches in two page cache 
 			LRU lists and flushes all the expired dirty data blocks. 
