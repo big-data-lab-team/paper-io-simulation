@@ -66,10 +66,11 @@
 		In this section, we present our approach to model file read/write, 
 		I/O in memory, data flushing and cache eviction mechanisms 
 		implemented in the Linux kernel. 
-		We also detail the design the simulators in order to simulate I/O activities 
-		and the implementation in Python and SimGrid framework \tristan{check grammar}. 
-		Finally, we describe experimental scenarios to evaluate our model using real applications and
-		a Python simulator prototype, the current SimGrid simulator, our extension of SimGrid, and the results from real pipelines.
+		We also detail the design of the simulators in order to simulate 
+		I/O activities and the implementation in Python and SimGrid framework. 
+		Finally, we describe experimental scenarios to evaluate our model using 
+		real applications and a Python simulator prototype, the current SimGrid 
+		simulator, our extension of SimGrid, and the results from real pipelines.
 
 		\subsection{Principle of the simulator}
 	
@@ -91,29 +92,13 @@
 			\end{figure}	
 
 			\subsubsection{Memory simulation model}
-
-			We model memory with a capacity, a read bandwidth and a write bandwidth. 
-			When data is read from or written to memory, the actual 
-			read/write time is calculated with the amount of data and memory 
-			read/write bandwidth:
 			
-			\begin{align*}
-				& t_{mr} = D / r_m \\ 
-				& t_{mw} = D / w_m\
-			\end{align*}		
-			
-			where:
-			\begin{itemize}
-				\item $t_{mr}$ is the time to read data from memory
-				\item $t_{mw}$ is the time to write data to memory
-				\item $D$ is the amount of data to read/write
-				\item $r_m$ is the memory read bandwidth
-				\item $w_m$ is the  memory write bandwidth
-			\end{itemize}						
-
-			\tristan{how about parallel accesses to memory? I think it would be a motivation to simualte memory as a storage device, 
-			and leverage existing bandwidth sharing mechanisms in SimGrid. You could updated Fig 1 to include memory in the storage devices, and 
-			explain in your Python simulator implementation that only a simplistic model of storage device is used (for both disk and memory).}
+			Memory can be characterized with a capacity, read bandwidth and write 
+			bandwidth. However, memory bandwidth is always shared between 
+			concurrent processes and implementing a simulation model of concurrent 
+			accesses to memory is non-trivial. Thus, we leverage existing storage 
+			models, which handle parallel storage accesses, in some simulation 
+			frameworks to simulate I/O time in memory.						
 
 			We introduce the concept of data block as a unit to represent cached data. 
 			A data block is a subset of pages of a file in page cache that is accessed 
@@ -182,26 +167,19 @@
 			reaches the amount to be flushed or there is no dirty data left in cache. 
 			If the last flushed block is not entirely flushed, it is split into 
 			two blocks, one is flushed and one remains dirty.
-			The flushing time is calculated as:
-					
-			\begin{align*}
-				t_f = A / w_d
-			\end{align*}		
-			
-			where:
-			\begin{itemize}
-				\item $t_f$ is the flushing time
-				\item $A$ is the amount of data to be flushed
-				\item $w_d$ is the disk write bandwidth
-			\end{itemize}		
-			\TG{This is specific to the disk model, your simulator should be independent of it}
+			The flushing time is simulated with storage model.
 			
 			For periodical flushing, our simulator searches in two page cache 
 			LRU lists and flushes all the expired dirty data blocks. 
 			A dirty data block is considered expired if the time from its last access 
 			to current simulated time is longer than the predefined expire time. 
-			The flushing time is calculated by storage simulation model with 
-			total amount of flushed data.
+			Periodical flushing can be concurrent with cache read/write, 
+			and sequential with disk read/write. When cache accesses and 
+			periodical flushing are concurrent, flushing time is not added to simulated 
+			time but the amount of flushed data is limited by flushing time. 
+			When data is flushed in parallel with disk read/write, flushing time is 
+			calculated by storage simulation model and total amount of data 
+			to be flushed.
 				
 			Similarly to data flushing, our cache eviction simulation function frees up 
 			the page cache by traversing and deleting least recently used clean 
@@ -247,12 +225,12 @@
 					\State rt = rt + mm.flush(2*fs - mm.cached(fn) - mm.evictable\_mem) 
 					\State mm.evict(2*fs - mm.cached(fn) - mm.free\_mem) 
 					\If {mm.cached(fn) $>$ 0}  \Comment{Read file cached data}
-    					\State mm.cache\_read(fn)  \Comment{Update blocks in LRU lists}
-    					\State pft = mm.periodic\_flush(rt) \Comment{Periodical flushing time}
-						\State rt = rt + max(mm.cached(fn) / rm, pft) \Comment{Add the longer}
+    					\State crt = mm.cache\_read(fn)  \Comment{Read data in cache}
+    					\State mm.periodic\_flush(rt, crt) \Comment{Flush in duration = crt}
+						\State rt = rt + crt
 					\EndIf
 					\If {mm.cached(fn) $<$ fs} \Comment{Read uncached data from disk}
-						\State rt = rt + mm.periodic\_flush(rt) \Comment{Another flushing interval}
+						\State rt = rt + mm.periodic\_flush(rt) \Comment{Sequential flushing}
 						\State mm.disk\_read(fs - mm.cached(fn), fn)
     					\State rt = rt + sm.read(fs - mm.cached(fn))
 					\EndIf					
@@ -280,14 +258,13 @@
 			from cache to accommodate the requested file (line 11). 
 			Next, if file is cached either partially or entirely, MemoryManager is 
 			called to re-access and update this cached data (line 13). 
-			Then, periodical flushing is called to flushed expired dirty data 
-			from cache (line 14).
-			Since periodical flushing and cache read can be concurrent, the time of 
-			the longer activity between them is added to simulated run time (line 15). 
+			During cache read, periodical flushing is called to flush dirty data if needed 
+			and limited to cache read time (line 14).
+			Cache read time is then added to total simulated time (line 15). 
 			If file is not cached or partially cached, a disk read is required (line 17). 
-			Periodical flushing is called once again, but this time the flushing time is 
-			added to total simulated time since flushing and disk read are time-shared, 
-			or sequential in other words (line 18).
+			Periodical flushing is called once again, but not time-limited since 
+			data flushing and disk read are sequential, and the flushing time is 
+			added to simulated time (line 18).
 			Finally, data is read from disk to cache and managed by MemoryManager, 
 			disk read time estimated by the storage model is added to 
 			total simulated run time (line 19-20). 
@@ -311,7 +288,8 @@
 					\State mem\_amt = min(fs, remain\_dirty)
 					\If {remain\_dirty $>$ 0} \Comment{Write with memory bandwidth}
     					\State mm.evict(mem\_amt - mm.free\_mem)
-    					\State mm.write(fn, mem\_amt)
+    					\State mm.periodic\_flush(rt, mm.write\_time(mem\_amt)) 
+    					\State rt = rt + mm.write(fn, mem\_amt)
     				\EndIf
     				\State rt = rt + max(mem\_amt / wm, pft) \Comment{Concurrent processes}
 					\If {mem\_amt $<$ fs}  \Comment{Write with disk bandwidth}
@@ -336,24 +314,24 @@
 			the amount of file data that can be written with memory write 
 			bandwidth (line 11-12).
 			If this amount is greater than 0, MemoryManager is asked to evict 
-			data from cache if needed and to write this amount of data to cache 
-			(line 14-15).
-			The simulated run time can be added with the longer time of cache write 
-			time and periodical flushing time because these can happen 
-			concurrently (line 17).
+			data from cache if needed (line 14).
+			Next, periodical flushing flushes data during cache write because they 
+			can be concurrent (line 15). Then, data is written to cache with memory 
+			bandwidth, write time is simulated and added to total simulated 
+			time (line 16).
 			The amount of data that is not written with memory bandwidth is written 
 			with disk bandwidth (line 18). 
 			Now, the dirty ratio threshold is reached, we have to flush and evict 
 			data from cache as much as possible so that 
-			the remaining data can be written to cache (line 19-20). 
+			the remaining data can be written to cache (line 20-21). 
 			Here, MemoryManager does not guarantee that the amount of flushed 
 			and evicted data is enough for the remaining data. In the case it is 
 			less than the required amount, the remaining data is written to cache 
 			but then can be flushed and evicted right away. Thus, the amount 
 			of remaining data that is written and kept in cache after the write 
-			is limited by the amount free memory (line 21). 
+			is limited by the amount free memory (line 22). 
 			Finally, the write time is simulated, added to the total time and 
-			returned to simulated applications (line 22).
+			returned to simulated applications (line 23).
 			
 		\subsection{Implementation}
 
@@ -361,6 +339,23 @@
 			simulator which is independent to simulation frameworks and libraries. 
 			This enables us to evaluate the accuracy and correctness of our 
 			model in a simple use case before integrating it to SimGrid. 
+			Since the simulator does not use any storage model, we simulate the 
+			I/O time in memory as follow:
+			
+			\begin{align*}
+				& t_{mr} = D / r_m \\ 
+				& t_{mw} = D / w_m\
+			\end{align*}		
+			
+			where:
+			\begin{itemize}
+				\item $t_{mr}$ is the time to read data from memory
+				\item $t_{mw}$ is the time to write data to memory
+				\item $D$ is the amount of data to read/write
+				\item $r_m$ is the memory read bandwidth
+				\item $w_m$ is the  memory write bandwidth
+			\end{itemize}			
+			
 			This simulator simulates a single-threaded pipeline running on a system 
 			with a single core CPU, one local storage device and all input and 
 			output files are stored locally. The results from the simulator is compared 
