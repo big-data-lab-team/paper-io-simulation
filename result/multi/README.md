@@ -1,0 +1,1 @@
+Open file `result.ipynb` with jupyter notebook
