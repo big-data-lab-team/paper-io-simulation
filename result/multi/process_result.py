@@ -17,7 +17,7 @@ def parse_single_pipeline(filename):
     return min(df["read_start"]), max(df["write_end"]), readtime, writetime
 
 
-def aggregate_result(no_pipeline):
+def aggregate_result(dir, no_pipeline):
     """
 
     :param no_pipeline:
@@ -28,7 +28,7 @@ def aggregate_result(no_pipeline):
     readtime = 0
     writetime = 0
     for i in range(no_pipeline):
-        filename = "export/cluster/multi/time/time_pipeline_%d_%d.csv" % (no_pipeline, i + 1)
+        filename = "%s/indv_logs/time_pipeline_%d_%d.csv" % (dir, no_pipeline, i + 1)
         start, end, read, write = parse_single_pipeline(filename)
         makespan += end - start
         readtime += read
@@ -53,8 +53,8 @@ def export_simgrid_result(filename):
             writer.writerow(list(parse_simgrid_result(i + 1)))
 
 
-def parse_simgrid_result(no_pipeline):
-    filename = "simgrid/multi/unified_%d.json" % no_pipeline
+def parse_simgrid_result(dir, no_pipeline):
+    filename = "%s/unified_%d.json" % (dir, no_pipeline)
     with open(filename) as json_file:
         res = json.load(json_file)
         tasks = res["workflow_execution"]["tasks"]
@@ -66,29 +66,28 @@ def parse_simgrid_result(no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-def plot_prop(propname, title, average=False):
-    real_df = pd.read_csv("export/cluster/multi/aggregated_result_real.csv")
-    simgrid_df = pd.read_csv("simgrid/multi/aggregated_result_simgrid.csv")
+# def plot_prop(propname, title, average=False):
+#     real_df = pd.read_csv("real/aggregated_result_real.csv")
+#     simgrid_df = pd.read_csv("simgrid_org/aggregated_result_simgrid.csv")
+#
+#     plt.figure()
+#     plt.title(title)
+#
+#     if average:
+#         plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="real")
+#         plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname] / simgrid_df["no_pipeline"], label="original simgrid")
+#     else:
+#         plt.plot(real_df["no_pipeline"], real_df[propname], label="real")
+#         plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname], label="original simgrid")
+#
+#     plt.xlabel("number of pipelines")
+#     plt.ylabel("time (s)")
+#
+#     plt.legend()
+#     plt.show()
 
-    plt.figure()
-    plt.title(title)
-
-    if average:
-        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="real")
-        plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname] / simgrid_df["no_pipeline"], label="original simgrid")
-    else:
-        plt.plot(real_df["no_pipeline"], real_df[propname], label="real")
-        plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname], label="original simgrid")
-
-    plt.xlabel("number of pipelines")
-    plt.ylabel("time (s)")
-
-    plt.legend()
-    plt.show()
-
-
-plot_prop("makespan", "makespan total")
-plot_prop("readtime", "accumulative read time")
-plot_prop("readtime", "average read time", average=True)
-plot_prop("writetime", "accumulative write time")
-plot_prop("writetime", "average write time", average=True)
+# plot_prop("makespan", "makespan total")
+# plot_prop("readtime", "accumulative read time")
+# plot_prop("readtime", "average read time", average=True)
+# plot_prop("writetime", "accumulative write time")
+# plot_prop("writetime", "average write time", average=True)
