@@ -1,4 +1,4 @@
-import parse_result
+import evaluate
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -32,8 +32,8 @@ def plot_task_error(size):
     sim_py_log = "pysim/%dgb_sim_time.csv" % size
     simgrid_log = "simgrid_org/timestamp_sim_exp1_%dgb.csv" % size
 
-    py_error = parse_result.task_time_error(real_time_log, sim_py_log)
-    simgrid_error = parse_result.task_time_error(real_time_log, simgrid_log)
+    py_error = evaluate.task_time_error(real_time_log, sim_py_log)
+    simgrid_error = evaluate.task_time_error(real_time_log, simgrid_log)
 
     grouped_bar_chart(labels, "Simulation error of tasks with %dGB" % size, "tasks", "error",
                       ("Python", py_error), ("Original SimGrid", simgrid_error))
