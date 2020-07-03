@@ -12,7 +12,7 @@ type inkscape &>/dev/null || die "Cannot find inkscape"
 for i in figures/*.svg
 do
     name=$(basename $i .svg)
-    command="inkscape $i --export-pdf=figures/${name}.pdf"
+    command="inkscape $i -o figures/${name}.pdf"
     echo ${command} 
     ${command} || die "Failed"
 done
