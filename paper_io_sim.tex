@@ -90,28 +90,29 @@
 
 			\subsubsection{Memory simulation model}
 			
-			We model memory as a storage device, characterized with a capacity,
-			a read bandwidth and a write bandwidth in most simulators
-			\tristan{are the read and write bandwidths distinguished in simgrid?
-			we should also talk about latency}. We refer to existing simulation
-			models for storage devices, to simulate bandwidth sharing for
-			parallel accesses \tristan{we should refer to related work, see
-			comment there}.
+			We leverage existing storage simulation models to simulate the memory,
+			which is characterized with capacity, read and write bandwidths. 
+			This can be done when disks are modeled with distinguished read/write 
+			bandwidths and negligible disk latency, which is applicable to memory 
+			\cite{lebre2015}. In addition, leveraging existing disk models allows us 
+			to take advantage of bandwidth sharing between concurrent disk I/O to 
+			simulate parallel memory accesses.\tristan{we should refer to related work, 
+			see comment there}.
 
 			We introduce the concept of a data block as a unit to represent data
 			cached in memory. A data block is a subset of file pages stored in
-			page cache that were accessed in the same read or write
-			operation. A data block
-			has information about file name, block size, last access time, and a
-			dirty flag that represents whether the data is clean (0) or dirty
-			(1). A given file can have multiple data blocks in page cache. In
+			page cache that were accessed in the same read or write operation. 
+			A data block has information about file name, block size, last access 
+			time, and a dirty flag that represents whether the data is clean (0) 
+			or dirty (1). 
+			A given file can have multiple data blocks in page cache. In
 			addition, a data block can be split into an arbitrary number of
 			smaller blocks, and data blocks can be merged together.
-			\tristan{I reformulated this paragraph, please check}
 			
 			We simulate the kernel LRU lists of file pages
 			with two lists of data blocks: an active list and 
-			an inactive list, ordered by last access time (earliest first, see Figure~\ref{fig:lrulist}).
+			an inactive list, ordered by last access time (earliest first, see 
+			Figure~\ref{fig:lrulist}).
 			As in the kernel, our simulator keeps the size of the active list under
 			twice the size of the inactive list by moving least recently 
 			used data blocks from the active list to the inactive list. 
@@ -126,36 +127,34 @@
    				\caption{Simulation of page cache LRU lists with data blocks}\label{fig:lrulist}
 			\end{figure}	
 			
-			
-			\tristan{is this paragraph about read accesses or write accesses? I
-			think you should make one for reads, and one for writes. The
-			paragraph could start as follows: ``The simulated LRU lists are used
-			as follows. When a file is accessed, \ldots ''} At the time when a
-			file is accessed, some data of the file can be in cache or not. If
-			accessed data is already cached, there are existing data blocks
-			representing cached data in two page cache LRU lists. 
-			As cached data is accessed again, these blocks are moved to 
+			The simulated LRU lists are used as follows. When a file is read, 
+			file data can be partially cached, completely cached, or uncached. 
+			For cached data, there are existing data blocks representing 
+			this data in two page cache LRU lists. 
+			As this cached data is accessed again, these blocks are moved to 
 			the active list, dirty blocks are merged into a bigger dirty block, 
 			while clean data blocks are merged into another clean block. 
-			If accessed data is not in cache, new blocks representing uncached data 
-			are created and put into the top of the inactive list. 
-			For more detail when uncached data is accessed, in the case of 
-			reading file, as all uncached data is clean data, only one clean data 
-			block is added to the inactive list.
-			But in the case of writing uncached file data though cache, 
-			this written data can be either dirty or clean. 
-			Thus, at most two data blocks can be added to the inactive lists, 
-			one is clean and one is dirty. 
+			If data read is not in cache, a clean block representing uncached data 
+			is created and put into the top of the inactive list. 
+			
+			In the case of writing data, we can assume that all written data 
+			is uncached. After data is written, some can remain dirty, some is 
+			clean after being flushed. 
+			Thus, at most two data blocks can be added, one is clean and one 
+			is dirty, to the inactive list.
+			
 			We also keep the size of the active list not larger than twice the size of 
-			the inactive list as in the kernel. This is done by moving least recently 
-			used blocks in the active list to the inactive list when the active list 
-			grows. If only a part of a data block needs to be moved, 
-			the block is split.
+			the inactive list as in the kernel 
+			\cite{gorman2004understanding, linuxdev3rd2010}. 
+			This is done by moving least recently used blocks in the active list 
+			to the inactive list when the active list grows. If only a part of a data 
+			block needs to be moved, the block is split.
 
 			Next, we simulate data flushing mechanism, which writes back 
 			dirty data to disk. 
 			The data flushing simulation function traverses the sorted inactive first, 
-			and then the active list, looks for least recently used dirty blocks \tristan{, writes them to disk through the storage device model,} and 
+			and then the active list, looks for least recently used dirty blocks, 
+			writes them to disk through the storage device model, and 
 			sets dirty flags of these blocks to 0 until the total flushed amount 
 			reaches the amount to be flushed or there is no dirty data left in cache. 
 			If the last flushed block is not entirely flushed, it is split into 
@@ -170,10 +169,9 @@
 			and sequential with disk read/write. When cache accesses and 
 			periodical flushing are concurrent, flushing time is not added to simulated 
 			time but the amount of flushed data is limited by flushing time. 
-			When data is flushed in parallel with disk read/write, flushing time is 
-			calculated by storage simulation model and total amount of data 
-			to be flushed \tristan{This concurrency should be handled by the storage model, not the memory manager described here. 
-			Rephrase the last sentences to explain this.}.
+			When data is flushed in parallel with disk accesses, the concurrency 
+			is handled by the storage model used as memory, and flushing time 
+			is simulated with the amount of flushed data by this model. 
 				
 			Similarly to data flushing, our cache eviction simulation function frees up 
 			the page cache by traversing and deleting least recently used clean 
@@ -185,8 +183,6 @@
 			and only one block is deleted.
 			Our cache eviction simulation does not add up to the simulated time 
 			since cache eviction time is negligible in real systems.			
-			
-            \tristan{very good writing Dzung, it reads very well now.}
 
 			\subsubsection{File I/O simulation model}			
 			
@@ -209,61 +205,52 @@
 					\Input
         				\Desc{fn}{file name}
         				\Desc{fs}{file size (assumed to fit in memory)}
-						\Desc{rt}{current simulated run time}
 						\Desc{mm}{MemoryManager object}
-						\Desc{rm}{memory read bandwidth}
 						\Desc{sm}{storage simulation model}
    					\EndInput
-   					\Output
-						\Desc{rt}{simulated run time after the file is read}
-   					\EndOutput
-					\State rt = rt + mm.flush(2*fs - mm.cached(fn) - mm.evictable\_mem) 
+					\State mm.flush(2*fs - mm.cached(fn) - mm.evictable\_mem) 
 					\State mm.evict(2*fs - mm.cached(fn) - mm.free\_mem) 
 					\If {mm.cached(fn) $>$ 0}  \Comment{Read file cached data}
-    					\State crt = mm.cache\_read(fn)  \Comment{Read data in cache}
-    					\State mm.periodic\_flush(rt, crt) \Comment{Flush in duration = crt}
-						\State rt = rt + crt
+					    \State mm.periodic\_flush() \Comment{Flush during cache read}
+    					\State mm.cache\_read(fn) 
 					\EndIf
 					\If {mm.cached(fn) $<$ fs} \Comment{Read uncached data from disk}
-						\State rt = rt + mm.periodic\_flush(rt) \Comment{Sequential flushing}
-						\State mm.disk\_read(fs - mm.cached(fn), fn)
-    					\State rt = rt + sm.read(fs - mm.cached(fn))
+						\State mm.periodic\_flush() \Comment{Sequential with disk read}
+						\State mm.add\_to\_cache(fs - mm.cached(fn), fn)
+    					\State sm.read(fs - mm.cached(fn))
 					\EndIf					
-					
-					\State \Return rt
 					
 				\end{algorithmic}
 			\end{algorithm}			
 			
 			The algorithm to simulate file reads is described in 
-			Algorithm~\ref{alg:read} \tristan{you should now remove the incrementation of simulation time, as the storage models will do that.
-			Essentially, we neglect kernel time and assume that time is entirely spent in IO. It will simplify the algorithms further, which is also elegant. If you 
-			agree, please revise the algorithm and its description accordingly, and do the same for algorithm 2.
-			}.  
-			In Linux systems with write-back storage devices, data can be either read 
-			from cache with memory bandwidth or read from disk with disk bandwidth. 
-			Therefore, total read time can be considered as a linear function 
-			of the read time with each of these bandwidths, 
-			enabling us to generalize reading process as two separate phases, 
-			cache read and disk read. 
-			When a simulated application reads a file, 
-			it sends a file read request to IO Controller. 
-			First, if there  is not enough memory available to store two
+			Algorithm~\ref{alg:read}.   
+			In Linux systems, data can be either read from cache with memory bandwidth 
+			or read from disk with disk bandwidth. 
+			Therefore, total read time can be considered as sequential reads with 
+			these different bandwidths, enabling us to generalize reading process as 
+			two separate phases, cache read and disk read. 
+			When a simulated application reads a file, it sends a file read request 
+			to IO Controller. 
+			First, if there is not enough memory available to store two
 			copies of the file (one in cache, one in anonymous memory), the
-			Memory Manager is called to flush dirty data to disk (line 10).
-			This flushing is complemented by eviction by the Memory Manager (line 11). 
-			Next, if the file is cached, either partially or entirely, the Memory Manager is 
-			called to read and update the corresponding data blocks in cache (line 13). 
-			During cache read, periodical flushing is called to flush dirty data if needed 
-			and limited to cache read time \tristan{unclear, reword} (line 14).
-			Cache read time is then added to total simulated time (line 15) \tristan{this should be part of the storage model}. 
-			If file is not cached or partially cached, a disk read is required (line 17). 
-			Periodical flushing is called once again, but not time-limited since 
-			data flushing and disk read are sequential, and the flushing time is 
-			added to simulated time (line 18).
-			Finally, data is read from disk to cache and managed by MemoryManager, 
-			disk read time estimated by the storage model is added to 
-			total simulated run time (line 19-20). 
+			Memory Manager is called to flush dirty data to disk and simulate 
+			flushing time with memory model (line 6).
+			This flushing is complemented by eviction by the Memory Manager (line 7). 
+			Next, if the file is cached, either partially or entirely, data is read from 
+			cache first. Periodical flushing is triggered at the beginning of the 
+			cache read to flush dirty data if some dirty data is expired (line 9).
+			At the same time, Memory Manager is called to read data from cache, 
+			and update the corresponding data blocks in cache (line 10). 
+			The concurrency of periodical flushing and cache read is handled and 
+			time is simulated by the memory and disk models.
+			
+			If file is not cached or partially cached, a disk read is required (line 12). 
+			Periodical flushing is called again at the beginning of the disk read 
+			(line 13), the storage model simulates the disk write with the remaining 
+			amount of data (line 14), and data read from disk is added to cache 
+			(line 15). Similar to cache read period, disk bandwidth sharing is handled 
+			and time is simulated by storage models.
 
 			\begin{algorithm}\caption{File write simulation}\label{alg:write}
 				\small
@@ -271,63 +258,53 @@
 					\Input
         				\Desc{fn}{file name}
         				\Desc{fs}{file size}
-						\Desc{rt}{current simulated run time}
 						\Desc{mm}{MemoryManager object}
-						\Desc{wm}{memory write bandwidth}
 						\Desc{sm}{storage simulation model}
    					\EndInput
-   					\Output
-						\Desc{rt}{simulated run time after the file is read}
-   					\EndOutput
-   					\State pft = mm.periodic\_flush(rt)
+   					\State mm.periodic\_flush()
 					\State remain\_dirty = dirty\_ratio * mm.avail\_mem - mm.dirty
 					\State mem\_amt = min(fs, remain\_dirty)
 					\If {remain\_dirty $>$ 0} \Comment{Write with memory bandwidth}
     					\State mm.evict(mem\_amt - mm.free\_mem)
-    					\State mm.periodic\_flush(rt, mm.write\_time(mem\_amt)) 
-    					\State rt = rt + mm.write(fn, mem\_amt)
+    					\State mm.write(fn, mem\_amt) 
     				\EndIf
-    				\State rt = rt + max(mem\_amt / wm, pft) \Comment{Concurrent processes}
 					\If {mem\_amt $<$ fs}  \Comment{Write with disk bandwidth}
-						\State mm.flushed(fs - mem\_amt)  \Comment{Concurrent flushing}
+						\State mm.flush(fs - mem\_amt)  \Comment{Concurrent with disk write}
 						\State mm.evict(fs - mem\_amt  - mm.free\_mem) 
-						\State mm.write(fn, min(fs - mem\_amt, mm.free\_mem))
-						\State rt = rt + sm.write(fs - mem\_amt)
+						\State mm.add\_to\_cache(fn, min(fs - mem\_amt, mm.free\_mem))
+						\State sm.write(fs - mem\_amt)
 					\EndIf
-					
-					\Return rt
 					
 				\end{algorithmic}
 			\end{algorithm}
 
 			Algorithm~\ref{alg:write} describes our simulation of file write. 
-			Initially, periodical flushing is called to flush expired dirty data 
-			at the beginning of the write (line 10).
+			Initially, periodical flushing is called to asynchronously flush expired 
+			dirty data at the beginning of the write (line 6).
 			Similar to the file read simulation, a file can also be written with 
 			two different bandwidths, memory bandwidth and disk bandwidth. 
-			Files can be written with memory bandwidth before the amount 
+			Data can be written with memory bandwidth before the amount 
 			of dirty data reaches dirty\_ratio. Thus, our algorithm initially checks 
-			the amount of file data that can be written with memory write 
-			bandwidth (line 11-12).
+			the amount of data that can be written with memory write 
+			bandwidth (line 7-8).
 			If this amount is greater than 0, MemoryManager is asked to evict 
-			data from cache if needed (line 14).
-			Next, periodical flushing flushes data during cache write because they 
-			can be concurrent (line 15). Then, data is written to cache with memory 
-			bandwidth, write time is simulated and added to total simulated 
-			time (line 16).
+			data from cache to accommodate the written data if needed (line 10). 
+			Then, cache write is simulated with memory model and data written is 
+			added to page cache LRU lists (11).
 			The amount of data that is not written with memory bandwidth is written 
-			with disk bandwidth (line 18). 
+			with disk bandwidth (line 13). 
 			Now, the dirty ratio threshold is reached, we have to flush and evict 
 			data from cache as much as possible so that 
-			the remaining data can be written to cache (line 20-21). 
+			the remaining data can be written to cache (line 14-15). 
 			Here, MemoryManager does not guarantee that the amount of flushed 
 			and evicted data is enough for the remaining data. In the case it is 
 			less than the required amount, the remaining data is written to cache 
 			but then can be flushed and evicted right away. Thus, the amount 
 			of remaining data that is written and kept in cache after the write 
-			is limited by the amount free memory (line 22). 
-			Finally, the write time is simulated, added to the total time and 
-			returned to simulated applications (line 23).
+			is limited by the amount free memory (line 16). 
+			Finally, the disk write is simulated with the remaining amount of 
+			data (line 17). As in the simulation of file read, all the concurrent 
+			cache write and disk write are simulated by memory and disk models.
 			
 		\subsection{Implementation}
 
@@ -337,42 +314,41 @@
 			model in a simple scenario before integrating it in the more complex SimGrid environment. 
 			In this prototype we use the following basic storage model, used for both memory and disk: 
 			\begin{align*}
-				& t_{mr} = D / r_m \\ 
-				& t_{mw} = D / w_m\
+				& t_{r} = D / b_r \\ 
+				& t_{w} = D / b_w\
 			\end{align*}		
 			
 			where:
 			\begin{itemize}
-				\item $t_{mr}$ is the time to read data from memory
-				\item $t_{mw}$ is the time to write data to memory
+				\item $t_{r}$ is the data read time
+				\item $t_{w}$ is the data write time
 				\item $D$ is the amount of data to read/write
-				\item $r_m$ is the memory read bandwidth
-				\item $w_m$ is the  memory write bandwidth
+				\item $b_r$ is the read bandwidth of the device
+				\item $b_w$ is the write bandwidth of the device
 			\end{itemize}			
-			\tristan{if this applies equally to memory and disk, use ``device'' instead of ``memory''}
 
-			Since bandwidth sharing is not simulated, this prototype doesn't support concurrency: it is limited 
-			to single-threaded pipelines running on systems 
-			with a single-core CPU. \tristan{the following aren't resulting from the lack of bandwidth sharing simulation, these are more general limitations, I think we 
-			should remove them: , a single local storage device, and all input and 
-			output files are stored locally.} We use it in a first validation of our simulation model,
-			against a real sequential pipeline running on
-			a real system.
+			Since bandwidth sharing is not simulated, this prototype doesn't support 
+			concurrency: it is limited to single-threaded pipelines running on systems 
+			with a single-core CPU. We use it in a first validation of our simulation 
+			model, against a real sequential pipeline running on a real system.
+			Source code of our Python prototype is available at 
+			https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim
 			
 			Having our model validated, we create simulators for different use cases 
 			using the current version of SimGrid and the SimGrid version that is 
-			extended with our model. To simulate our pipelines and system, we leverage the Workflow Management System Simulation Workbench (WRENCH~\cite{wrench}), a framework  
-			built over SimGrid.
+			extended with our model. To simulate our pipelines and system, we leverage 
+			the Workflow Management System Simulation Workbench 
+			(WRENCH~\cite{wrench}), a framework  built over SimGrid.
 		    We compare the results of the simulators with
 			original SimGrid and extended SimGrid with the results of real
-			pipelines on a real system \tristan{this will have to be updated with a description of extended SimGrid, 
-			you should add a placeholder for this description.}. 
+			pipelines on a real system. 
+			
+			\textcolor{red}{[Description, implementation of our SimGrid extension]}. 
 		
 			We use Python 3.7 to implement the simple simulator, SimGrid 3.25
 			and Wrench 1.6 for SimGrid simulators. SimGrid source code is
 			available at \url{https://framagit.org/simgrid/simgrid}, and WRENCH
 			is at \url{https://github.com/wrench-project/wrench}.
-			\tristan{You should also add the URL of your Python prototype}
 			
 		\subsection{Experiments}
 		
@@ -382,34 +358,11 @@
 			of sequential tasks where each task reads an input file, increments
 			every byte of the input to emulate real processing and avoid caching
 			effects, and writes the result to disk. The output of the previous
-			task is the input of the next task. We also use a real application pipeline, to evaluate the applicability of our
-			simulation model \tristan{add a placeholder to describe the real pipeline here}.
+			task is the input of the next task. We also use a real application 
+			pipeline, to evaluate the applicability of oursimulation model. 
 			
-			The simplest execution scenario is single-threaded, where memory 
-			bandwidth and disk bandwidth are dedicated. 
-			This allows us to compare the detailed results in terms of read/write time, 
-			memory states after every single task and, more importantly, validate our 
-			simulation model \tristan{last sentence is convoluted, reword}. 
-			
-			For multi-threaded applications, we vary the number of concurrent
-			pipelines running on a multi-core host and writing to the same local
-			disk. In this way, we evaluate our model with concurrent I/Os, when
-			the device bandwidth is shared.
-			
-		    Since different storage types should also be taken into account, 
-		    we conduct the next experiment with the same scenario as 
-		    in the multi-threaded experiment, except that files are stored on a 
-		    shared file system instead of local disk. 
-		    
-		    Finally, we consider a real pipeline from the neuroimaging domain. 
-		    We simulate the pipeline with a simulated workflow in SimGrid 
-			and compare the simulation results with the real results. 
-			Because our work focuses on I/O time, we assume that CPU time is 
-			correctly modeled and use the CPU time measured in the real pipelines 
-			to setup our simulated workflow \tristan{the pipeline should be described, including the workflow engine if it's Dask.}. 
-			
-			We use our dedicated cluster hosted at Concordia University to conduct the experiments. The cluster 
-			consists of one login node, 8 compute nodes 
+			We use our dedicated cluster hosted at Concordia University to conduct 
+			the experiments. The cluster consists of one login node, 8 compute nodes 
 			and 4 storage nodes connected with two network switches. The login node 
 			has one Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 128GiB of RAM, 1.8TB 
 			of storage of XFS file system, 13GB of tmpfs file system and 385 TB of 
@@ -418,48 +371,74 @@
 			with XFS file system, 378GB of tmpfs and 126GB of devtmpfs file system.
 			Lustre file system is configured with one metadata target with 854GB 
 			of storage, 44 object storage targets with 8.7TB of storage each. 
-			The cluster is run on CentOS 8.1 with the Slurm Workload Manager installed. We use 
-			\textbf{\textit{atop}} and \textbf{\textit{collectl}} as tools to monitor 
-			and collect data of memory, page cache status and disk throughput on 
-			the cluster. The cluster nodes are connected with ... 
-			\textcolor{red}{[network description here]}
-			\tristan{mention the number of disks on all nodes. Maybe add a diagram.}
-	
-
-			\tristan{I don't think you need an intro paragraph for each experiment, as you did above, AND then subsections. I'd just make a single paragraph or sub-section.}
+			The cluster is run on CentOS 8.1 with the Slurm Workload Manager installed. 
+			We use \textbf{\textit{atop}} and \textbf{\textit{collectl}} as tools to 
+			monitor and collect data of memory, page cache status and disk throughput 
+			on the cluster. 
+			\textcolor{red}{[Add network description here, include number of disks 
+			on all nodes ,maybe add a diagram]}
+			
 			\subsubsection{Single-threaded evaluation}
+			
+			The simplest execution scenario is single-threaded, where memory 
+			bandwidth and disk bandwidth are dedicated. Our goal is to 
+			compare the detailed simulation results of each task in the pipeline 
+			including read/write time, memory status and then validate the correctness 
+			of the simulation model. 
 
-				In this experiment, our goal is to validate our model by comparing 
-				the simulation results of the simple Python simulator with results of 
-				a simulator implemented with original SimGrid, a simulator 
-				implemented with SimGrid integrated with our model, and a real pipeline 
-				running of the cluster. 
-				The pipeline consists of three tasks, each task reads a file, 
-				increases every byte and writes output file to local disk. 
-				We use the input sizes of 20 GB, 50 GB, 75 GB and 100 GB, run 
-				the pipeline on the cluster, measure the CPU time of the pipeline 
-				with each input to simulate the pipeline with the simulators.
+			The pipeline used in this experiment consists of three tasks, 
+			each task reads a file, increases every byte and writes output file 
+			to local disk. 
+			We use the input sizes of 20 GB, 50 GB, 75 GB and 100 GB, run 
+			the pipeline on the cluster, measure the CPU time of the tasks  
+			with each input and use it to simulate CPU time in the simulators .
 
+			We simulate the pipeline with the Python prototype simulator, 
+			a simulator implemented with original SimGrid and a simulator implemented 
+			with SimGrid extended with our model.  
+			
 			\subsubsection{Multi-threaded evaluation}
 
-				In the second experiment, we evaluate the simulator in concurrent I/O 
-				with a multi-threaded application. As we run the pipelines on 
-				only one compute node of the cluster, which has upto 32 cores per node,  
-				we create 32 input files with the size of 3GB each and vary the number of 
-				concurrent pipelines from 1 to 32. 
-				Because multi-threaded simulator implementation in Python is 
-				expensive, and we have our model integrated in SimGrid, 
-				we only compare the results of simulators with original SimGrid, 
-				SimGrid integrated with our model and and real pipelines. 
-				The results are compared in total makespan of the pipelines, 
-				cumulative read time and cumulative write time.
+			In the second experiment, we evaluate the simulator in a concurrent I/O, 
+			bandwidth-sharing scenario with a multi-threaded application. 			
+			We vary the number of concurrent pipelines running on a multi-core host.  
+			
+			All the task in the pipelines read input files from and write output files 
+			to a local disk. 
+			As a compute node of the cluster has 32 cores CPU and 256 GB of RAM,  
+			we create 32 input files with the size of 3GB each and vary the number of 
+			concurrent pipelines from 1 to 32. 
+			
+			Because implementation of a multi-threaded simulator  in Python is 
+			expensive, and we have our model integrated in SimGrid, 
+			we only compare the results of simulators with original SimGrid, 
+			SimGrid integrated with our model and and real pipelines in this 
+			experiment. The results are compared in total makespan of the pipelines, 
+			cumulative read time and cumulative write time.
 			
 			\subsubsection{Evaluation on storage types}
+			
+		    Since different storage types should also be taken into account, 
+		    we conduct another experiment with the same scenario as 
+		    in the multi-threaded experiment, except that files are stored on a 
+		    shared file system instead of local disk. 
+		    
+		    \textcolor{red}{[Description of Lustre on the cluster and how it's 
+		    simulated]}. 
+		    
+		    \subsubsection{Simulation of a real application}
 
-				
-
-			\subsubsection{Simulation of a real application}
-				A real pipeline (for example a pipeline with nighres)
+		    Finally, we consider a real pipeline from the neuroimaging domain. 			
+			\textcolor{red}{[Description of the real pipeline with nighres 
+			(including the workflow engine if it's Dask)]}.  			
+			
+			We simulate this pipeline with a simulator with original SimGrid and 
+			extended SimGrid. 
+			The simulation results are then compared with the real results. 
+			Because our work focuses on I/O time, we assume that CPU time is 
+			correctly modeled and use the CPU time measured in the real pipelines 
+			to setup our simulated workflow. The results are compared in terms of 
+			I/O time and total makespan.
 
 	\section{Results}
 	
