@@ -46,12 +46,14 @@
 			\item Difficulties in conducting high performance computing experiments and the need of simulation frameworks.
 			\item Existing experiment methods, simulators, simulation frameworks. The advantages of SimGrid compared to others \cite{casanova2008, lebre2015}. The missing of the ability to simulate page cache in SimGrid \cite{lebre2015}.
 			\item The objective of the paper: Add capability to simulate I/O with page cache in SimGrid.
+			\item Clarify, distinguish between memory I/O (i/o to page cache) and disk I/O.
 		\end{itemize}
 	\section{Related Work}			
 		
 		\subsection{Page cache}
 			\begin{itemize}
-				\item What is page cache? How it works \cite{linuxdev3rd2010}. Effects and importance of page cache.
+				\item What is page cache? How it works \cite{linuxdev3rd2010}. 
+				Write-back vs writethrough and direct i/o. Effects and importance of page cache.
 				\item Introduce some existing strategies with some highlighted pros and cons.
 				\item Current implementation in Linux and some reasons why it is chosen to be implemented (implementation complexity, effectiveness, overhead, etc) \cite{linuxdev3rd2010}
 				\item \tristan{LRU lists are mentioned in the next section, they should be described here.}
@@ -61,33 +63,31 @@
 			\begin{itemize}
 				\item Discuss some existing methods, simulation frameworks to conduct HPC experiments. Compare pros and cons (accuracy, simulation time, usability) of some simulators (SimGrid, GridSim).
 				\item Related development: RAM energy consumption \cite{gill2019} \cite{ouarnoughi2017} 
+				\item What is implemented in simulators that useful for our model:
+				distinguished and shared bandwidths, concurrency, device latency. 
 				\item Discuss the pros of SimGrid and the reasons why we chose it to extend. (Section 2.2.2 in \cite{casanova2014})
 				\item \tristan{Mention the status of storage simulation in simulators, so that we understand from Fig 1 that storage devices are available}
 			\end{itemize}
 			
 	\section{Method}
 
-    \valerie{ In this section, you use terms like, ``file read and write'', ``memory I/O''
-    and ``Kernel I/O''. I think it's important that you define them in your introduction
-and make sure that these terms are actually distinct. By ``file read and write'', i'm guessing you essentially
-mean disk+memory I/O, by memory I/O, you must mean I/O to page cache (and not anonymous memory management). I'm not sure
-what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenets?}
-		In this section, we present our approach to model file read and write,
-		memory I/O, cache eviction and data flushing mechanisms implemented in
-		the Linux kernel. We also detail the design of our simulators and their
+		In this section, we present our approach to model file read and write with
+		I/O to page cache, cache eviction and data flushing mechanisms implemented 
+		in the Linux kernel. We also detail the design of our simulators and their
 		implementation. Finally, we describe experimental scenarios to evaluate
 		our simulation model on real applications using a standalone Python
-		prototype, the current SimGrid simulator, and our extension of SimGrid.
+		prototype, the current SimGrid simulator, and the SimGrid version that is 
+		extended with our simulation model (SimGridExt).
 
 		\subsection{Principle of the simulator}
 	
             We separate our simulation model in two components, the IO
-			Controller and the Memory Manager, which together simulate Linux
-			kernel I/Os (Figure~\ref{fig:interaction}). The Memory Manager
-			simulates memory I/O, flushing, and cache eviction, whereas the IO
-			Controller simulates file reads and writes. Simulated applications
-			can simply interact with the IO Manager instead of calling simulated
-			storage directly as is the case with current simulators.
+			Controller and the Memory Manager, which together simulate 
+			file read/write mechanisms in Linux (Figure~\ref{fig:interaction}). 
+			The Memory Manager simulates I/Os to cache, flushing, and cache eviction, 
+			whereas the IO Controller simulates file reads and writes. 
+			Simulated applications can simply interact with the IO Manager instead of 
+			calling simulated storage directly as is the case with current simulators.
 
 			\begin{figure}
    				\centering
@@ -98,15 +98,19 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 			\subsubsection{Memory simulation model}
 			
 			We leverage existing storage simulation models to simulate the memory,
-			which is characterized by storage capacity and read and write bandwidths. 
-			This can be done when disks are modeled with distinct read/write 
-            bandwidths and negligible disk latency \valerie{Does this mean we assume that all file i/o within a pipeline occurs on relatively large files?}, which is applicable to memory 
-			\cite{lebre2015}. In addition, leveraging existing disk models allows us 
+			which is characterized by storage capacity, distinguished read/write 
+			bandwidths and device latency. 
+			All of these features are dealt within models in simulation 
+			frameworks, which makes storage models applicable to memory \cite{lebre2015}. 
+			In addition, leveraging existing disk models allows us 
 			to take advantage of bandwidth sharing between concurrent disk I/O to 
 			simulate parallel memory accesses.\tristan{we should refer to related work, 
             see comment there} \valerie{Agreed. It's unclear how existing storage models enable this at the moment}.
 
-			We introduce the concept of a data block as a unit to represent data
+			In Linux kernel, the page cache LRU lists contain file pages. However, 
+			due to the large number of file pages, managing lists of pages may 
+			require significant computation overhead. 
+			Thus, we introduce the concept of a data block as a unit to represent data 
 			cached in memory. A data block is a subset of file pages stored in
             page cache that were accessed in the same read or write operation. 
 			A data block has information about file name, block size, last access 
@@ -115,35 +119,36 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 			A given file can have multiple data blocks in page cache. In
 			addition, a data block can be split into an arbitrary number of
 			smaller blocks, and data blocks can be merged together.
-			
-			We simulate the kernel LRU lists of file pages
-			with two lists of data blocks: an active list and 
-			an inactive list, ordered by last access time (earliest first, see 
-			Figure~\ref{fig:lrulist}).
-			As in the kernel, our simulator keeps the size of the active list under
-			twice the size of the inactive list by moving least recently 
-            used data blocks from the active list to the inactive list.\valerie{should maybe explain this in the datablock section}
-			Modeling page cache LRU lists as lists of data blocks reduces the
-			overhead of the simulator, as data blocks are obviously less
-			numerous than file pages, while preserving the accuracy in I/O time
-			simulation \tristan{how do you know that, can you provide an argument?}.
 
 			\begin{figure}
    				\centering
    				\includegraphics[width=\columnwidth]{figures/lru_lists.pdf}
-   				\caption{Simulation of page cache LRU lists with data blocks}\label{fig:lrulist}
+   				\caption{Simulation of page cache LRU lists with data blocks}	\label{fig:lrulist}
 			\end{figure}	
 			
-
-            \valerie{I think you might need to reorder the paragraphs. First one would be
-            to explain what and dirty/clean blocks, 2. what happens when data is read, 3. what happens
-            when data is written, and maybe mention file accesses that are not read/write}
-            The simulated LRU lists are used as follows. When a file is read, 
-            file data \valerie{are you talking about the file you just read or file data already in cache?} can be partially cached, completely cached, or uncached. 
-            \valerie{rewrite: Cached data can be composed of data blocks existing in either or both
+			Now, page cache LRU lists can be modeled with two lists of data blocks: 
+			an active list and an inactive list, ordered by last access time 
+			(earliest first, see Figure~\ref{fig:lrulist}).
+			As in the kernel, our simulator keeps the size of the active list under
+			twice the size of the inactive list by moving least recently 
+            used data blocks from the active list to the inactive list.
+			Modeling page cache LRU lists as lists of data blocks reduces the
+			overhead of the simulator, as data blocks are obviously less
+			numerous than file pages, while preserving the accuracy in I/O time
+			simulation \tristan{how do you know that, can you provide an argument?}.
+			
+			Given an arbitrary file, at a specific time, its data can be partially 
+			cached, completely cached, or uncached.
+			Cached data can be composed of data blocks existing in either or both
             of the page cache LRU lists. Cached blocks reside in the inactive list
-            unless they have been recently been reaccessed. Cached blocks located on the inactive
-            list that are subsequently accessed, will be moved to the top of the active list.}
+            unless they have been recently been reaccessed. Cached blocks 
+            located on the inactive list that are subsequently accessed, 
+            will be moved to the top of the active list. Cached blocks 
+            recently written to cache are dirty until they are flushed to disk.
+
+            The simulated LRU lists are used as follows. When a file is read, 
+            as mentioned, its data can be partially cached, completely cached, 
+            or uncached. 
             For cached data, there are existing data blocks representing
 			this data in two page cache LRU lists. 
 			As this cached data is accessed again, these blocks are moved to 
@@ -157,6 +162,9 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 			clean after being flushed. 
 			Thus, at most two data blocks can be added, one is clean and one 
 			is dirty, to the inactive list.
+			
+			\textcolor{red}{[Is there any kind of accesses other than read and write? 
+			Should we mention them?]}. 			
 			
             As done in the kernel, we ensure the size of the active list does not exceed twice the size of 
 			the inactive list 
@@ -225,28 +233,27 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
    					\EndInput
 					\State mm.flush(2*fs - mm.cached(fn) - mm.evictable\_mem) 
 					\State mm.evict(2*fs - mm.cached(fn) - mm.free\_mem) 
+					\State mm.periodic\_flush() \Comment{Periodically flush expired dirty data}
 					\If {mm.cached(fn) $>$ 0}  \Comment{Read file cached data}
-					    \State mm.periodic\_flush() \Comment{Flush during cache read}
-    					\State mm.cache\_read(fn) 
+    					\State mm.cache\_read(fn)  \Comment{Update cached data}
 					\EndIf
 					\If {mm.cached(fn) $<$ fs} \Comment{Read uncached data from disk}
-						\State mm.periodic\_flush() \Comment{Sequential with disk read}
+						\State sm.read(fs - mm.cached(fn)) \Comment{Simulated disk read}
 						\State mm.add\_to\_cache(fs - mm.cached(fn), fn)
-    					\State sm.read(fs - mm.cached(fn))
 					\EndIf					
 					
 				\end{algorithmic}
 			\end{algorithm}			
 			
-			The algorithm to simulate file reads is described in 
-			Algorithm~\ref{alg:read}.   
-			In Linux systems, data can be either read from cache with memory bandwidth 
-			or read from disk with disk bandwidth. 
-			Therefore, total read time can be considered as sequential reads with 
-            these different bandwidths\valerie{i understand what you're saying,
-            but maybe it'd be better to say: ``Therefore read time can be considered as the sum of the time required to write to all devices''.
-            Can you clarify if disk+memory writes are not concurrent }, enabling us to generalize reading process as 
-			two separate phases, cache read and disk read. 
+			The algorithm to simulate file reads is described in Algorithm~\ref{alg:read}.   
+%			In Linux systems with page cache, data can be either read from cache 
+%			or read from disk with disk bandwidth. 
+%			Therefore read time can be considered as the sum of the time required to 
+%			read from all devices\valerie{Can you clarify if disk+memory writes are not concurrent }, enabling us to generalize reading process as 
+%			two separate phases, cache read and disk read. 
+			In Linux systems with page cache, data can be either read from cache 
+			or read from disk concurrently. As this concurrency is modeled in simulation 
+			frameworks, we simulate a file read as follows.
 			When a simulated application reads a file, it sends a file read request 
 			to IO Controller. 
 			First, if there is not enough memory available to store two
@@ -254,20 +261,20 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 			Memory Manager is called to flush dirty data to disk and simulate 
 			flushing time with memory model (line 6).
 			This flushing is complemented by eviction by the Memory Manager (line 7). 
+			In lines 6-7, we assume that user applications require the amount of memory 
+			equal to the file size, making total required memory twice the size of 
+			the file. Apart from flushing a required amount of memory, periodical 
+			flushing is then triggered to flush expired dirty data (line 8).
 			Next, if the file is cached, either partially or entirely, data is read from 
-			cache first. Periodical flushing is triggered at the beginning of the 
-			cache read to flush dirty data if some dirty data is expired (line 9).
-			At the same time, Memory Manager is called to read data from cache, 
-			and update the corresponding data blocks in cache (line 10). 
-			The concurrency of periodical flushing and cache read is handled and 
-			time is simulated by the memory and disk models.
+			cache first (line 9). Memory Manager is called to read data from cache, 
+			update the corresponding data blocks in cache (line 10). 
 			
 			If file is not cached or partially cached, a disk read is required (line 12). 
-			Periodical flushing is called again at the beginning of the disk read 
-			(line 13), the storage model simulates the disk write with the remaining 
-            amount of data (line 14) \valerie{Has this line been removed?}, and data read from disk is added to cache 
-			(line 15). Similar to cache read period, disk bandwidth sharing is handled 
-			and time is simulated by storage models.
+			The storage model simulates the disk read with the remaining 
+            amount of data (line 13), and data read from disk is added to 
+            cache (line 14). The total file read time is simulated at the end of the algorithm. 
+            During the entire file read, the concurrency between periodical flushing, 
+            cache read and disk read is handled by storage models. 
 
 			\begin{algorithm}\caption{File write simulation}\label{alg:write}
 				\small
@@ -297,34 +304,32 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 
             \valerie{I think we need to take periodic flush out as it shouldn't be added to the write time}
 
-
 			Algorithm~\ref{alg:write} describes our simulation of file write. 
 			Initially, periodical flushing is called to asynchronously flush expired 
 			dirty data at the beginning of the write (line 6).
-			Similar to the file read simulation, a file can also be written with 
-            two different bandwidths, memory bandwidth and disk bandwidth \valerie{can't we just say cached to memory and written to disk and assume the bandwidths are implied?}. 
-			Data can be written with memory bandwidth before the amount 
-			of dirty data reaches the dirty\_ratio. Thus, our algorithm initially checks 
-			the amount of data that can be written with memory write 
-			bandwidth (line 7-8).
+			During file write simulation, a file is cached in memory and also written 
+			to disk. Data can be written to cache without waiting for flushing or 
+			being throttled before the amount of dirty data reaches dirty\_ratio. 
+			Thus, our algorithm initially checks the amount of data that can be written 
+			with memory write bandwidth (line 7-8).
 			If this amount is greater than 0, MemoryManager is asked to evict 
 			data from cache to accommodate the written data if needed (line 10). 
 			Then, cache write is simulated with memory model and data written is 
 			added to page cache LRU lists (11).
-			The amount of data that is not written with memory bandwidth is written 
-			with disk bandwidth (line 13). 
-			Now, the dirty ratio threshold is reached, we have to flush and evict 
-			data from cache as much as possible so that 
-			the remaining data can be written to cache (line 14-15). 
+			After dirty\_ratio is reached, dirty data has to be flushed before new data 
+			is written to cache again. 
+			We flush and evict data from cache as much as possible so that the 
+			remaining data can be written to cache (line 14-15). 
 			Here, MemoryManager does not guarantee that the amount of flushed 
 			and evicted data is enough for the remaining data. In the case it is 
-			less than the required amount, the remaining data is written to cache 
-			but then can be flushed and evicted right away. Thus, the amount 
-			of remaining data that is written and kept in cache after the write 
-			is limited by the amount free memory (line 16). 
+			less than the required amount and existing dirty data can not be flushed, 
+			the remaining data being written to cache can be flushed and evicted right away. 
+			Thus, the amount of remaining data written and kept in cache 
+			after the write is limited by the amount free memory, and this amount 
+			is added to cache (line 16). 
 			Finally, the disk write is simulated with the remaining amount of 
-			data (line 17). As in the simulation of file read, all the concurrent 
-			cache write and disk write are simulated by memory and disk models.
+			data (line 17). As in the simulation of file read, all the concurrency  
+			of cache write and disk write are simulated by memory and disk models.
 			
 		\subsection{Implementation}
 
@@ -355,15 +360,15 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}
 			
 			Having our model validated, we create simulators for different use cases 
-			using the current version of SimGrid and the SimGrid version that is 
-            extended with our model \valerie{I think you should give the extended simgrid a new name ``SimGridExt'' or something just so you can use that name in you figures}. To simulate our pipelines and system, we leverage 
+			using original SimGrid and our SimGridExt version. 
+			To simulate our pipelines and system, we leverage 
 			the Workflow Management System Simulation Workbench 
 			(WRENCH~\cite{wrench}), a framework  built over SimGrid.
 		    We compare the results of the simulators with
 			original SimGrid and extended SimGrid with the results of real
 			pipelines on a real system. 
 			
-			\textcolor{red}{[Description, implementation of our SimGrid extension]}. 
+			\textcolor{red}{[Description, implementation of our SimGridExt]}. 
 		
 			We use Python 3.7 to implement the simple simulator, SimGrid 3.25
 			and Wrench 1.6 for SimGrid simulators. SimGrid source code is
@@ -372,23 +377,23 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 			
 		\subsection{Experiments}
 		
-        The goal of our experiments is to evaluate our write-back cache \valerie{This is the first time the write-back cache is mentioned apart from in a figure caption. definitely should be described in your intro alongside write-through and direct I/O}
+        	The goal of our experiments is to evaluate our write-back cache 
 			simulation in single-threaded and multi-threaded applications
 			accessing data on different types of file system. We use a pipeline
 			of sequential tasks where each task reads an input file, increments
 			every byte of the input to emulate real processing and avoid caching
 			effects, and writes the result to disk. The output of the previous
 			task is the input of the next task. We also use a real application 
-            pipeline \valerie{Maybe briefly describe this application's purpose (e.g. a standard fMRI preprocessing piepeline) or something of the sort}, to evaluate the applicability of our simulation model. 
+            pipeline \textcolor{red}{[Maybe briefly describe this application's purpose (e.g. a standard fMRI preprocessing piepeline)]}, to evaluate the applicability of our simulation model. 
 			
 			We use our dedicated cluster hosted at Concordia University to conduct 
 			the experiments. The cluster consists of one login node, 8 compute nodes 
 			and 4 storage nodes connected with two network switches. The login node 
-			has one Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 128~GiB of RAM, 1.8TB 
-			of storage of XFS file system, 13~GB of tmpfs file system and 385 TB of 
+			has one Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 137~GB (128~GiB) of RAM, 
+			1.8TB of storage of XFS file system, 13~GB of tmpfs file system and 385 TB of 
 			Lustre shared file system. Each compute node has two 16 cores Intel(R) 
-			Xeon(R) Gold 6130 CPU @ 2.10GHz, 256~GB of RAM and 6 SSDs, 450~GB each 
-			with XFS file system, 378~GB of tmpfs and 126~GB of devtmpfs file system.
+			Xeon(R) Gold 6130 CPU @ 2.10GHz, 275~GB (256~GiB) of RAM and 6 SSDs, 
+			450~GB each with XFS file system, 378~GB of tmpfs and 126~GB of devtmpfs file system.
 			Lustre file system is configured with one metadata target with 854~GB 
 			of storage, 44 object storage targets with 8.7~TB of storage each. 
 			The cluster is run on CentOS 8.1 with the Slurm Workload Manager installed. 
@@ -409,7 +414,6 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 			The pipeline used in this experiment consists of three tasks, 
 			each task reads a file, increases every byte and writes output file 
 			to local disk. 
-            \valerie{Be careful because you've been switching between GiB and GB. Make sure your input sizes are not GiB}
 			We use the input sizes of 20~GB, 50~GB, 75~GB and 100~GB, run 
 			the pipeline on the cluster, measure the CPU time of the tasks  
 			with each input and use it to simulate CPU time in the simulators .
@@ -459,7 +463,7 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 			Because our work focuses on I/O time, we assume that CPU time is 
 			correctly modeled and use the CPU time measured in the real pipelines 
 			to setup our simulated workflow. The results are compared in terms of 
-			I/O time and total makespan.
+			read/write time and total makespan.
 
 	\section{Results}
 	
@@ -467,7 +471,7 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 
 			\item Quantitative results: 
 				\begin{itemize}
-					\item Errors of simulation time and memory used compared to real results.
+					\item Relative errors of simulation time and memory used compared to real results.
 					\item Simulation time compared to baseline SimGrid.
 				\end{itemize} 
 
@@ -478,6 +482,7 @@ what you mean by ``kernel I/O'' unless it's the whole ensemble of i/o componenet
 	\section{Discussion and Future Work}
 		\begin{itemize}
 			\item Sensitivity of the simulator on the variation of memory and disk bandwidth. 
+			\item Our model does not support random I/O and readahead.
 		\end{itemize}
 	\section{CFI for cluster}
 \bibliographystyle{plain}
