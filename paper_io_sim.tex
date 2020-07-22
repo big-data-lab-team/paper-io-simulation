@@ -44,7 +44,7 @@
 		\begin{itemize}
 			\item HPC, the bottleneck in I/O and the demand of HPC experiments. 
 			\item Difficulties in conducting high performance computing experiments and the need of simulation frameworks.
-			\item Existing experiment methods, simulators, simulation frameworks. The advantages of SimGrid compared to others \cite{casanova2008, lebre2015}. The missing of the ability to simulate page cache in SimGrid \cite{lebre2015}.
+			\item Existing experiment methods, simulators, simulation frameworks. The advantages of SimGrid compared to others \cite{simgrid2008, lebre2015}. The missing of the ability to simulate page cache in SimGrid \cite{lebre2015}.
 			\item The objective of the paper: Add capability to simulate I/O with page cache in SimGrid.
 			\item Clarify, distinguish between memory I/O (i/o to page cache) and disk I/O.
 		\end{itemize}
@@ -65,7 +65,7 @@
 				\item Related development: RAM energy consumption \cite{gill2019} \cite{ouarnoughi2017} 
 				\item What is implemented in simulators that useful for our model:
 				distinguished and shared bandwidths, concurrency, device latency. 
-				\item Discuss the pros of SimGrid and the reasons why we chose it to extend. (Section 2.2.2 in \cite{casanova2014})
+				\item Discuss the pros of SimGrid and the reasons why we chose it to extend. (Section 2.2.2 in \cite{simgrid2014})
 				\item \tristan{Mention the status of storage simulation in simulators, so that we understand from Fig 1 that storage devices are available}
 			\end{itemize}
 			
@@ -84,8 +84,8 @@
             We separate our simulation model in two components, the IO
 			Controller and the Memory Manager, which together simulate 
 			file read/write mechanisms in Linux (Figure~\ref{fig:interaction}). 
-			The Memory Manager simulates I/Os to cache, flushing, and cache eviction, 
-			whereas the IO Controller simulates file reads and writes. 
+			The Memory Manager simulates I/Os to cache, flushing, periodical flushing 
+			and cache eviction, whereas the IO Controller simulates file reads and writes. 
 			Simulated applications can simply interact with the IO Manager instead of 
 			calling simulated storage directly as is the case with current simulators.
 
@@ -106,6 +106,13 @@
 			to take advantage of bandwidth sharing between concurrent disk I/O to 
 			simulate parallel memory accesses.\tristan{we should refer to related work, 
             see comment there} \valerie{Agreed. It's unclear how existing storage models enable this at the moment}.
+
+			Memory Manager simulates two parallel threads. The first thread is the 
+			main thread where activities of applications are simulated, and responsible 
+			for the simulation of data flushing, cache eviction and I/Os to cache. 
+			The second thread is a simulated background thread, in which Memory Manager 
+			periodically searches and flushes expired dirty data in page cache LRU lists 
+			to disks. 
 
 			In Linux kernel, the page cache LRU lists contain file pages. However, 
 			due to the large number of file pages, managing lists of pages may 
@@ -166,15 +173,15 @@
 			\textcolor{red}{[Is there any kind of accesses other than read and write? 
 			Should we mention them?]}. 			
 			
-            As done in the kernel, we ensure the size of the active list does not exceed twice the size of 
-			the inactive list 
+            As done in the kernel, we ensure the size of the active list does not 
+            exceed twice the size of the inactive list 
 			\cite{gorman2004understanding, linuxdev3rd2010}. 
 			This is done by moving least recently used blocks in the active list 
 			to the inactive list when the active list grows. If only a part of a data 
 			block needs to be moved, the block is split.
 
-			Next, we simulate data flushing mechanism, which writes back 
-			dirty data to disk. 
+			Next, we simulate data flushing, which runs on the main simulated 
+			thread and writes back dirty data to disk. 
 			The data flushing simulation function traverses the sorted inactive first, 
 			and then the active list, looks for least recently used dirty blocks, 
 			writes them to disk through the storage device model, and 
@@ -183,29 +190,58 @@
 			If the last flushed block is not entirely flushed, it is split into 
 			two blocks, one that is flushed and one that remains dirty.
 			The flushing time is simulated with storage model.
-			
-			For periodical flushing, our simulator searches in two page cache 
-			LRU lists and flushes all the expired dirty data blocks. 
-			A dirty data block is considered expired if the time from its last access 
-			to current simulated time is longer than the predefined expire time. 
-			Periodical flushing can be concurrent with cache read/write, 
-			and sequential with disk read/write. When cache accesses and 
-			periodical flushing are concurrent, flushing time is not added to simulated 
-			time but the amount of flushed data is limited by flushing time. 
-			When data is flushed in parallel with disk accesses, the concurrency 
-			is handled by the storage model used as memory, and flushing time 
-			is simulated with the amount of flushed data by this model. 
 				
-			Similarly to data flushing, our cache eviction simulation function frees up 
-			the page cache by traversing and deleting least recently used clean 
-			data blocks in the inactive list.
+			Similarly to data flushing, our cache eviction simulation runs on 
+			the main thread, frees up the page cache by traversing and deleting 
+			least recently used clean data blocks in the inactive list.
 			The amount of evicted data is passed in and data blocks are deleted 
 			from the inactive list until total evicted data reaches the amount 
 			passed in, or there is no clean block left in the list.
 			If the last evicted block is not entirely evicted, the block is split, 
 			and only one block is deleted.
 			Our cache eviction simulation does not add up to the simulated time 
-			since cache eviction time is negligible in real systems.			
+			since cache eviction time is negligible in real systems.		
+			
+			\begin{algorithm}\caption{Periodical flushing simulation}\label{alg:pdflush}
+				\small
+				\begin{algorithmic}[1]
+					\Input
+        				\Desc{in}{page cache inactive list}
+        				\Desc{ac}{page cache active list}
+						\Desc{t}{predefined flushing time interval}
+						\Desc{sm}{storage simulation model}
+   					\EndInput
+   					\While{has unfinished tasks or flushing}
+						\State blocks = expired dirty blocks in active and inactive list
+						\State flushing\_time = sm.write(blocks)
+						\State Flag blocks as clean data
+						\If{flushing\_time $<$ t}
+							\State sleep(t - flushing\_time)
+						\EndIf
+					\EndWhile
+				\end{algorithmic}
+			\end{algorithm}				
+			
+			The periodical flushing simulation is run on a simulated background thread 
+			to flush expired dirty data blocks from cache to disk.
+			Similar to expired dirty pages in real Linux systems, a dirty block in our model 
+			is considered expired if the time from its last access to current simulated time 
+			is longer than the predefined expire time.
+			The simulation algorithm of periodical flushing is an infinite loop in which 
+			Memory Manager searches and flushes these expired dirty blocks to disk, 
+			as described in Algorithm~\ref{alg:pdflush}. 
+			The loop ends when the host does not has any remaining incomplete task 
+			and all dirty data has been flushed (line 6). 
+			In each repetition, Memory Manager collects expired dirty blocks in two 
+			page cache LRU lists (line 7), simulates a write of this data to disk (line 8), 
+			and mark these blocks as clean (line 9).
+			If the time to flush data does not exceed our time interval, the thread is put 
+			to sleep for the remaining time (lines 10-12). 
+			Then simulation time is advanced, the algorithm finishes or continues the loop 
+			based on the conditions at current simulated time.
+			Because periodical flushing is simulated as a background thread, it can be 
+			concurrent with disk read/write. This parallelism is handled by the 
+			storage model and reflected in simulated I/O time. 	
 
 			\subsubsection{File I/O simulation model}			
 			
@@ -233,15 +269,14 @@
    					\EndInput
 					\State mm.flush(2*fs - mm.cached(fn) - mm.evictable\_mem) 
 					\State mm.evict(2*fs - mm.cached(fn) - mm.free\_mem) 
-					\State mm.periodic\_flush() \Comment{Periodically flush expired dirty data}
 					\If {mm.cached(fn) $>$ 0}  \Comment{Read file cached data}
-    					\State mm.cache\_read(fn)  \Comment{Update cached data}
+    					\State cache\_read = mm.cache\_read(fn)  \Comment{Read async}
 					\EndIf
 					\If {mm.cached(fn) $<$ fs} \Comment{Read uncached data from disk}
-						\State sm.read(fs - mm.cached(fn)) \Comment{Simulated disk read}
+						\State disk\_read = sm.read(fs - mm.cached(fn)) \Comment{Async disk read}
 						\State mm.add\_to\_cache(fs - mm.cached(fn), fn)
 					\EndIf					
-					
+					\State Wait for completion of cache\_read and disk\_read 
 				\end{algorithmic}
 			\end{algorithm}			
 			
@@ -261,20 +296,18 @@
 			Memory Manager is called to flush dirty data to disk and simulate 
 			flushing time with memory model (line 6).
 			This flushing is complemented by eviction by the Memory Manager (line 7). 
-			In lines 6-7, we assume that user applications require the amount of memory 
-			equal to the file size, making total required memory twice the size of 
-			the file. Apart from flushing a required amount of memory, periodical 
-			flushing is then triggered to flush expired dirty data (line 8).
-			Next, if the file is cached, either partially or entirely, data is read from 
-			cache first (line 9). Memory Manager is called to read data from cache, 
-			update the corresponding data blocks in cache (line 10). 
-			
-			If file is not cached or partially cached, a disk read is required (line 12). 
-			The storage model simulates the disk read with the remaining 
-            amount of data (line 13), and data read from disk is added to 
-            cache (line 14). The total file read time is simulated at the end of the algorithm. 
-            During the entire file read, the concurrency between periodical flushing, 
-            cache read and disk read is handled by storage models. 
+			Here, we assume that user applications use the amount of memory 
+			equal to the file size. 
+			Next, if the file is cached, either partially or entirely, data is read from cache (line 8). 
+			Memory Manager is called to simulate a asynchronous cache read, 
+			update the corresponding data blocks in cache (line 9). 
+			If file is not cached or partially cached, a disk read is required (line 11). 
+			The storage model simulates a asynchronous disk read with the remaining 
+            amount of data (line 12), and data read from disk is added to 
+            cache (line 13). 
+            At the end of the algorithm, we wait for the completion of two 
+            asynchronous activities, the cache read in line 9 and the disk read in line 12, 
+            to finish our file read and get the total simulated read time (line 15). 
 
 			\begin{algorithm}\caption{File write simulation}\label{alg:write}
 				\small
@@ -285,7 +318,6 @@
 						\Desc{mm}{MemoryManager object}
 						\Desc{sm}{storage simulation model}
    					\EndInput
-   					\State mm.periodic\_flush()
 					\State remain\_dirty = dirty\_ratio * mm.avail\_mem - mm.dirty
 					\State mem\_amt = min(fs, remain\_dirty)
 					\If {remain\_dirty $>$ 0} \Comment{Write with memory bandwidth}
@@ -302,34 +334,29 @@
 				\end{algorithmic}
 			\end{algorithm}
 
-            \valerie{I think we need to take periodic flush out as it shouldn't be added to the write time}
-
 			Algorithm~\ref{alg:write} describes our simulation of file write. 
-			Initially, periodical flushing is called to asynchronously flush expired 
-			dirty data at the beginning of the write (line 6).
 			During file write simulation, a file is cached in memory and also written 
 			to disk. Data can be written to cache without waiting for flushing or 
 			being throttled before the amount of dirty data reaches dirty\_ratio. 
 			Thus, our algorithm initially checks the amount of data that can be written 
-			with memory write bandwidth (line 7-8).
+			with memory write bandwidth (line 6-7).
 			If this amount is greater than 0, MemoryManager is asked to evict 
 			data from cache to accommodate the written data if needed (line 10). 
 			Then, cache write is simulated with memory model and data written is 
-			added to page cache LRU lists (11).
+			added to page cache LRU lists (10).
 			After dirty\_ratio is reached, dirty data has to be flushed before new data 
 			is written to cache again. 
 			We flush and evict data from cache as much as possible so that the 
-			remaining data can be written to cache (line 14-15). 
+			remaining data can be written to cache (line 13-14). 
 			Here, MemoryManager does not guarantee that the amount of flushed 
 			and evicted data is enough for the remaining data. In the case it is 
 			less than the required amount and existing dirty data can not be flushed, 
 			the remaining data being written to cache can be flushed and evicted right away. 
 			Thus, the amount of remaining data written and kept in cache 
 			after the write is limited by the amount free memory, and this amount 
-			is added to cache (line 16). 
+			is added to cache (line 15). 
 			Finally, the disk write is simulated with the remaining amount of 
-			data (line 17). As in the simulation of file read, all the concurrency  
-			of cache write and disk write are simulated by memory and disk models.
+			data (line 16), and the algorithm finishes with the total file write simulation time.
 			
 		\subsection{Implementation}
 
@@ -363,7 +390,7 @@
 			using original SimGrid and our SimGridExt version. 
 			To simulate our pipelines and system, we leverage 
 			the Workflow Management System Simulation Workbench 
-			(WRENCH~\cite{wrench}), a framework  built over SimGrid.
+			(WRENCH~\cite{wrench2018}), a framework built over SimGrid.
 		    We compare the results of the simulators with
 			original SimGrid and extended SimGrid with the results of real
 			pipelines on a real system. 
