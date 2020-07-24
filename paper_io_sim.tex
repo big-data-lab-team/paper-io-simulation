@@ -84,9 +84,9 @@
             We separate our simulation model in two components, the IO
 			Controller and the Memory Manager, which together simulate 
 			file read/write mechanisms in Linux (Figure~\ref{fig:interaction}). 
-			The Memory Manager simulates I/Os to cache, flushing, periodical flushing 
-			and cache eviction, whereas the IO Controller simulates file reads and writes. 
-			Simulated applications can simply interact with the IO Manager instead of 
+			The Memory Manager simulates I/Os to cache, flushing, periodical flushing, 
+			and cache eviction \tristan{how about periodical eviction?}, whereas the IO Controller simulates file reads and writes. 
+			Simulated applications can simply interact with the IO Controller instead of 
 			calling simulated storage directly as is the case with current simulators.
 
 			\begin{figure}
