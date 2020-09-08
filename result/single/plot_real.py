@@ -103,14 +103,24 @@ def plot(atop_log_file, timestamps_file, collectl_log_file, input_size):
 
     figure = plt.figure()
     plt.tight_layout()
-    ax1 = figure.add_subplot(2, 1, 1)
-    ax2 = figure.add_subplot(2, 1, 2, sharex=ax1)
+
+    if collectl_log_file is not None:
+        ax1 = figure.add_subplot(2, 1, 1)
+        ax2 = figure.add_subplot(2, 1, 2, sharex=ax1)
+    else:
+        ax1 = figure.add_subplot(1, 1, 1)
 
     ax1.set_ylim(top=280000, bottom=-10000)
-    ax1.set_xlim(left=0, right=700)
+    ax1.set_xlim(left=0, right=200)
     mem_plot(ax1, atop_log, timestamps, input_size)
 
-    collectl_plot(ax2, collectl_log_file, timestamps)
+    if collectl_log_file is not None:
+        collectl_plot(ax2, collectl_log_file, timestamps)
 
     plt.show()
 
+size = 20000
+plot(atop_log_file="real/%dgb/atop_mem.log" % int(size/1000),
+     timestamps_file="real/%dgb/timestamps_pipeline.csv" % int(size/1000),
+     collectl_log_file=None,
+     input_size=size)
