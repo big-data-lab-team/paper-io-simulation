@@ -105,7 +105,3 @@ def plot_sim_log(time_log_file, mem_log_file, title, xmin, xmax, ymin, ymax):
 
     plt.show()
 
-
-size = 50
-plot_sim_log("simgrid_ext/%dgb_sim_time.csv" % size, "simgrid_ext/%dgb_sim_mem.csv" % size, "Sim %dGB" % size,
-             0, 500, -1000, 280000)
