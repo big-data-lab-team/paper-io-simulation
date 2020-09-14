@@ -25,12 +25,12 @@ def export_time(task_list, filename):
             writer.writerow([task_list[i][0], task_list[i][1], task_list[i][2]])
 
 
-mm = MemoryManager(268600, 268600, read_bw=7100, write_bw=2000)
-storage = Storage(450000, read_bw=500, write_bw=500)
+mm = MemoryManager(268600, 268600, read_bw=7100, write_bw=3100)
+storage = Storage(450000, read_bw=465, write_bw=465)
 kernel = IOManager(mm, storage, dirty_ratio=0.4)
 
-input_size = 20000
-compute_time = 28
+input_size = 75000
+compute_time = 110
 
 file1 = File("file1", input_size, input_size)
 file2 = File("file2", input_size, input_size)
@@ -72,11 +72,11 @@ tasks = [("read", start_time, task1_read_end), ("write", task1_compute_end, task
          ("read", task1_write_end, task2_read_end), ("write", task2_compute_end, task2_write_end),
          ("read", task2_write_end, task3_read_end), ("write", task3_compute_end, task3_write_end)]
 
-plot_sim.plot_mem_log(mm.get_log(), task_time, "input = %d MB \nmem_rb = %d MBps\nmem_wb = %d MBps \n"
+plot_sim.plot_pysim_log(mm.get_log(), task_time, "input = %d MB \nmem_rb = %d MBps\nmem_wb = %d MBps \n"
                                            "disk_rb = %d MBps\ndisk_wb = %d MBps"
                       % (input_size, mm.read_bw, mm.write_bw,
                      storage.read_bw, storage.write_bw),
-                      xmin=0, xmax=200, ymin=-10000, ymax=280000)
+                      xmin=0, xmax=900, ymin=-10000, ymax=280000)
 
-# export_mem(mm.get_log(), "export/100gb_sim_mem.csv")
-# export_time(tasks, "export/100gb_sim_time.csv")
+export_mem(mm.get_log(), "export/%dgb_sim_mem.csv" % (input_size / 1000))
+export_time(tasks, "export/%dgb_sim_time.csv" % (input_size / 1000))
