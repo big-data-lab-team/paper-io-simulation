@@ -66,28 +66,28 @@ def parse_simgrid_result(dir, no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-# def plot_prop(propname, title, average=False):
-#     real_df = pd.read_csv("real/aggregated_result_real.csv")
-#     simgrid_df = pd.read_csv("simgrid_org/aggregated_result_simgrid.csv")
-#
-#     plt.figure()
-#     plt.title(title)
-#
-#     if average:
-#         plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="real")
-#         plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname] / simgrid_df["no_pipeline"], label="original simgrid")
-#     else:
-#         plt.plot(real_df["no_pipeline"], real_df[propname], label="real")
-#         plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname], label="original simgrid")
-#
-#     plt.xlabel("number of pipelines")
-#     plt.ylabel("time (s)")
-#
-#     plt.legend()
-#     plt.show()
+def plot_prop(propname, title, average=False):
+    real_df = pd.read_csv("real/aggregated_result_real.csv")
+    simgrid_df = pd.read_csv("simgrid_org/aggregated_result_simgrid.csv")
 
-# plot_prop("makespan", "makespan total")
-# plot_prop("readtime", "accumulative read time")
-# plot_prop("readtime", "average read time", average=True)
-# plot_prop("writetime", "accumulative write time")
-# plot_prop("writetime", "average write time", average=True)
+    plt.figure()
+    plt.title(title)
+
+    if average:
+        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="real")
+        plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname] / simgrid_df["no_pipeline"], label="original simgrid")
+    else:
+        plt.plot(real_df["no_pipeline"], real_df[propname], label="real")
+        plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname], label="original simgrid")
+
+    plt.xlabel("number of pipelines")
+    plt.ylabel("time (s)")
+
+    plt.legend()
+    plt.show()
+
+plot_prop("makespan", "makespan total")
+plot_prop("readtime", "accumulative read time")
+plot_prop("readtime", "average read time", average=True)
+plot_prop("writetime", "accumulative write time")
+plot_prop("writetime", "average write time", average=True)

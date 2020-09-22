@@ -30,13 +30,16 @@ def plot_task_error(size):
     # atop_file =     "log/cluster/100gb/atop_mem.log"
     real_time_log = "real/%dgb/timestamps_pipeline.csv" % size
     sim_py_log = "pysim/%dgb_sim_time.csv" % size
-    simgrid_log = "simgrid_org/timestamp_sim_exp1_%dgb.csv" % size
+    simgrid_org_log = "simgrid_org/%dgb_sim_time.csv" % size
+    simgrid_ext_log = "simgrid_ext/%dgb_sim_time.csv" % size
 
     py_error = evaluate.task_time_error(real_time_log, sim_py_log)
-    simgrid_error = evaluate.task_time_error(real_time_log, simgrid_log)
+    simgrid_org_error = evaluate.task_time_error(real_time_log, simgrid_org_log)
+    simgrid_ext_error = evaluate.task_time_error(real_time_log, simgrid_ext_log)
 
-    grouped_bar_chart(labels, "Simulation error of tasks with %dGB" % size, "tasks", "error",
-                      ("Python", py_error), ("Original SimGrid", simgrid_error))
+    grouped_bar_chart(labels, "Simulation error with %dGB" % size, "tasks", "error",
+                      ("Python", py_error), ("Original SimGrid", simgrid_org_error),
+                      ("Extended SimGrid", simgrid_ext_error))
 
 
 sizes = [20, 50, 75, 100]

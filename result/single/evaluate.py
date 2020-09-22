@@ -69,7 +69,7 @@ def mem_error(real_time_logfile, sim_time_logfile, real_mem_logfile, sim_mem_log
     sim_time_log = log_parse.read_timelog(sim_time_logfile)
     sim_mem_log = log_parse.read_sim_log(sim_mem_logfile)
 
-    sim_dirty_amt = get_sim_mem_prop(sim_time_log, sim_mem_log, "dirty_data")
+    sim_dirty_amt = get_sim_mem_prop(sim_time_log, sim_mem_log, "dirty")
     sim_cache_amt = get_sim_mem_prop(sim_time_log, sim_mem_log, "cache")
 
     print("sim:")

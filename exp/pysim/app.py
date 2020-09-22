@@ -1,6 +1,7 @@
 # i/o simulator in python
-import plot
+import plot_sim
 import csv
+import time
 from components import IOManager
 from components import File
 from components import Storage
@@ -24,34 +25,40 @@ def export_time(task_list, filename):
             writer.writerow([task_list[i][0], task_list[i][1], task_list[i][2]])
 
 
-mm = MemoryManager(268600, 268600, read_bw=7100, write_bw=3300)
+mm = MemoryManager(268600, 268600, read_bw=7100, write_bw=3100)
 storage = Storage(450000, read_bw=465, write_bw=465)
 kernel = IOManager(mm, storage, dirty_ratio=0.4)
 
-input_size = 20000
-compute_time = 28
+input_size = 75000
+compute_time = 110
 
 file1 = File("file1", input_size, input_size)
 file2 = File("file2", input_size, input_size)
 file3 = File("file3", input_size, input_size)
 file4 = File("file4", input_size, input_size)
 
+start = time.time()
+
 start_time = 0
 
-task1_read_end = kernel.read(file1, start_time)
+task1_read_end = kernel.read_file_by_chunk(file1, 50, start_time)
 task1_compute_end = kernel.compute(task1_read_end, compute_time)
-task1_write_end = kernel.write(file2, task1_compute_end)
+task1_write_end = kernel.write_file_in_chunk(file2, 50, task1_compute_end)
 kernel.release(file2)
 
-task2_read_end = kernel.read(file2, task1_write_end)
+task2_read_end = kernel.read_file_by_chunk(file2, 50, task1_write_end)
 task2_compute_end = kernel.compute(task2_read_end, compute_time)
-task2_write_end = kernel.write(file3, task2_compute_end)
+task2_write_end = kernel.write_file_in_chunk(file3, 50, task2_compute_end)
 kernel.release(file3)
 
-task3_read_end = kernel.read(file3, task2_write_end)
+task3_read_end = kernel.read_file_by_chunk(file3, 50, task2_write_end)
 task3_compute_end = kernel.compute(task3_read_end, compute_time)
-task3_write_end = kernel.write(file4, task3_compute_end)
+task3_write_end = kernel.write_file_in_chunk(file4, 50, task3_compute_end)
 kernel.release(file4)
+
+end = time.time()
+
+print("Sim time: %.8f" % (end - start))
 
 task_time = {
     "read_start": [start_time, task1_write_end, task2_write_end],
@@ -65,11 +72,11 @@ tasks = [("read", start_time, task1_read_end), ("write", task1_compute_end, task
          ("read", task1_write_end, task2_read_end), ("write", task2_compute_end, task2_write_end),
          ("read", task2_write_end, task3_read_end), ("write", task3_compute_end, task3_write_end)]
 
-plot.plot_mem_log(mm.get_log(), task_time, "input = %d MB \nmem_rb = %d MBps\nmem_wb = %d MBps \n"
+plot_sim.plot_pysim_log(mm.get_log(), task_time, "input = %d MB \nmem_rb = %d MBps\nmem_wb = %d MBps \n"
                                            "disk_rb = %d MBps\ndisk_wb = %d MBps"
-                  % (input_size, mm.read_bw, mm.write_bw,
+                      % (input_size, mm.read_bw, mm.write_bw,
                      storage.read_bw, storage.write_bw),
-                  xmin=0, xmax=200, ymin=-10000, ymax=280000)
+                      xmin=0, xmax=900, ymin=-10000, ymax=280000)
 
-export_mem(mm.get_log(), "py_log/ex1/new/100gb_sim_mem.csv")
-export_time(tasks, "py_log/ex1/new/100gb_sim_time.csv")
+export_mem(mm.get_log(), "export/%dgb_sim_mem.csv" % (input_size / 1000))
+export_time(tasks, "export/%dgb_sim_time.csv" % (input_size / 1000))
