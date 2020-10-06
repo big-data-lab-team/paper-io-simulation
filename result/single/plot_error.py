@@ -28,7 +28,7 @@ def plot_task_error(size):
     labels = ["read1", "write1", "read2", "write2", "read3", "write3"]
 
     # atop_file =     "log/cluster/100gb/atop_mem.log"
-    real_time_log = "real/%dgb/timestamps_pipeline.csv" % size
+    real_time_log = "real/%dgb/timestamps.csv" % size
     sim_py_log = "pysim/%dgb_sim_time.csv" % size
     simgrid_org_log = "wrench_org/%dgb_sim_time.csv" % size
     simgrid_ext_log = "wrench_ext/%dgb_sim_time.csv" % size
