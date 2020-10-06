@@ -45,16 +45,17 @@ def export_real_results(filename):
             writer.writerow(list(aggregate_result(i + 1)))
 
 
-def export_simgrid_result(filename):
-    with open(filename, 'w', newline='') as csvfile:
+def export_simgrid_result(dir, filename):
+    exported_file = "%s/%s" % (dir, filename)
+    with open(exported_file, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["no_pipeline", "makespan", "readtime", "writetime"])
         for i in range(32):
-            writer.writerow(list(parse_simgrid_result(i + 1)))
+            dump_file = "%s/dump_%d.json" % (dir, i + 1)
+            writer.writerow(list(parse_simgrid_result(dump_file, i + 1)))
 
 
-def parse_simgrid_result(dir, no_pipeline):
-    filename = "%s/unified_%d.json" % (dir, no_pipeline)
+def parse_simgrid_result(filename, no_pipeline):
     with open(filename) as json_file:
         res = json.load(json_file)
         tasks = res["workflow_execution"]["tasks"]
@@ -68,17 +69,20 @@ def parse_simgrid_result(dir, no_pipeline):
 
 def plot_prop(propname, title, average=False):
     real_df = pd.read_csv("real/aggregated_result_real.csv")
-    simgrid_df = pd.read_csv("simgrid_org/aggregated_result_simgrid.csv")
+    simg_org_df = pd.read_csv("wrench_org/aggregated.csv")
+    simg_ext_df = pd.read_csv("wrench_ext/aggregated.csv")
 
     plt.figure()
     plt.title(title)
 
     if average:
         plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="real")
-        plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname] / simgrid_df["no_pipeline"], label="original simgrid")
+        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], label="original WRENCH")
+        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], label="extended WRENCH")
     else:
         plt.plot(real_df["no_pipeline"], real_df[propname], label="real")
-        plt.plot(simgrid_df["no_pipeline"], simgrid_df[propname], label="original simgrid")
+        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname], label="original WRENCH")
+        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname], label="extended WRENCH")
 
     plt.xlabel("number of pipelines")
     plt.ylabel("time (s)")
@@ -86,8 +90,12 @@ def plot_prop(propname, title, average=False):
     plt.legend()
     plt.show()
 
-plot_prop("makespan", "makespan total")
-plot_prop("readtime", "accumulative read time")
-plot_prop("readtime", "average read time", average=True)
-plot_prop("writetime", "accumulative write time")
-plot_prop("writetime", "average write time", average=True)
+
+# export_simgrid_result("wrench_org", "aggregated.csv")
+# export_simgrid_result("wrench_ext", "aggregated.csv")
+#
+# plot_prop("makespan", "total makespan")
+# plot_prop("readtime", "cumulative read time")
+# plot_prop("readtime", "average read time", average=True)
+# plot_prop("writetime", "cumulative write time")
+# plot_prop("writetime", "average write time", average=True)

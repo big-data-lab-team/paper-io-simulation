@@ -59,18 +59,18 @@ def plot_log(time, read_starts, read_ends, write_starts, write_ends, total, cach
     plt.figure()
     plt.title(title)
 
-    start = read_starts[0]
-    for idx in range(len(read_starts)):
-        if idx == 0:
-            plt.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k",
-                        alpha=0.2, label="computation")
-            plt.axvspan(xmin=0, xmax=read_ends[idx] - start, color="g", alpha=0.2, label="read")
-            plt.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=0.2,
-                        label="write")
-        else:
-            plt.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k", alpha=0.2)
-            plt.axvspan(xmin=read_starts[idx] - start, xmax=read_ends[idx] - start, color="g", alpha=0.2)
-            plt.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=0.2)
+    # start = read_starts[0]
+    # for idx in range(len(read_starts)):
+    #     if idx == 0:
+    #         plt.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k",
+    #                     alpha=0.2, label="computation")
+    #         plt.axvspan(xmin=0, xmax=read_ends[idx] - start, color="g", alpha=0.2, label="read")
+    #         plt.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=0.2,
+    #                     label="write")
+    #     else:
+    #         plt.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k", alpha=0.2)
+    #         plt.axvspan(xmin=read_starts[idx] - start, xmax=read_ends[idx] - start, color="g", alpha=0.2)
+    #         plt.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=0.2)
 
     plt.plot(time, total, color='k', linewidth=1, linestyle="-.", label="total mem")
     plt.plot(time, used, color='g', linewidth=1, label="used mem")
@@ -88,10 +88,10 @@ def plot_log(time, read_starts, read_ends, write_starts, write_ends, total, cach
     plt.show()
 
 
-def compare_plot(real_time_file, real_mem_file,
-                 pysim_time_file, pysim_mem_file,
-                 simgrid_time_file, simgrid_mem_file,
-                 size, title, xmin, xmax, ymin, ymax):
+def compare_sep(real_time_file, real_mem_file,
+                pysim_time_file, pysim_mem_file,
+                simgrid_time_file, simgrid_mem_file,
+                size, title, xmin, xmax, ymin, ymax):
     figure = plt.figure()
     plt.tight_layout()
 
@@ -100,6 +100,37 @@ def compare_plot(real_time_file, real_mem_file,
     ax3 = figure.add_subplot(3, 1, 3, sharex=ax1)
 
     # REAL RESULTS
+    real_subplot(ax1, real_time_file, real_mem_file, xmin, xmax, ymin, ymax, bar_alpha=0.2, linestyle="-", linewidth=1)
+
+    # PYSIM RESULTS
+    sim_subplot(ax2, pysim_time_file, pysim_mem_file, "python simulator", bar_alpha=0.2)
+    sim_subplot(ax3, simgrid_time_file, simgrid_mem_file, "SimGrid simulator", bar_alpha=0.2)
+
+    plt.ylim(top=ymax, bottom=ymin)
+    plt.xlim(right=xmax, left=xmin)
+    # plt.text(1, 200000, text, fontsize=9)
+    plt.subplots_adjust(left=0.1, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0.25)
+    plt.show()
+
+
+def compare_overlap(real_time_file, real_mem_file,
+                    sim_time_file, sim_mem_file, title, xmin, xmax, ymin, ymax):
+    figure = plt.figure()
+    plt.tight_layout()
+
+    ax1 = figure.add_subplot(2, 1, 1)
+    ax2 = figure.add_subplot(2, 1, 2, sharex=ax1)
+
+    real_subplot(ax1, real_time_file, real_mem_file, xmin, xmax, ymin, ymax, alpha=0.2)
+    sim_subplot(ax1, sim_time_file, sim_mem_file, "", alpha=0.3)
+
+    plt.ylim(top=ymax, bottom=ymin)
+    plt.xlim(right=xmax, left=xmin)
+    plt.show()
+
+
+def real_subplot(subplot_ax, real_time_file, real_mem_file, xmin, xmax, ymin, ymax,
+                 bar_alpha=0.2, line_alpha=1, linestyle=".-", linewidth=1.5):
     timestamps = log_parse.read_timelog(real_time_file, skip_header=False)
     atop_log = log_parse.read_atop_log(real_mem_file, dirty_ratio=0.4, dirty_bg_ratio=0.1)
     dirty_data = np.array(atop_log["total"])
@@ -110,37 +141,33 @@ def compare_plot(real_time_file, real_mem_file,
 
     for i in range(len(timestamps)):
         if timestamps[i][0] == "read":
-            ax1.axvspan(xmin=timestamps[i][1] - start, xmax=timestamps[i][2] - start, color="g", alpha=0.2,
-                        label="read" if i == 0 else "")
+            subplot_ax.axvspan(xmin=timestamps[i][1] - start, xmax=timestamps[i][2] - start, color="g", alpha=bar_alpha,
+                               label="read" if i == 0 else "")
         else:
-            ax1.axvspan(xmin=timestamps[i - 1][2] - start, xmax=timestamps[i][1] - start, color="k", alpha=0.2,
-                        label="computation" if i == 1 else "")
-            ax1.axvspan(xmin=timestamps[i][1] - start, xmax=timestamps[i][2] - start, color="b", alpha=0.2,
-                        label="write" if i == 1 else "")
+            subplot_ax.axvspan(xmin=timestamps[i - 1][2] - start, xmax=timestamps[i][1] - start, color="k", alpha=bar_alpha,
+                               label="computation" if i == 1 else "")
+            subplot_ax.axvspan(xmin=timestamps[i][1] - start, xmax=timestamps[i][2] - start, color="b", alpha=bar_alpha,
+                               label="write" if i == 1 else "")
 
     # app_cache = list(np.array(app_mem) + np.array(cache_used))
-    ax1.plot(time, atop_log["total"], color='k', linewidth=1, linestyle=":", label="total mem")
-    ax1.plot(time, atop_log["used_mem"], color='g', linewidth=1.5, label="used mem")
-    ax1.plot(time, atop_log["cache"], color='m', linewidth=1.5, label="cache used")
-    ax1.plot(time, atop_log["dirty_data"], color='r', linewidth=1.5, label="dirty data")
-    ax1.plot(time, atop_log["avai_mem"], color='b', linewidth=1, linestyle="-.", label="available mem")
-    ax1.plot(time, atop_log["dirty_ratio"], color='k', linewidth=1, linestyle="-.", label="dirty_ratio")
-    ax1.plot(time, atop_log["dirty_bg_ratio"], color='r', linewidth=1, linestyle="-.", label="dirty_bg_ratio")
-    ax1.set_title("Real pipeline", fontsize=10)
-    ax1.legend(fontsize='small', loc='upper right')
-
-    # PYSIM RESULTS
-    sim_subplot(ax2, pysim_time_file, pysim_mem_file, "python simulator")
-    sim_subplot(ax3, simgrid_time_file, simgrid_mem_file, "SimGrid simulator")
-
-    plt.ylim(top=ymax, bottom=ymin)
-    plt.xlim(right=xmax, left=xmin)
-    # plt.text(1, 200000, text, fontsize=9)
-    plt.subplots_adjust(left=0.1, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0.25)
-    plt.show()
+    # subplot_ax.plot(time, atop_log["total"], color='k', linewidth=1.5, linestyle=linestyle, label="total mem", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["used_mem"], color='g', linewidth=linewidth, linestyle=linestyle,
+                    label="used mem", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["cache"], color='m', linewidth=linewidth, linestyle=linestyle,
+                    label="cache used", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["dirty_data"], color='r', linewidth=linewidth, linestyle=linestyle,
+                    label="dirty data", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["avai_mem"], color='b', linewidth=linewidth, linestyle=linestyle,
+                    label="available mem", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["dirty_ratio"], color='k', linewidth=linewidth, linestyle=linestyle,
+                    label="dirty_ratio", alpha=line_alpha)
+    # subplot_ax.plot(time, atop_log["dirty_bg_ratio"], color='r', linewidth=1, linestyle="-.", label="dirty_bg_ratio",
+    #                 alpha=alpha)
+    subplot_ax.set_title("Real pipeline", fontsize=10)
+    subplot_ax.legend(fontsize='small', loc='upper right')
 
 
-def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title):
+def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, line_alpha=1):
     sim_time_log = log_parse.read_timelog(sim_time_file)
     sim_mem_log = log_parse.read_sim_log(sim_mem_file)
 
@@ -171,31 +198,39 @@ def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title):
     for idx in range(len(read_starts)):
         if idx == 0:
             subplot_ax.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k",
-                               alpha=0.2, label="computation")
-            subplot_ax.axvspan(xmin=0, xmax=read_ends[idx] - start, color="g", alpha=0.2, label="read")
-            subplot_ax.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=0.2,
+                               alpha=bar_alpha, label="computation")
+            subplot_ax.axvspan(xmin=0, xmax=read_ends[idx] - start, color="g", alpha=bar_alpha, label="read")
+            subplot_ax.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=bar_alpha,
                                label="write")
         else:
-            subplot_ax.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k", alpha=0.2)
-            subplot_ax.axvspan(xmin=read_starts[idx] - start, xmax=read_ends[idx] - start, color="g", alpha=0.2)
-            subplot_ax.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=0.2)
+            subplot_ax.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k", alpha=bar_alpha)
+            subplot_ax.axvspan(xmin=read_starts[idx] - start, xmax=read_ends[idx] - start, color="g", alpha=bar_alpha)
+            subplot_ax.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="b", alpha=bar_alpha)
 
-    subplot_ax.plot(time, total, color='k', linewidth=1, linestyle="-.", label="total mem")
-    subplot_ax.plot(time, used, color='g', linewidth=1, label="used mem")
-    subplot_ax.plot(time, cache, color='m', linewidth=1, label="cache")
-    subplot_ax.plot(time, dirty, color='r', linewidth=1, label="dirty")
-    subplot_ax.plot(time, available, color='b', linewidth=1, linestyle="-.", label="available mem")
-    subplot_ax.plot(time, dirty_ratio, color='k', linewidth=1, linestyle="-.", label="dirty_ratio")
-    subplot_ax.plot(time, dirty_bg_ratio, color='r', linewidth=1, linestyle="-.", label="dirty_bg_ratio")
+    subplot_ax.plot(time, total, color='k', linewidth=1, label="total mem", alpha=line_alpha)
+    subplot_ax.plot(time, used, color='g', linewidth=1, label="used mem", alpha=line_alpha)
+    subplot_ax.plot(time, cache, color='m', linewidth=1, label="cache", alpha=line_alpha)
+    subplot_ax.plot(time, dirty, color='r', linewidth=1, label="dirty", alpha=line_alpha)
+    subplot_ax.plot(time, available, color='b', linewidth=1, label="available mem", alpha=line_alpha)
+    subplot_ax.plot(time, dirty_ratio, color='k', linewidth=1, label="dirty_ratio", alpha=line_alpha)
+    # subplot_ax.plot(time, dirty_bg_ratio, color='r', linewidth=1, label="dirty_bg_ratio", alpha=alpha)
 
     subplot_ax.set_title(title, fontsize=10)
 
 
-input_size = 100
+input_size = 75
 # plot_sim_result("pysim/%dgb_sim_time.csv" % input_size, "pysim/%dgb_sim_mem.csv" % input_size,
-#                 "python simulator: %dGB" % input_size, 0, 800, -1000, 280000)
+#                 "python simulator: %dGB" % input_size, 0, 500, -1000, 280000)
 
-compare_plot("real/%dgb/timestamps_pipeline.csv" % input_size, "real/%dgb/atop_mem.log" % input_size,
-             "pysim/%dgb_sim_time.csv" % input_size, "pysim/%dgb_sim_mem.csv" % input_size,
-             "simgrid_ext/%dgb_sim_time.csv" % input_size, "simgrid_ext/%dgb_sim_mem.csv" % input_size,
-             input_size, "Simulation results with %dGB input file" % input_size, 0, 1500, -1000, 280000)
+compare_sep("real/%dgb/timestamps_pipeline.csv" % input_size, "real/%dgb/atop_mem.log" % input_size,
+            "pysim/%dgb_sim_time.csv" % input_size, "pysim/%dgb_sim_mem.csv" % input_size,
+            "simgrid_ext/%dgb_sim_time.csv" % input_size, "simgrid_ext/%dgb_sim_mem.csv" % input_size,
+            input_size, "Simulation results with %dGB input file" % input_size, 0, 800, -1000, 280000)
+
+# compare_overlap("real/%dgb/timestamps_pipeline.csv" % input_size, "real/%dgb/atop_mem.log" % input_size,
+#                 "pysim/%dgb_sim_time.csv" % input_size, "pysim/%dgb_sim_mem.csv" % input_size,
+#                 "Simulation results with %dGB input file" % input_size, 0, 1500, -1000, 280000)
+
+
+# plot_sim_result("simgrid_ext/9_sim_mem.csv", "simgrid_ext/9_sim_mem.csv",
+#                 "WRENCH Ext: 9 pipelines", 0, 150, -1000, 280000)

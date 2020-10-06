@@ -1,6 +1,8 @@
-# simulator_py
-I/O simulator in Python.
+## I/O simulator in Python.
 
-# How to run the simulator
-- Open and run file `simulation.ipynb` with jupyter notebook.
-- Modify and export log files to correct location to parse the results.
+#### How to run the simulator
+Open jupyter notebook `simulation.ipynb`.
+
+#### Results
+Log files are generated in `export/`. 
+There are 2 log files for each input file size: `<size_in_gb>gb_sim_mem.csv`, `<size_in_gb>gb_sim_time.csv`.
