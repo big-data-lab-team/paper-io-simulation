@@ -88,6 +88,10 @@ def plot_prop(propname, title, average=False):
     plt.ylabel("time (s)")
 
     plt.legend()
+    if average:
+        plt.savefig("figures/%s_avg.pdf" % propname)
+    else:
+        plt.savefig("figures/%s.pdf" % propname)
     plt.show()
 
 

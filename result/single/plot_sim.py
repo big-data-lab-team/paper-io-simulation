@@ -218,14 +218,14 @@ def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, l
     subplot_ax.set_title(title, fontsize=10)
 
 
-input_size = 100
+input_size = 75
 # plot_sim_result("pysim/%dgb_sim_time.csv" % input_size, "pysim/%dgb_sim_mem.csv" % input_size,
 #                 "python simulator: %dGB" % input_size, 0, 500, -1000, 280000)
 
 compare_sep("real/%dgb/timestamps.csv" % input_size, "real/%dgb/atop_mem.log" % input_size,
             "pysim/%dgb_sim_time.csv" % input_size, "pysim/%dgb_sim_mem.csv" % input_size,
             "wrench_ext/%dgb_sim_time.csv" % input_size, "wrench_ext/%dgb_sim_mem.csv" % input_size,
-            input_size, "Simulation results with %dGB input file" % input_size, 0, 1300, -1000, 280000)
+            input_size, "Simulation results with %dGB input file" % input_size, 0, 800, -1000, 280000)
 
 # compare_overlap("real/%dgb/timestamps_pipeline.csv" % input_size, "real/%dgb/atop_mem.log" % input_size,
 #                 "pysim/%dgb_sim_time.csv" % input_size, "pysim/%dgb_sim_mem.csv" % input_size,

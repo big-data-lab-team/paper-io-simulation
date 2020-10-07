@@ -224,12 +224,12 @@ class MemoryManager:
             block = lru_list[i]
             if block.dirty and current_time - block.last_access > self.dirty_expire:
                 if 0 < max_flushed < flushed + block.size:
-                    flushed += max_flushed - flushed
+                    blk_flushed = max_flushed - flushed
+                    flushed += blk_flushed
                     # split the block, new clean block is created
-                    new_blk = Block(block.filename, max_flushed - flushed, dirty=False,
-                                    last_access=block.last_access)
+                    new_blk = Block(block.filename, blk_flushed, dirty=False, last_access=block.last_access)
                     lru_list.insert(i, new_blk)
-                    block.size = block.size + flushed - max_flushed
+                    block.size = block.size - blk_flushed
                 else:
                     block.dirty = False
                     flushed += block.size
