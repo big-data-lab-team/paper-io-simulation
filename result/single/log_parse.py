@@ -32,16 +32,16 @@ def read_atop_log(filename, dirty_ratio=0.2, dirty_bg_ratio=0.1):
         if line.startswith("MEM"):
             values = line.split(" ")
 
-            sys_mem_mb = int(values[7]) * 4096 / 1000 ** 2
+            sys_mem_mb = int(values[7]) * 4096 / 1000 ** 3
             sys_mem.append(sys_mem_mb)
 
-            cache_in_mb = int(values[9]) * 4096 / 1000 ** 2
+            cache_in_mb = int(values[9]) * 4096 / 1000 ** 3
             cache_used.append(cache_in_mb)
 
-            dirty_amt_mb = int(values[12]) * 4096 / 1000 ** 2
+            dirty_amt_mb = int(values[12]) * 4096 / 1000 ** 3
             dirty_data.append(dirty_amt_mb)
 
-            free_mem_mb = int(values[8]) * 4096 / 1000 ** 2
+            free_mem_mb = int(values[8]) * 4096 / 1000 ** 3
             free_mem.append(free_mem_mb)
 
             used_mem.append(sys_mem_mb - free_mem_mb)
@@ -77,10 +77,10 @@ def read_sim_log(filename):
 
         for line in csv_reader:
             time.append(float(line[0]))
-            total.append(float(line[1]))
-            dirty.append(float(line[2]))
-            cache.append(float(line[3]))
-            used.append(float(line[4]))
+            total.append(float(line[1]) / 1000)
+            dirty.append(float(line[2]) / 1000)
+            cache.append(float(line[3]) / 1000)
+            used.append(float(line[4]) / 1000)
 
     return {
         "time": time,

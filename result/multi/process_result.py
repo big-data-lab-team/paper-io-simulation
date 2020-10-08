@@ -89,9 +89,12 @@ def plot_prop(propname, title, average=False):
 
     plt.legend()
     if average:
-        plt.savefig("figures/%s_avg.pdf" % propname)
+        plt.savefig("figures/%s_avg.pdf" % propname, format="pdf")
+        plt.savefig("figures/%s_avg.svg" % propname, format="svg")
     else:
-        plt.savefig("figures/%s.pdf" % propname)
+        plt.savefig("figures/%s.pdf" % propname, format="pdf")
+        plt.savefig("figures/%s.svg" % propname, format="svg")
+
     plt.show()
 
 

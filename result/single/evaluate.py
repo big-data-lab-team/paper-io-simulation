@@ -56,26 +56,26 @@ def task_time_error(realtime_logfile, simtime_logfile):
     return time_acc
 
 
-def mem_error(real_time_logfile, sim_time_logfile, real_mem_logfile, sim_mem_logfile):
-    real_time_log = log_parse.read_timelog(real_time_logfile, skip_header=False)
-    real_mem_log = log_parse.read_atop_log(real_mem_logfile)
-
-    real_dirty_amt = [amt for amt in get_atop_mem_prop(real_time_log, real_mem_log, "dirty_data")]
-    real_cache_amt = [amt for amt in get_atop_mem_prop(real_time_log, real_mem_log, "cache")]
-
-    print("real:")
-    print(get_atop_mem_prop(real_time_log, real_mem_log, "dirty_data"))
-
-    sim_time_log = log_parse.read_timelog(sim_time_logfile)
-    sim_mem_log = log_parse.read_sim_log(sim_mem_logfile)
-
-    sim_dirty_amt = get_sim_mem_prop(sim_time_log, sim_mem_log, "dirty")
-    sim_cache_amt = get_sim_mem_prop(sim_time_log, sim_mem_log, "cache")
-
-    print("sim:")
-    print(sim_dirty_amt)
-
-    dirty_err = [abs(sim - real) / real for real, sim in zip(real_dirty_amt, sim_dirty_amt)]
-    cache_err = [abs(sim - real) / real for real, sim in zip(real_cache_amt, sim_cache_amt)]
-
-    return dirty_err, cache_err
+# def mem_error(real_time_logfile, sim_time_logfile, real_mem_logfile, sim_mem_logfile):
+#     real_time_log = log_parse.read_timelog(real_time_logfile, skip_header=False)
+#     real_mem_log = log_parse.read_atop_log(real_mem_logfile)
+#
+#     real_dirty_amt = [amt for amt in get_atop_mem_prop(real_time_log, real_mem_log, "dirty_data")]
+#     real_cache_amt = [amt for amt in get_atop_mem_prop(real_time_log, real_mem_log, "cache")]
+#
+#     print("real:")
+#     print(get_atop_mem_prop(real_time_log, real_mem_log, "dirty_data"))
+#
+#     sim_time_log = log_parse.read_timelog(sim_time_logfile)
+#     sim_mem_log = log_parse.read_sim_log(sim_mem_logfile)
+#
+#     sim_dirty_amt = get_sim_mem_prop(sim_time_log, sim_mem_log, "dirty")
+#     sim_cache_amt = get_sim_mem_prop(sim_time_log, sim_mem_log, "cache")
+#
+#     print("sim:")
+#     print(sim_dirty_amt)
+#
+#     dirty_err = [abs(sim - real) / real for real, sim in zip(real_dirty_amt, sim_dirty_amt)]
+#     cache_err = [abs(sim - real) / real for real, sim in zip(real_cache_amt, sim_cache_amt)]
+#
+#     return dirty_err, cache_err
