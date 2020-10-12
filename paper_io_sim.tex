@@ -23,7 +23,7 @@
 \begin{document}
 \title{I/O simulation model with Linux page cache, integration and evaluation in SimGrid framework}
 
-\author{\IEEEauthorblockN{Hoang-Dung Do, Tristan Glatard, Val\'erie Hayot-Sasson
+\author{\IEEEauthorblockN{Hoang-Dung Do, Val\'erie Hayot-Sasson, Tristan Glatard
   }\\
   \IEEEauthorblockA{
     Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada
@@ -482,15 +482,11 @@
 			The results are compared in total makespan of the pipelines, 
 			cumulative read time and cumulative write time.
 			
-			\subsubsection{Evaluation on storage types}
+			\subsubsection{Evaluation on remote storage}
 			
-		    Since different storage types should also be taken into account, 
-		    we conduct another experiment with the same scenario as 
-		    in the multi-threaded experiment, except that files are stored on a 
-		    shared file system instead of local disk. 
-		    
-		    \textcolor{red}{[Description of Lustre on the cluster and how it's 
-		    simulated]}. 
+		    Since remote storage is common in HPC, we conduct another experiment with 
+		    the same scenario as in the multi-threaded experiment, except that files 
+		    are stored on a node and read by another node. 
 		    
 		    \subsubsection{Simulation of a real application}
 
@@ -671,6 +667,7 @@
 			which we have seen in Figure~\ref{fig:single_error_100}. 
 			This can be explained with the amount of cached data of files at the beginning 
 			of the read shown in Figure~\ref{fig:fincore}. 
+			In this figure, \textit{file\_i} is the input of \textit{read\_i} and output of \textit{write\_i-1}. 
 			In real pipeline execution, after \textit{write2}, which writes \textit{file3}, 
 			all data of \textit{file3} is in cache (Figure~\ref{fig:fincore_real}). 
 			Thus, in \textit{read3}, \textit{file3} is read with memory bandwidth. 
