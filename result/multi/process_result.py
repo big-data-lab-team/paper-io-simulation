@@ -76,13 +76,13 @@ def plot_prop(propname, title, average=False):
     plt.title(title)
 
     if average:
-        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="real")
+        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="reality")
         plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], label="original WRENCH")
-        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], label="extended WRENCH")
+        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], label="WRENCH-Ext")
     else:
-        plt.plot(real_df["no_pipeline"], real_df[propname], label="real")
+        plt.plot(real_df["no_pipeline"], real_df[propname], label="reality")
         plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname], label="original WRENCH")
-        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname], label="extended WRENCH")
+        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname], label="WRENCH-Ext")
 
     plt.xlabel("number of pipelines")
     plt.ylabel("time (s)")
@@ -98,11 +98,11 @@ def plot_prop(propname, title, average=False):
     plt.show()
 
 
-# export_simgrid_result("wrench_org", "aggregated.csv")
-# export_simgrid_result("wrench_ext", "aggregated.csv")
-#
-# plot_prop("makespan", "total makespan")
-# plot_prop("readtime", "cumulative read time")
-# plot_prop("readtime", "average read time", average=True)
-# plot_prop("writetime", "cumulative write time")
-# plot_prop("writetime", "average write time", average=True)
+export_simgrid_result("wrench_org", "aggregated.csv")
+export_simgrid_result("wrench_ext", "aggregated.csv")
+
+plot_prop("makespan", "Total makespan")
+plot_prop("readtime", "Cumulative read time")
+plot_prop("readtime", "Average read time", average=True)
+plot_prop("writetime", "Cumulative write time")
+plot_prop("writetime", "Average write time", average=True)

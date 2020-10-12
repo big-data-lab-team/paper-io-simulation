@@ -102,8 +102,8 @@ def compare_sep(real_time_file, real_mem_file,
     real_subplot(ax1, real_time_file, real_mem_file, xmin, xmax, ymin, ymax, bar_alpha=0.2, linestyle="-", linewidth=1)
 
     # PYSIM RESULTS
-    sim_subplot(ax2, pysim_time_file, pysim_mem_file, "python simulator", bar_alpha=0.2)
-    sim_subplot(ax3, simgrid_time_file, simgrid_mem_file, "SimGrid simulator", bar_alpha=0.2)
+    sim_subplot(ax2, pysim_time_file, pysim_mem_file, "Python", bar_alpha=0.2)
+    sim_subplot(ax3, simgrid_time_file, simgrid_mem_file, "WRENCH-Ext", bar_alpha=0.2)
 
     # plt.ylim(top=ymax, bottom=ymin)
     plt.xlim(right=xmax, left=xmin)

@@ -7,6 +7,8 @@
 \usepackage[dvipsnames]{xcolor}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \algblock{Input}{EndInput}
 \algnotext{EndInput}
@@ -438,7 +440,7 @@
 			of storage, 44 object storage targets with 8.7~TB of storage each. 
 			The cluster is run on CentOS 8.1 with the Slurm Workload Manager installed. 
 			We use \textbf{\textit{atop}} and \textbf{\textit{collectl}} as tools to 
-			monitor and collect data of memory, page cache status and disk throughput 
+			monitor and collect memory status and disk throughput 
 			on the cluster. 
 			\textcolor{red}{[Add network description here, include number of disks 
 			on all nodes ,maybe add a diagram]}
@@ -516,15 +518,260 @@
 
 			\item Ability of the model to generalize memory trends (dirty data, cache used) and disk throughput.
 
+			\end{itemize}
+			
+		We use the disk and memory benchmark results and CPU time measured from 
+		the cluster to configure the simulated platform. The benchmark results of 
+		bandwidths and configured values in the simulators are shown in \ref{table:benchmark}.
+		
+		\begin{table}
+		\centering
+		\begin{tabular}{|l|c|c|c|}
+		\hline
+			Bandwidths (MBps)  & Cluster & Python & WRENCH\\
+		\hline
+			Memory read  & 6860	& 6860	 & 2765\\
+			Memory write & 2765	& 2765 & 2765\\
+			Disk read & ~510 & 465 & 465\\
+			Disk write & ~420 & 465	 & 465\\
+		\hline
+		\end{tabular}
+		\caption{Bandwidth benchmark results and simulator configurations}
+		\label{table:benchmark}
+		\end{table}
+				
+		In the Python simulator, we use different read and write bandwidths for both 
+		memory and disk as in cluster. However, as read and write bandwidths are 
+		symmetrical in SimGrid, we configure memory with write bandwidth 
+		and disk with average bandwidth. 
+		
 		\subsection{Single-threaded experiment}
+
+		\subsubsection{Simulated time}
+		
+			\begin{figure*}
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/error_20.pdf}
+   				\caption{20GB input file}	\label{fig:single_error_20}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/error_50.pdf}
+   				\caption{50GB input file}	\label{fig:single_error_50}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/error_75.pdf}
+   				\caption{75GB input file}	\label{fig:single_error_75}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/error_100.pdf}
+   				\caption{100GB input file}	\label{fig:single_error_100}
+			\end{subfigure}	
+			\caption{Relative error of individual simulated tasks}
+			\label{fig:single_error}
+			\end{figure*}
+			
+			The I/O time of tasks in both simulators is tracked, and then compared 
+			to the I/O time in the real pipeline execution. 
+			Figure~\ref{fig:single_error} shows the relative error of simulated I/O time of 
+			individual I/O activities in simulators with different input sizes. 
+			There are 3 tasks in the pipeline and each task reads an input file, 
+			performs some computation, and writes output file. 
+			Thus, we have 6 sequential I/O activities, \textit{read1} and \textit{write1} 
+			from the first task, \textit{read2} and \textit{write2} the second task, 
+			and \textit{read3}, \textit{write3} from the last task.
+			
+			In general, with all input sizes used in the experiment, the simulation errors 
+			of our simulators, both Python and WRENCH-Ext are remarkably lower 
+			in comparison with that of the original WRENCH simulator . 
+			The reason for this is, in original WRENCH, because page cache is not simulated, 
+			all data is only read/written with disk bandwidth, which makes simulated 
+			I/O time longer than in reality.
+			Especially, in our simulators, the errors of the Python simulator are significantly 
+			higher than that of the WRENCH-Ext simulator. 
+			This difference may attribute to the limitation in the periodical flushing 
+			mechanism simulation in Python. 
+			In WRENCH, it can be easily implemented with a simulated background thread, 
+			while there is only one thread simulated in our Python simulator, which 
+			hinders the correctness of this mechanism. 
+			Noticeably, the simulation time errors of \textit{read3} in the Python and 
+			WRENCH-Ext simulators are just under the error in original WRENCH. 
+			We will give our explanation for this later in this section.
+			
+		\subsubsection{Memory behavior}
+		
+			\begin{figure*}
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/single_comp_sep_20gb.pdf}
+   				\caption{20GB input file}	\label{fig:single_memprof_20gb}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/single_comp_sep_50gb.pdf}
+   				\caption{50GB input file}	\label{fig:single_memprof_50gb}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/single_comp_sep_75gb.pdf}
+   				\caption{75GB input file}	\label{fig:single_memprof_75gb}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/single_comp_sep_100gb.pdf}
+   				\caption{100GB input file}	\label{fig:single_memprof_100gb}
+			\end{subfigure}	
+			\caption{Memory profiling results with different input file sizes}
+			\label{fig:single_memprof}
+			\end{figure*}			
+			
+			Memory behaviors of real pipeline execution and simulators are also recorded 
+			and the memory profiling results are illustrated in Figure~\ref{fig:single_memprof}, 
+			with the bars presenting activities in tasks (read, compute and write) 
+			and the lines describing memory status throughout pipeline run time. 
+			
+			As shown in the figures, the makespans of the simulated pipeline are 
+			close to the makespan of the real pipeline. 
+			But more importantly, with all input file sizes, the trends of the lines describing 
+			memory in simulators are very similar to observations in the real execution. 
+			The similar trends in the amount of cache used (purple lines) in both reality 
+			and simulation shows that the use of page cache is well reproduced in the simulators. 
+			Besides, the red lines, which represent dirty data in cache, also 
+			follow similar trends. That means not only the amount dirty data written to 
+			cache is simulated, but also the flushing and periodical flushing 
+			mechanisms are accurately modeled in our simulators. 
+			This can be seen in the decrease in the amount of dirty data during computation 
+			time as well as read time. 
+			In addition, the effect of \textit{dirty\_data}  threshold is also simulated, 
+			which is reflected the interactions between dirty data (red line) and dirty\_ratio 
+			(black dashed line).
+			
+			\begin{figure*}
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/fincore_real.pdf}
+   				\caption{Real pipeline execution}	
+   				\label{fig:fincore_real}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/single/figures/fincore_wrench.pdf}
+   				\caption{WRENCH Simulator}	
+   				\label{fig:fincore_wrench}
+			\end{subfigure}	
+			\caption{Amount of file data in cache after each I/O activity with 100GB of input}
+			\label{fig:fincore}
+			\end{figure*}			
+
+			Again, with 100GB input file, memory behavior in the third read in the 
+			simulators is different from reality, causing unexpected long read time, 
+			which we have seen in Figure~\ref{fig:single_error_100}. 
+			This can be explained with the amount of cached data of files at the beginning 
+			of the read shown in Figure~\ref{fig:fincore}. 
+			In real pipeline execution, after \textit{write2}, which writes \textit{file3}, 
+			all data of \textit{file3} is in cache (Figure~\ref{fig:fincore_real}). 
+			Thus, in \textit{read3}, \textit{file3} is read with memory bandwidth. 
+			But in our simulator, after \textit{write2}, only a part of \textit{file3} 
+			remains in cache (Figure~\ref{fig:fincore_wrench}). 
+			The reason is while \textit{file3}  is being written, the page cache is saturated, 
+			and eviction is evoked to evict data from page cache, make space 
+			available for \textit{file3} data. 
+			However, because the amount of evictable memory is less than required amount, 
+			some \textit{file3} data is evicted after being written, make \textit{file3} 
+			partially cached. As a result, in \textit{read3}, only a part of \textit{file3} is read 
+			from cache with memory bandwidth, a part of it is read from disk with disk read 
+			bandwidth, which is many times slower, leading to longer read time. 			
+			
+			In summary, in single-threaded applications, our model can accurately 
+			simulate I/O time as well as the internal memory behavior. 
+			The model not only proves its applicability, but also proves that it is on 
+			a right track and can be further improve to achieve higher accuracy. 
 			
 		\subsection{Multi-threaded experiment}
 		
+			\begin{figure*}
+			\begin{subfigure}{\linewidth}
+				\centering
+   				\includegraphics[width=0.5\columnwidth]{result/multi/figures/makespan.pdf}
+   				\caption{Total makespan}	
+   				\label{fig:multi_makespan}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/multi/figures/readtime.pdf}
+   				\caption{Cumulative read time}	
+   				\label{fig:multi_readtime}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/multi/figures/readtime_avg.pdf}
+   				\caption{Average read time}	
+   				\label{fig:multi_readtime_avg}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/multi/figures/writetime.pdf}
+   				\caption{Cumulative write time}	
+   				\label{fig:multi_writetime}
+			\end{subfigure}	
+			\begin{subfigure}{\columnwidth}
+				\centering
+   				\includegraphics[width=\columnwidth]{result/multi/figures/writetime_avg.pdf}
+   				\caption{Average write time}	
+   				\label{fig:multi_writetime_avg}
+			\end{subfigure}	
+			\caption{Total makespan and I/O time with different number of concurrent pipeline}
+			\label{fig:multi_result}
+			\end{figure*}		
+			
+			In this experiment, we vary the number of 	concurrent pipeline from 1 to 32 
+			and record total makespan, cumulative and average read/write time 
+			of the pipelines on the cluster as well as from original WRENCH and 
+			WRENCH-Ext simulators. 
+			The results are presented in Figure~\ref{fig:multi_result}.
+			
+			The Figure~\ref{fig:multi_makespan} shows that as the number of pipelines 
+			increases, the total makespan raises accordingly because the amount of data 
+			increases but the memory and disk bandwidths are constant and shared between 
+			pipelines. 
+			In comparison with original WRENCH, the result from WRENCH-Ext are closer to 
+			reality because it is implemented with our I/O with page cache model. 
+			
+			If we focus on read time only, both cumulative read time (Figure~\ref{fig:multi_readtime}) 
+			and average read time (Figure~\ref{fig:multi_readtime_avg}) 
+			follow the same trend in total makespan, and the simulated read time 
+			of WRENCH-Ext simulator is closer to reality than the read time in original WRENCH. 
+			In addition, the average read time seems to increase linearly in all cases when 
+			the bandwidth is shared by pipelines. Again, the result from WRENCH-Ext is more 
+			accurate than that from original WRENCH. 
+			
+			Similarly, the cumulative write time (shown in Figure~\ref{fig:multi_writetime}) 
+			and the average write time (shown in Figure~\ref{fig:multi_writetime_avg}) have 
+			the same increasing trend and the result from WRENCH-Ext are more realistic than 
+			the result from original WRENCH. 
+			Especially, the average write time in both reality and WRENCH-Ext have a similar 
+			pattern, when they gradually increase before a surge linearly with the same slope 
+			after the number of pipelines reaches 10. 
+			This can be explained that with less than 10 concurrent pipelines, the page cache 
+			is still not saturated, so all files can be written entirely to cache with memory 
+			bandwidth in a short time. 
+			After the page cache is saturated with dirty data (after around 10 concurrent pipelines 
+			in this experiment), this dirty data needs to be flushed in order to make space 
+			available for new data being written to cache. This dirty data is flushed to 
+			disk with disk bandwidth, which is many times slower than memory bandwidth. 
+			The more pipelines we have, the more data needs to be written, the more data 
+			needs to be flushed, leading to a sharper increase in the average write time. 
+			
+			To conclude, the results from WRENCH-Ext shows that our model can simulate I/O 
+			with page cache accurately in a multi-threaded application.  
+			
 		\subsection{Remote storage}
 		
 		\subsection{Real application}
 
-		\end{itemize}
 
 	\section{Discussion and Future Work}
 		\begin{itemize}

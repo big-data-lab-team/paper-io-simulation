@@ -26,7 +26,7 @@ def export_time(task_list, filename):
 
 
 mm = MemoryManager(268600, 268600, read_bw=6860, write_bw=2765)
-storage = Storage(450000, read_bw=465, write_bw=465)
+storage = Storage(450000, read_bw=510, write_bw=420)
 kernel = IOManager(mm, storage, dirty_ratio=0.4)
 
 input_size = 100000
