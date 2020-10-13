@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def grouped_bar_chart(labels, title, xlabel, ylabel, *argv):
+def grouped_bar_chart(labels, size, xlabel, ylabel, *argv):
     x = np.arange(len(labels))  # the label locations
     width = 0.2  # the width of the bars
     bars = len(argv)
@@ -15,12 +15,13 @@ def grouped_bar_chart(labels, title, xlabel, ylabel, *argv):
 
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    ax.set_title(title)
+    ax.set_title("Simulation time error with %dGB input file" % size)
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
-    ax.set_ylim(bottom=0, top=8)
+    ax.set_ylim(bottom=0, top=800)
     ax.legend()
-
+    plt.savefig("figures/error_%d.svg" % size, format="svg")
+    plt.savefig("figures/error_%d.pdf" % size, format="pdf")
     plt.show()
 
 
@@ -28,18 +29,18 @@ def plot_task_error(size):
     labels = ["read1", "write1", "read2", "write2", "read3", "write3"]
 
     # atop_file =     "log/cluster/100gb/atop_mem.log"
-    real_time_log = "real/%dgb/timestamps_pipeline.csv" % size
+    real_time_log = "real/%dgb/timestamps.csv" % size
     sim_py_log = "pysim/%dgb_sim_time.csv" % size
-    simgrid_org_log = "simgrid_org/%dgb_sim_time.csv" % size
-    simgrid_ext_log = "simgrid_ext/%dgb_sim_time.csv" % size
+    simgrid_org_log = "wrench_org/%dgb_sim_time.csv" % size
+    simgrid_ext_log = "wrench_ext/%dgb_sim_time.csv" % size
 
-    py_error = evaluate.task_time_error(real_time_log, sim_py_log)
-    simgrid_org_error = evaluate.task_time_error(real_time_log, simgrid_org_log)
-    simgrid_ext_error = evaluate.task_time_error(real_time_log, simgrid_ext_log)
+    py_error = [item * 100 for item in evaluate.task_time_error(real_time_log, sim_py_log)]
+    simgrid_org_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_org_log)]
+    simgrid_ext_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_ext_log)]
 
-    grouped_bar_chart(labels, "Simulation error with %dGB" % size, "tasks", "error",
-                      ("Python", py_error), ("Original SimGrid", simgrid_org_error),
-                      ("Extended SimGrid", simgrid_ext_error))
+    grouped_bar_chart(labels, size, "", "error (%)",
+                      ("Python", py_error), ("Original WRENCH", simgrid_org_error),
+                      ("WRENCH-Ext", simgrid_ext_error))
 
 
 sizes = [20, 50, 75, 100]

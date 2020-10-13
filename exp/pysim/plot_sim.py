@@ -20,7 +20,7 @@ def plot_pysim_log(mem_log, time_stamps, text, xmin, xmax, ymin, ymax):
     write_ends = time_stamps["write_end"]
 
     plot_log(time, read_starts, read_ends, write_starts, write_ends, total, cache, dirty, used,
-             "python simulator result", xmax, xmin, ymax, ymin)
+             "python simulation result", xmax, xmin, ymax, ymin)
 
 
 def plot_sim_result(time_log_file, mem_log_file, title, xmin, xmax, ymin, ymax):
