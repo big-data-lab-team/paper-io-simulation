@@ -20,14 +20,14 @@ To run the Python simulator, use the source code in [/exp/pysim/](/exp/pysim/)  
 
 - **WRENCH simulator**: The log files of the WRENCH simulator shoule be place in [result/single/wrench_org](result/single/wrench_org/) 
 for original WRENCH and [result/single/wrench_ext/](result/single/wrench_ext/) for WRENCH with page cache.
-To run the WRENCH simulator, use the source code in [/exp/simgrid/](/exp/simgrid/) and follow the instructions in README file.
+To run the WRENCH simulator, use the source code in this [branch](https://github.com/dohoangdzung/wrench/tree/io_chunk_test) and follow the instructions in README file.
 
 3. Multi-threaded simulation log
 
 - The log files of the WRENCH simulator shoule be place in [result/single/wrench_org](result/single/wrench_org) for original WRENCH 
 and in [result/single/wrench_ext/](result/single/wrench_ext/) for WRENCH with page cache.
 
-- To run the WRENCH simulators, use the source code in [/exp/simgrid/](/exp/simgrid/) and follow the instructions in README file.
+- To run the WRENCH simulators, use the source code in this [branch](https://github.com/dohoangdzung/wrench/tree/io_chunk_test) and follow the instructions in README file.
 
 ## To generate the figures
 
