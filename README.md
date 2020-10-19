@@ -18,16 +18,16 @@ run pipeline on a real system using the source code in [exp/real/](exp/real/)
 - **Python simulator**: The log files of the Python simulator should be placed [result/single/pysim/](result/single/pysim/). 
 To run the Python simulator, use the source code in [/exp/pysim/](/exp/pysim/)  and follow the instructions in README file.
 
-- **WRENCH simulator**: The log files of the WRENCH simulator shoule be place in [result/single/wrench_org](result/single/wrench_org/) 
-for original WRENCH and [result/single/wrench_ext/](result/single/wrench_ext/) for WRENCH with page cache.
-To run the WRENCH simulator, use the source code in this [branch](https://github.com/dohoangdzung/wrench/tree/io_chunk_test) and follow the instructions in README file.
+- **WRENCH simulator**: The log files of the WRENCH simulator shoule be place in [result/single/wrench/original/](result/single/wrench/original/) 
+for original WRENCH and [result/single/wrench/pagecache/](result/single/wrench/pagecache/) for WRENCH with page cache.
+To run the WRENCH simulator, use this source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test/examples/basic-examples/bare-metal-chain) and follow the instructions in README file.
 
 3. Multi-threaded simulation log
 
-- The log files of the WRENCH simulator shoule be place in [result/single/wrench_org](result/single/wrench_org) for original WRENCH 
-and in [result/single/wrench_ext/](result/single/wrench_ext/) for WRENCH with page cache.
+- The log files of the WRENCH simulator shoule be place in [result/single/wrench/original/](result/single/wrench/original/) for original WRENCH 
+and in [result/single/wrench/pagecache/](result/single/wrench/pagecache/) for WRENCH with page cache.
 
-- To run the WRENCH simulators, use the source code in this [branch](https://github.com/dohoangdzung/wrench/tree/io_chunk_test) and follow the instructions in README file.
+- To run the WRENCH simulators, use the source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test) and follow the instructions in README file.
 
 ## To generate the figures
 

@@ -8,11 +8,11 @@ There are 3 required log files: `atop` logfile (named as `atop_mem.log`), `colle
 There are 2 logfiles for each input file size: `<file_size_gb>gb_sim_mem.csv` 
 and `<file_size_gb>gb_sim_time.csv`
 
-- The output log files from the orignal WRENCH simulator should be place in `wrench_org/` directory.
+- The output log files from the orignal WRENCH simulator should be place in `wrench/original/` directory.
 There is only one log file for each input file size named `<file_size_gb>gb_sim_time.csv` 
 (because memory profiling is not available in original WRENCH and SimGrid).
 
-- The output log files from the extended WRENCH simulator should be place in `wrench_ext/` directory.
+- The output log files from the extended WRENCH simulator should be place in `wrench/pagecache/` directory.
 There are 2 logfiles for each input file size: `<file_size_gb>gb_sim_mem.csv` 
 and `<file_size_gb>gb_sim_time.csv`
 
