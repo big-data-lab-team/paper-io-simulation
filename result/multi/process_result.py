@@ -67,42 +67,38 @@ def parse_simgrid_result(filename, no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-def plot_prop(propname, title, average=False):
+def plot_prop(propname, title):
     real_df = pd.read_csv("real/aggregated_result_real.csv")
-    simg_org_df = pd.read_csv("wrench_org/aggregated.csv")
-    simg_ext_df = pd.read_csv("wrench_ext/aggregated.csv")
+    simg_org_df = pd.read_csv("wrench/original/aggregated.csv")
+    simg_ext_df = pd.read_csv("wrench/pagecache/aggregated.csv")
 
     plt.figure()
     plt.title(title)
 
-    if average:
-        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="reality")
-        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], label="original WRENCH")
-        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], label="WRENCH-Ext")
+    if propname == "makespan":
+        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="reality", color="k")
+        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"],
+                 label="original WRENCH", color="tab:orange")
+        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"],
+                 label="WRENCH with page cache", color="tab:green")
+        plt.legend()
     else:
-        plt.plot(real_df["no_pipeline"], real_df[propname], label="reality")
-        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname], label="original WRENCH")
-        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname], label="WRENCH-Ext")
+        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], color="k")
+        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], color="tab:orange")
+        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], color="tab:green")
 
     plt.xlabel("number of pipelines")
     plt.ylabel("time (s)")
 
-    plt.legend()
-    if average:
-        plt.savefig("figures/%s_avg.pdf" % propname, format="pdf")
-        plt.savefig("figures/%s_avg.svg" % propname, format="svg")
-    else:
-        plt.savefig("figures/%s.pdf" % propname, format="pdf")
-        plt.savefig("figures/%s.svg" % propname, format="svg")
+    plt.savefig("figures/%s.pdf" % propname, format="pdf")
+    plt.savefig("figures/%s.svg" % propname, format="svg")
 
     plt.show()
 
 
-export_simgrid_result("wrench_org", "aggregated.csv")
-export_simgrid_result("wrench_ext", "aggregated.csv")
+export_simgrid_result("wrench/original/", "aggregated.csv")
+export_simgrid_result("wrench/pagecache", "aggregated.csv")
 
-plot_prop("makespan", "Total makespan")
-plot_prop("readtime", "Cumulative read time")
-plot_prop("readtime", "Average read time", average=True)
-plot_prop("writetime", "Cumulative write time")
-plot_prop("writetime", "Average write time", average=True)
+plot_prop("makespan", "")
+plot_prop("readtime", "")
+plot_prop("writetime", "")
