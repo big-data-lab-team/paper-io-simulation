@@ -399,7 +399,7 @@
 			Source code of our Python prototype is available at 
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}
 			
-			Having our model validated, we create simulators for different use cases 
+			Having the model validated, we create simulators for different use cases 
 			using WRENCH.
 			We integrate our I/O model to the original WRENCH by implementing 
 			the core of the model separately from existing WRENCH components, 
@@ -419,7 +419,7 @@
 			
 		\subsection{Experiments}
 		
-        	The goal of our experiments is to evaluate our write-back cache 
+        	The goal of our experiments is to evaluate our page cache 
 			simulation in single-threaded and multi-threaded applications
 			accessing data on different types of file system. We use a pipeline
 			of sequential tasks where each task reads an input file, increments
@@ -445,27 +445,39 @@
 			\textcolor{red}{[Add network description here, include number of disks 
 			on all nodes ,maybe add a diagram]}
 			
+			In simulated platform description, because the disk bandwidths in SimGrid 
+			are symmetrical, we measure the read/write bandwidths on our cluster and 
+			take the average bandwidths. 
+			As the pipelines are single-core, we create simulated tasks, 
+			each of them runs on only one core. 
+			While in Python, computation time can be directly configured, 
+			this time is injected to the WRENCH simulators with number of flops, 
+			which is calculated with CPU speed and compute duration. 
+			In our experiments, the CPU speed is set to 1 Gflops. 
+			Finally, because WRENCH simulates applications base on network-communication, 
+			we use an infinite bandwidth to eliminate network latency for local I/Os.
+			The details of simulated platform is available here: 
+			https://github.com/dohoangdzung/wrench/blob/io_chunk_test/examples/basic-examples/io-pagecache/single_host.xml
+			
 			\subsubsection{Single-threaded evaluation}
 			
-			The simplest execution scenario is single-threaded, where memory 
-			bandwidth and disk bandwidth are dedicated. Our goal is to 
-			compare the detailed simulation results of each task in the pipeline 
-			including read/write time, memory status and then validate the correctness 
-			of the simulation model. 
+			The first experiment is single-threaded, where memory bandwidth 
+			and disk bandwidth are dedicated. 
+			Our goal is to compare the detailed simulation results of each task 
+			in the pipeline including read/write time, memory behavior and 
+			then validate the correctness of the simulation model. 
 
 			The pipeline used in this experiment consists of three tasks, 
 			each task reads a file, increases every byte and writes output file 
 			to local disk. 
-			We use the input sizes of 20~GB, 50~GB, 75~GB and 100~GB, run 
-			the pipeline on the cluster, measure the CPU time of the tasks  
-			with each input and use it to simulate CPU time in the simulators .
-
-			We simulate the pipeline with the Python prototype simulator, 
-			a simulator with original WRENCH and another with WRENCH-Ext.  
+			We use the input sizes of 20~GB, 50~GB, 75~GB, 100~GB and run 
+			the pipeline on the cluster.
+			The pipeline is simulated with the Python prototype simulator, 
+			original WRENCH and WRENCH with page cache simulator. 
 			
 			\subsubsection{Multi-threaded evaluation}
 
-			In the second experiment, we evaluate the simulator in a concurrent I/O, 
+			In the second scenario, we evaluate the simulator in a concurrent I/O, 
 			bandwidth-sharing scenario with a multi-threaded application. 			
 			We vary the number of concurrent pipelines running on a multi-core host.  
 			
@@ -516,9 +528,7 @@
 
 			\end{itemize}
 			
-		We use the disk and memory benchmark results and CPU time measured from 
-		the cluster to configure the simulated platform. The benchmark results of 
-		bandwidths and configured values in the simulators are shown in \ref{table:benchmark}.
+		The benchmark results of bandwidths and the values used in the simulators are shown in \ref{table:benchmark}. These configurations are used in all experiments. 
 		
 		\begin{table}
 		\centering
@@ -534,10 +544,7 @@
 		\end{tabular}
 		\caption{Bandwidth benchmark results and simulator configurations}
 		\label{table:benchmark}
-		\end{table}
-				
-		As read and write bandwidths are symmetrical in SimGrid, we take the average values 
-		to configure our simulators. 
+		\end{table}		
 		
 		\subsection{Single-threaded experiment}
 

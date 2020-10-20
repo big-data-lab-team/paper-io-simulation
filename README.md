@@ -20,14 +20,14 @@ To run the Python simulator, use the source code in [/exp/pysim/](/exp/pysim/)  
 
 - **WRENCH simulator**: The log files of the WRENCH simulator shoule be place in [result/single/wrench/original/](result/single/wrench/original/) 
 for original WRENCH and [result/single/wrench/pagecache/](result/single/wrench/pagecache/) for WRENCH with page cache.
-To run the WRENCH simulator, use this source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test/examples/basic-examples/bare-metal-chain) and follow the instructions in README file.
+To run the WRENCH simulator, use this source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test/examples/basic-examples/io-pagecache) and follow the instructions in README file.
 
 3. Multi-threaded simulation log
 
 - The log files of the WRENCH simulator shoule be place in [result/single/wrench/original/](result/single/wrench/original/) for original WRENCH 
 and in [result/single/wrench/pagecache/](result/single/wrench/pagecache/) for WRENCH with page cache.
 
-- To run the WRENCH simulators, use the source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test) and follow the instructions in README file.
+- To run the WRENCH simulators, use the source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test/examples/basic-examples/io-pagecache) and follow the instructions in README file.
 
 ## To generate the figures
 
