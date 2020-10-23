@@ -56,4 +56,4 @@ def plot_cache(real_file, sim_file):
     plt.show()
 
 
-plot_cache("fincore/real.csv", "fincore/sim.csv")
+# plot_cache("fincore/real.csv", "fincore/sim.csv")

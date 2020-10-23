@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def grouped_bar_chart(ax, labels, size, xlabel, ylabel, *argv):
+def grouped_bar_chart(ax, labels, xlabel, ylabel, *argv):
     x = np.arange(len(labels))  # the label locations
     width = 0.2  # the width of the bars
     bars = len(argv)
@@ -32,20 +32,20 @@ def plot_task_error(ax, size):
     simgrid_org_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_org_log)]
     simgrid_ext_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_ext_log)]
 
-    grouped_bar_chart(ax, labels, size, "", "error (%)",
+    grouped_bar_chart(ax, labels, "", "error (%)",
                       ("Python simulator", py_error, "tab:pink"), ("Original WRENCH", simgrid_org_error, 'tab:orange'),
                       ("WRENCH simulator with page cache", simgrid_ext_error, 'tab:cyan'))
     ax.set_title("%d GB" % size)
 
 
-plt.rcParams.update({'font.size': 8})
-fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
-plot_task_error(ax1, 20)
-plot_task_error(ax2, 100)
-
-lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
-
-plt.savefig("figures/errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
-plt.savefig("figures/errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
-plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
-plt.show()
+# plt.rcParams.update({'font.size': 8})
+# fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
+# plot_task_error(ax1, 20)
+# plot_task_error(ax2, 100)
+#
+# lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+#
+# plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
+# plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
+# plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+# plt.show()
