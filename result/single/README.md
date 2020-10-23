@@ -30,8 +30,8 @@ and `<file_size_gb>gb_sim_time.csv`
 
 - Instructions are in the jupyter notebook `plot_cache.ipynb` 
 
-### Results from the real pipeline
-Instructions are in the jupyter notebook `plot_real_result.ipynb`
+### Memory profiling results from real execution and simulators
+Instructions are in the jupyter notebook `plot_memprof.ipynb`
 
 ### Errors comparison between python simulator and WRENCH simulator
 Instructions are in the jupyter notebook `plot_error.ipynb` 
