@@ -84,20 +84,20 @@ def plot_prop(ax, exp_folder, propname, title):
     ax.set_ylabel("time (s)")
 
 
-export_real_results("local/real/", "aggregated.csv")
-export_simgrid_result("local/wrench/original/", "aggregated.csv")
-export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
-
-plt.rcParams.update({'font.size': 8})
-fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
-
-plot_prop(ax1, "local", "readtime", "average read time")
-plot_prop(ax2, "local", "writetime", "average write time")
-
-plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
-plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
-
-plt.savefig("figures/multi_local.pdf", format="pdf")
-plt.savefig("figures/multi_local.svg", format="svg")
-
-plt.show()
+# export_real_results("local/real/", "aggregated.csv")
+# export_simgrid_result("local/wrench/original/", "aggregated.csv")
+# export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
+#
+# plt.rcParams.update({'font.size': 8})
+# fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
+#
+# plot_prop(ax1, "local", "readtime", "average read time")
+# plot_prop(ax2, "local", "writetime", "average write time")
+#
+# plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+# plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+#
+# plt.savefig("figures/multi_local.pdf", format="pdf")
+# plt.savefig("figures/multi_local.svg", format="svg")
+#
+# plt.show()
