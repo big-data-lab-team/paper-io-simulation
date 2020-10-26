@@ -38,12 +38,12 @@ def plot_task_error(ax, size):
     ax.set_title("%d GB" % size)
 
 
-# plt.rcParams.update({'font.size': 8})
-# fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
-# plot_task_error(ax1, 20)
-# plot_task_error(ax2, 100)
-#
-# lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+plt.rcParams.update({'font.size': 8})
+fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
+plot_task_error(ax1, 20)
+plot_task_error(ax2, 100)
+
+lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
 #
 # plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
 # plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')

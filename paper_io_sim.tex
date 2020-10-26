@@ -594,16 +594,10 @@
 		
 			\begin{figure*}
 			\centering
-			\begin{subfigure}{\columnwidth}
+			\begin{subfigure}{\linewidth}
 				\centering
-   				\includegraphics[width=\columnwidth]{result/single/figures/single_comp_sep_20gb.pdf}
-   				\caption{20GB input file}	\label{fig:single_memprof_20gb}
-			\end{subfigure}	
-			\begin{subfigure}{\columnwidth}
-				\centering
-   				\includegraphics[width=\columnwidth]{result/single/figures/single_comp_sep_100gb.pdf}
-   				\caption{100GB input file}	\label{fig:single_memprof_100gb}
-			\end{subfigure}	
+   				\includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
+			\end{subfigure}
 			\caption{Memory profiling results with different input file sizes}
 			\label{fig:single_memprof}	
 			\begin{subfigure}{\linewidth}
@@ -656,20 +650,19 @@
 			\label{fig:multi_local}
 			\end{figure*}		
 			
-			In this experiment, the results is analyzed with the average I/O time of concurrent pipelines.
-			The results from real execution and simulation are presented in Figure~\ref{fig:multi_result}.
+			In this experiment, the results are analyzed in terms of average I/O time 
+			of concurrent pipelines shown in Figure~\ref{fig:multi_local}.
 			
-			The Figure~\ref{fig:multi_readtime} shows that as the number of pipelines 
-			increases, the average read time raises accordingly because the amount of data 
+			As is shown in the figure, when the number of pipelines increases, 
+			the average read time raises accordingly because the amount of data 
 			increases but memory and disk bandwidths are fixed and shared between pipelines. 
 			In comparison with original WRENCH, the result from WRENCH with page cache are closer 
 			to reality. 
-			Especially, when it comes to the average write time 
-			(shown in Figure~\ref{fig:multi_writetime}), 
+			Especially, when it comes to the average write time, 
 			although the trend in reality is more complex, our WRENCH with page cache 
-			simulator can still capture it and share the same pattern with 
-			the real execution, when they gradually increase before surging 
-			with the same slope after the number of pipelines reaches 10. 
+			simulator can still capture the pattern in real execution.
+			In both, the average write time gradually increases before surging with the 
+			same slopes after the number of pipelines reaches 10. 
 			This can be explained that with less than 10 concurrent pipelines, 
 			the page cache is not saturated, so all files can be written entirely to 
 			cache with memory bandwidth in a short time. 
