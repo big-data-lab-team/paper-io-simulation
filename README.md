@@ -2,9 +2,21 @@
 
 A paper on I/O simulation in [SimGrid](http://simgrid.org).
 
-## Before generating figures
-The figures are generated from the log files exported in real execution and simulators. 
-You can use the existing simulation log files in this repository or run the real pipeline/simulators to generate these logs.
+### Generate the figures
+The figures are generated from the log files exported in real execution and simulators.
+Follow the instruction in README file as well as Jupyter notebook available in result directories.
+
+- Single-threaded experiment: [result/single/](result/single/)
+- Multi-threaded experiment: [result/multi/](result/multi/)
+
+#### Generate the pdf from svg figures
+
+1. Install [inkscape](http://inkscape.org)
+2. ./generate_figures.sh
+
+### Get the log files
+If the log files are missing, or if you would like to run the experiments with your own configurations,
+you should run the real pipeline/simulators to generate these logs.
 
 1. Real execution
 - Single-threaded experiment: The log files of real execution should be placed in [result/single/real/](result/single/real/).
@@ -24,20 +36,7 @@ To run the WRENCH simulator, use this source code [example](https://github.com/d
 
 3. Multi-threaded simulation log
 
-- The log files of the WRENCH simulator shoule be place in [result/single/wrench/original/](result/single/wrench/original/) for original WRENCH 
-and in [result/single/wrench/pagecache/](result/single/wrench/pagecache/) for WRENCH with page cache.
+- The log files of the WRENCH simulator shoule be place in [result/multi/local/wrench/original/](result/multi/local/wrench/original/) for original WRENCH 
+and in [result/multi/local/wrench/pagecache/](result/multi/local//wrench/pagecache/) for WRENCH with page cache.
 
 - To run the WRENCH simulators, use the source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test/examples/basic-examples/io-pagecache) and follow the instructions in README file.
-
-## To generate the figures
-
-Follow the instruction in README file as well as Jupyter notebook available in result directories.
-
-- Single-threaded experiment: [result/single/](result/single/)
-
-- Multi-threaded experiment: [result/multi/](result/multi/)
-
-## Before generate paper: generate the pdf from svg figures
-
-1. Install [inkscape](http://inkscape.org)
-2. ./generate_figures.sh
