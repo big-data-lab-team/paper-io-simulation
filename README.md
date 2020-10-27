@@ -10,10 +10,11 @@ If the svg files are not available to generate pdf files, you should re-generate
 from experiment results. 
 
 The figures are generated from the log files exported in real execution and simulators.
-Follow the instruction in README file as well as Jupyter notebook available in result directories.
+Use the Jupyter notebook `generate_figures.ipynb` to generate svg (and also pdf) files.
 
-- Single-threaded experiment: [result/single/](result/single/)
-- Multi-threaded experiment: [result/multi/](result/multi/)
+Figures are generated and saved in:
+- Single-threaded experiment: [result/single/figures/](result/single/figures/)
+- Multi-threaded experiment: [result/multi/figures/](result/multi/figures/)
 
 ### Get the log files
 If the log files are missing, or if you would like to run the experiments with your own configurations,
