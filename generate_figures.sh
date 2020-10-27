@@ -7,31 +7,14 @@ function die(){
     echo $*
     exit 1
 }
-
-#General figures
 type inkscape &>/dev/null || die "Cannot find inkscape"
-for i in figures/*.svg
+for folder in figures result/single/figures result/multi/figures
 do
-    name=$(basename $i .svg)
-    command="inkscape $i -o figures/${name}.pdf"
-    echo ${command} 
-    ${command} || die "Failed"
-done
-
-# single-threaded exp figures
-for i in result/single/figures/*.svg
-do
-    name=$(basename $i .svg)
-    command="inkscape $i -o result/single/figures/${name}.pdf"
-    echo ${command}
-    ${command} || die "Failed"
-done
-
-# multi-threaded exp figures
-for i in result/multi/*.svg
-do
-    name=$(basename $i .svg)
-    command="inkscape $i -o result/single/multi/${name}.pdf"
-    echo ${command}
-    ${command} || die "Failed"
+    for i in $folder/*.svg
+    do
+        name=$(basename $i .svg)
+        command="inkscape $i -o ${folder}/${name}.pdf"
+        echo ${command}
+        ${command} || die "Failed"
+    done
 done
