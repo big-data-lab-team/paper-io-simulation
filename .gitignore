@@ -1,4 +1,3 @@
-*.log
 *.gz
 *.pdf
 *.bbl
@@ -51,3 +50,7 @@ exp/simgrid/CMakeModules/
 
 exp/real/pull.sh
 exp/real/push2cloud.sh
+
+# Latex log
+paper_io_sim.log
+texput.log

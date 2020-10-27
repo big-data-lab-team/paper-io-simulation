@@ -1,18 +1,19 @@
-# paper-io-simulation
-
 A paper on I/O simulation in [SimGrid](http://simgrid.org).
 
+### Generate the pdf from svg figures
+Generate pdf files used in the paper from svg files. 
+1. Install [inkscape](http://inkscape.org)
+2. ./generate_figures.sh
+
 ### Generate the figures
+If the svg files are not available to generate pdf files, you should re-generate the svg files 
+from experiment results. 
+
 The figures are generated from the log files exported in real execution and simulators.
 Follow the instruction in README file as well as Jupyter notebook available in result directories.
 
 - Single-threaded experiment: [result/single/](result/single/)
 - Multi-threaded experiment: [result/multi/](result/multi/)
-
-#### Generate the pdf from svg figures
-
-1. Install [inkscape](http://inkscape.org)
-2. ./generate_figures.sh
 
 ### Get the log files
 If the log files are missing, or if you would like to run the experiments with your own configurations,
