@@ -3,12 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def grouped_bar_chart(labels, size, xlabel, ylabel, *argv):
+def grouped_bar_chart(ax, labels, xlabel, ylabel, *argv):
     x = np.arange(len(labels))  # the label locations
     width = 0.2  # the width of the bars
     bars = len(argv)
 
-    fig, ax = plt.subplots()
     for i in range(len(argv)):
         arg = argv[i]
         ax.bar(x + (2 * i + 1 - bars) * width / 2, arg[1], width, label=arg[0], color=arg[2])
@@ -17,15 +16,11 @@ def grouped_bar_chart(labels, size, xlabel, ylabel, *argv):
     ax.set_ylabel(ylabel)
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
-    ax.set_ylim(bottom=0, top=800)
-    if size == 20: ax.legend()
-    plt.savefig("figures/error_%d.svg" % size, format="svg")
-    plt.savefig("figures/error_%d.pdf" % size, format="pdf")
-    plt.show()
+    ax.set_ylim(bottom=0, top=700)
 
 
-def plot_task_error(size):
-    labels = ["read1", "write1", "read2", "write2", "read3", "write3"]
+def plot_task_error(ax, size):
+    labels = ["read_1", "write_1", "read_2", "write_2", "read_3", "write_3"]
 
     # atop_file =     "log/cluster/100gb/atop_mem.log"
     real_time_log = "real/%dgb/timestamps.csv" % size
@@ -37,11 +32,20 @@ def plot_task_error(size):
     simgrid_org_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_org_log)]
     simgrid_ext_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_ext_log)]
 
-    grouped_bar_chart(labels, size, "", "error (%)",
-                      ("Python simulator", py_error, "tab:blue"), ("Original WRENCH", simgrid_org_error, 'tab:orange'),
-                      ("WRENCH simulator with page cache", simgrid_ext_error, 'tab:green'))
+    grouped_bar_chart(ax, labels, "", "error (%)",
+                      ("Python simulator", py_error, "tab:pink"), ("Original WRENCH", simgrid_org_error, 'tab:orange'),
+                      ("WRENCH simulator with page cache", simgrid_ext_error, 'tab:cyan'))
+    ax.set_title("%d GB" % size)
 
 
-sizes = [20, 50, 75, 100]
-for size in sizes:
-    plot_task_error(size)
+plt.rcParams.update({'font.size': 8})
+fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
+plot_task_error(ax1, 20)
+plot_task_error(ax2, 100)
+
+lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+#
+# plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
+# plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
+# plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+# plt.show()
