@@ -20,7 +20,7 @@ def grouped_bar_chart(ax, labels, xlabel, ylabel, *argv):
 
 
 def plot_task_error(ax, size):
-    labels = ["read_1", "write_1", "read_2", "write_2", "read_3", "write_3"]
+    labels = ["Read 1", "Write 1", "Read 2", "Write 2", "Read 3", "Write 3"]
 
     # atop_file =     "log/cluster/100gb/atop_mem.log"
     real_time_log = "real/%dgb/timestamps.csv" % size

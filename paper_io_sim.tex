@@ -617,20 +617,20 @@
 			This longer read can be explained with the amount of cached data of files 
 			at the beginning of the read in reality and simulators shown in 
 			Figure~\ref{fig:single_cache}. 			
-			In this figure, \textit{file$<$i$>$} is the input of \textit{read$<$i$>$} and 
-			output of \textit{write$<$i-1$>$}. 
-			In the real execution, after \textit{write2}, which writes \textit{file3}, 
-			all data of \textit{file3} is in cache (Figure~\ref{fig:fincore_real}). 
-			Thus, in \textit{read3}, \textit{file3} is read with memory bandwidth. 
-			But in our simulator, after \textit{write2}, only a part of \textit{file3} 
-			remains in cache (Figure~\ref{fig:fincore_wrench}). 
-			The reason is while \textit{file3}  is being written, the page cache is saturated, 
+			In this figure, \textit{file $<$i$>$} is the input of \textit{Read $<$i$>$} and 
+			output of \textit{Write $<$i-1$>$}. 
+			In the real execution, after \textit{Write 2}, which writes \textit{file 3}, 
+			all data of \textit{file 3} is in cache. 
+			Thus, in \textit{Read 3}, \textit{file 3} is read with memory bandwidth. 
+			But in our simulator, after \textit{Write 2}, only a part of \textit{file 3} 
+			remains in cache. 
+			The reason is while \textit{file 3}  is being written, the page cache is saturated, 
 			eviction is then evoked to evict data from page cache, make space 
-			available for \textit{file3}. 
+			available for \textit{file 3}. 
 			However, because the evicted amount is less than required, 
-			some \textit{file3} data is evicted after being written, make \textit{file3} 
+			some \textit{file 3} data is evicted after being written, make \textit{file 3} 
 			partially cached. 
-			As a result, in \textit{read3}, only a part of \textit{file3} is read from cache 
+			As a result, in \textit{Read 3}, only a part of \textit{file 3} is read from cache 
 			with memory bandwidth, a part of it is read from disk with disk read bandwidth, 
 			which is many times slower, leading to longer read time. 			
 			
