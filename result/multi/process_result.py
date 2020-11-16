@@ -53,7 +53,7 @@ def export_simgrid_result(folder, filename):
         writer = csv.writer(csvfile)
         writer.writerow(["no_pipeline", "makespan", "readtime", "writetime"])
         for i in range(32):
-            dump_file = "%s/dump_%d.json" % (folder, i + 1)
+            dump_file = "%sdump_%d.json" % (folder, i + 1)
             writer.writerow(list(parse_simgrid_result(dump_file, i + 1)))
 
 
@@ -86,7 +86,7 @@ def suplot_prop(ax, exp_folder, propname, title):
     ax.set_ylabel("time (s)")
 
 
-def aggrerate_and_plot():
+def result_local():
     export_real_results("local/real/", "aggregated.csv")
     export_simgrid_result("local/wrench/original/", "aggregated.csv")
     export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
@@ -96,10 +96,35 @@ def aggrerate_and_plot():
     suplot_prop(ax1, "local", "readtime", "average read time")
     suplot_prop(ax2, "local", "writetime", "average write time")
 
+    ax1.set_ylim(bottom=0, top=1500)
+    ax2.set_ylim(bottom=0, top=1500)
+
     plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
-
     plt.savefig("figures/multi_local.pdf", format="pdf")
     plt.savefig("figures/multi_local.svg", format="svg")
 
     plt.show()
+
+
+def result_nfs():
+    export_real_results("remote/real/", "aggregated.csv")
+    export_simgrid_result("remote/wrench/original/", "aggregated.csv")
+    export_simgrid_result("remote/wrench/pagecache/", "aggregated.csv")
+    plt.rcParams.update({'font.size': 8})
+    fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
+
+    suplot_prop(ax1, "remote", "readtime", "average read time")
+    suplot_prop(ax2, "remote", "writetime", "average write time")
+
+    ax1.set_ylim(bottom=0, top=1500)
+    ax2.set_ylim(bottom=0, top=1500)
+
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+    plt.savefig("figures/multi_nfs.pdf", format="pdf")
+    plt.savefig("figures/multi_nfs.svg", format="svg")
+
+    plt.show()
+
+result_nfs()

@@ -13,4 +13,5 @@ plot_cache.plot_cache("fincore/real.csv", "fincore/sim.csv")
 
 os.chdir("../multi")
 import result.multi.process_result as multi_result
-multi_result.aggrerate_and_plot()
+multi_result.result_local()
+multi_result.result_nfs()

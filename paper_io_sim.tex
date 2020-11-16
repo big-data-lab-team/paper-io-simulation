@@ -23,56 +23,214 @@
 \begin{document}
 \title{I/O simulation model with Linux page cache, integration and evaluation in SimGrid framework}
 
-\author{\IEEEauthorblockN{Hoang-Dung Do, Val\'erie Hayot-Sasson, Rafael Ferreira da Silva, Henri Casanova, Tristan Glatard
+\author{\IEEEauthorblockN{Hoang-Dung Do$^1$, Val\'erie Hayot-Sasson$^1$, Rafael Ferreira da Silva$^3$, Henri Casanova$^2$, Tristan Glatard$^1$
   }\\
   \IEEEauthorblockA{
-    Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada
+    $^1$Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada \\
+     $^2$Department of Information and Computer Sciences, University of Hawai‘i at Manoa, U.S.A \\
+     $^3$Department of Computer Science, University of Southern California, Los Angeles, CA, USA
   }
 }
 
 \maketitle
 
 	\begin{abstract}
-		\begin{itemize}
-			\item The I/O bottleneck in HPC and the need of experiments.
-			\item HPC experiment frameworks and advantages of SimGrid.
-			\item The missing of the ability to simulate page cache, the goal of this paper.
-			\item Principle of the simulator, experiment scenarios and comparisons.
-			\item Brief discussion on results and future work.
-		\end{itemize}
-	\end{abstract}
+		
+		The data explosion era seen in recent years results in growing needs in 
+		data storing, data analysis. 
+		Large computing systems including grids, clusters, clouds, peer-to-peer, 
+		volunteer computers have been increasingly used to solve the problem. 
+		Despite of their powerful computing capability and technological improvements, 
+		there are still bottlenecks in these systems. 
+		When it comes to I/O, a bottleneck can be seen in the disk I/O due to hardware 
+		limitations. Data caching using page cache is one of the solutions applied 
+		to minimize disk accesses and improve the I/O performance. 
+		In computing system and application optimization studies, one of the 
+		effective approaches is using simulation tools to conduct experiments instead 
+		of running applications on real infrastructures. 
+		Although simulators are built with individual simulation model for each computing 
+		resource, the majority does not take page cache into consideration, 
+		which can lead to low simulation accuracy in many cases. 
+		
+		In this paper, we propose a simulation model page cache to simulate I/O 
+		with key features of page cache. 
+		The model is build with the consideration to allow it to be integrated to 
+		existing simulation tools. 
+		We also implement the model with SimGrid using WRENCH. 
+		Then we create some simulators for different use cases. 
+		Finally, we analyze the results, compare them to results of the existing 
+		tool as well as real execution. 
+		
+	\end{abstract}		 
 
 	\section{Introduction}
-		\begin{itemize}
-			\item HPC, the bottleneck in I/O and the demand of HPC experiments. 
-			\item Difficulties in conducting high performance computing experiments and the need of simulation frameworks.
-			\item Existing experiment methods, simulators, simulation frameworks. The advantages of SimGrid compared to others \cite{simgrid2008, lebre2015}. The missing of the ability to simulate page cache in SimGrid \cite{lebre2015}.
-			\item The objective of the paper: Add capability to simulate I/O with page cache in SimGrid.
-			\item Clarify, distinguish between memory I/O (i/o to page cache) and disk I/O.
-		\end{itemize}
-	\section{Related Work}			
 		
-		\subsection{Page cache}
-			\begin{itemize}
-				\item What is page cache? How it works \cite{linuxdev3rd2010}. 
-				Write-back vs writethrough and direct i/o. Effects and importance of page cache.
-				\item Introduce some existing strategies with some highlighted pros and cons.
-				\item Current implementation in Linux and some reasons why it is chosen to be implemented (implementation complexity, effectiveness, overhead, etc) \cite{linuxdev3rd2010}
-				\item \tristan{LRU lists are mentioned in the next section, they should be described here.}
-			\end{itemize}									
+		In recent years, as a result of the growth of data generated from a variety 
+		of data sources, we have seen increasingly growing demands in data storage, 
+		processing and analysis. 
+		Storing and processing such a massive amount of data require large 
+		computing infrastructures. 
+		Data processing is a complex process whose the performance is affected 
+		by many factors and hindered by bottlenecks in the systems.
+		One of the bottlenecks that should be taken into consideration is disk access 
+		time due to hardware limitations. 
+		Beside hardware technical improvements, architectural solutions have been 
+		proposed and implemented in computing systems in order to tackle the 
+		disk I/O problem. 
+		Caching, a successful technique applied into memory to maximize the 
+		I/O performance by keeping data in memory for future accesses,
+		has been proving the effectiveness when employed in computer systems. 
+		
+		Studying in optimizing not only the utilization of page cache but also other 
+		computing resources is a need that has never been overlooked.
+		The research on computing infrastructures to maximize performance, 
+		shorten processing time, and minimize costs gets involved with experiments. 
+		However, real platforms are complex and not built for the experimental 
+		purposes due to limited and shared resources, operational costs, unstable 
+		environments and the result reproducibility difficulties. 
+		An alternative approach is to used simulation tools developed for research 
+		and experimental purposes.
+		The obvious advantages of using simulation are the freedom of choosing 
+		simulated infrastructures, reproducible results and low costs.
+		These simulators are developed and integrated with simulation models 
+		of computing resources including CPU, network and storage.
+		However, some reviews over many simulators report that there has been 
+		a trade-off between accuracy and scalability due to the level of details in 
+		simulation models \cite{casanova2014simgrid} \cite{byrne2017review}.
+		Moreover, different simulators are developed by and for a specific community,
+		which hinders them from being used in cross-domain.
+		SimGrid is a simulation framework developed with the objectives of  
+		balancing between accuracy and scalability, as well as versatility. 
 
+		In spite of the importance of page cache and the impacts it has on I/O 
+		operations, its simulation model is absent in many simulators. 
+		Some simulation tools try to model the page cache with cached data, 
+		but their models lack of some key features \cite{nunez2012simcan} 
+		\cite{nunez2012icancloud}. 
+		Moreover, these simulators have a problem in scalability with 
+		long simulation time regarding to their very detailed level of simulation.
+		Some other works are able to capture some important features of page cache, 
+		but they focus on very specific domains \cite{xu2018saving}.
+		
+		In this paper, we propose a simulation model of I/O with page cache.
+		The model is integrated in WRENCH, an open-source library built 
+		on top of SimGrid with more abstract API. 
+		Then we evaluate our model with four simulators in four 
+		experiment scenarios. 
+		This paper is organized as follows. 
+		In Section \ref{relatedwork} we provide details of page cache 
+		existing simulation tools.
+		In Section \ref{relatedwork} we propose our I/O with page 
+		cache simulation model and how we implement it and our experiments 
+		to evaluate the model.  
+		Section \ref{results} compares the results of our model with the results 
+		of original WRENCH and real execution results. 
+		Finally, Section \ref{discussion} concludes and presents future 
+		work.  
+		
+		
+		
+	\section{Related Work}		
+	\label{relatedwork}	
+		
+		\subsection{Page cache}							
+			
+			In Linux, page cache is a part of memory, which includes pages referring to 
+			physical pages on disk \cite{linuxdev3rd2010}. 
+			The goal of the page cache is to avoid disk I/O by keeping data in memory 
+			for later accesses, minimize I/O time since disk accesses are considerably 
+			slower than memory accesses.
+			When the kernel starts a read operation, it checks if required data is in page cache.
+			If yes, data is read from memory. This is called a \textit{cache hit}. 
+			Otherwise, data is read from disk and placed in page cache.
+			For writing, page cache is implemented with three different strategies. 
+			The first is \textit{direct~I/O} or \textit{no-write}, which means the page cache 
+			is not involved in write operations. 
+			The second is \textit{write-through}, in which data goes \textit{through} 
+			page cache to disk is. In this case, data is written to both page cache and disk. 
+			In the third strategy, which is \textit{write-back}, data are written directly 
+			to disk as \textit{dirty} pages and these pages will be periodically flushed 
+			to disk later by a \textit{writeback} process and then marked as not dirty. 
+			The write-back strategy is considered to outperform write-through as well as 
+			direct I/O since it delays disk writes and perform in batch later 
+			\cite{linuxdev3rd2010}. 
+			
+			In write-back, one of the keys is the cache eviction mechanism, which 
+			removes pages from the page cache when available memory is insufficient. 
+			The kernel chooses clean pages from page cache to evict. 
+			If the clean pages are inadequate, dirty pages are flushed to disk, 
+			marked as clean and available for eviction. 
+			Different cache eviction algorithms have been developed and proposed
+			\cite{owda2014comparison}.
+			In Linux kernel, a \textit{two lists strategy (LRU/2)} is implemented based on 
+			the least-recently-used (LRU) scheme, with an \textit{active list} only containing 
+			pages accesses more than once, and an \textit{inactive list} containing 
+			pages available for eviction. 
+			Pages are moved from inactive list to active list if they are 
+			accessed when residing in the inactive list. 
+			The lists work on LRU manner, pages are added to the tail and removed 
+			from the top. 
+			The lists are also kept balanced by moving pages from the active list
+			to the inactive list when the active list grows too large. 
+			 
 		\subsection{Simulators}
-			\begin{itemize}
-				\item Discuss some existing methods, simulation frameworks to conduct HPC experiments. Compare pros and cons (accuracy, simulation time, usability) of some simulators (SimGrid, GridSim).
-				\item Related development: RAM energy consumption \cite{gill2019} \cite{ouarnoughi2017} 
-				\item What is implemented in simulators that useful for our model:
-				distinguished and shared bandwidths, concurrency, device latency. 
-				\item Discuss the pros of SimGrid and the reasons why we chose it to conduct experiments. (Section 2.2.2 in \cite{simgrid2014})
-				\item Introduce WRENCH and it's advantage.
-				\item \tristan{Mention the status of storage simulation in simulators, so that we understand from Fig 1 that storage devices are available}
-			\end{itemize}
+			
+			There has been the research and development of many simulation tools 
+			and frameworks for cloud computing with the goal to simulate cloud, grid, 
+			HPC platforms, etc. 
+			A number of the most famous existing simulators have been analyzed 
+			and compared in some reviews (e.g., \cite{byrne2017review}, \cite{casanova2014simgrid}). 
+			These simulators provide simulation models of CPU, network, storage 
+			with different approaches and levels of details.
+			Some simulators are at packet-level, which allows to achieve 
+			high simulation accuracy with fine-grain details such as storage simulation 
+			in \textit{DiskSim} or network simulation in \textit{CloudSim} 
+			and \textit{iCanCloud} \cite{casanova2014simgrid}. 
+			However, the issues with the packet-level simulation are scalability due to 
+			long simulation time when the simulated platforms and applications grow 
+			to hundreds and thousands nodes. 
+			SimGrid is an open source simulation platform that has been developed 
+			not only to balance the trade-off between accuracy and scalability, 
+			but also to achieve versatility, which allows the use of the framework 
+			to simulate applications in multiple domains \cite{casanova2014simgrid}.
+			
+			However, I/O with page cache model has not been provided in SimGrid. 
+			It only simulates storage with capacity and bandwidths.
+			Lebre \textit{et al.} adds a storage simulation extension to SimGrid 
+			to simulate file system,  but the page cache is not taken into account 
+			\cite{lebre2015}. 
+			SIMCAN is the simulation framework that models I/O with page cache 
+			with data on disk can be kept in page cache \cite{nunez2012simcan}.
+			Memory is also modeled in iCanCloud simulator with a component in charge 
+			of managing memory accesses and cached data \cite{nunez2012icancloud}, 
+			but one of the issues is scalability due to its sophisticated model.
+			Ultimately, non of these simulators provide any cache write strategy, 
+			cache eviction mechanism with dirty/clean data and the page cache LRU lists. 
+			Xu \textit{et al.} applies four cache replacement policies to simulate in-memory 
+			caching, but for the study in energy consumption of multi-tier heterogenous 
+			network \cite{xu2018saving}.
+			
+			In this study, we chose SimGrid to implement our I/O with page cache model
+			due to the balancing between accuracy and scalibility, the versatility allowing it 
+			to be adopted in different domains, and the design enabling this 
+			framework to be extended with new models. 
+			The main issue users have to face when using SimGrid is everything has to be 
+			implemented from scratch due to its low-level API. 
+			To ease this challenge, WRENCH, an open-source library, is built on top 
+			of SimGrid to abstract the low-level logic and expose a higher abstraction 
+			level API \cite{casanova2018wrench}. 
+			We integrate our model in WRENCH and use the SimGrid API to interact with 
+			simulated storage resource.
+			This approach allows us to leverage existing features in WRENCH and SimGrid.
+			The first is the process control, synchronization of resource consumption by 
+			concurrent processes handled by the simulation core in SimGrid. 
+			The second is the existing SimGrid storage model with capacity and 
+			bandwidth properties, which are similar to the characteristics of memory.
+			The third is dropping the burden of implementation with the high level 
+			of abstraction in WRENCH. 
 			
 	\section{Method}
+	\label{method}	
 
 		In this section, we present our approach to model file read and write with
 		I/O to page cache, cache eviction and data flushing mechanisms implemented 
@@ -107,8 +265,7 @@
 			frameworks, which makes storage models applicable to memory \cite{lebre2015}. 
 			In addition, leveraging existing disk models allows us 
 			to take advantage of bandwidth sharing between concurrent disk I/O to 
-			simulate parallel memory accesses.\tristan{we should refer to related work, 
-            see comment there} \valerie{Agreed. It's unclear how existing storage models enable this at the moment}.
+			simulate parallel memory accesses.
 
 			Memory Manager simulates two parallel threads. The first thread is the 
 			main thread where activities of applications are simulated, and responsible 
@@ -263,12 +420,8 @@
 			 
 			When simulated applications need to read/write a file, they can simply call 
 			the IO Controller instead of the storage simulation models. 
-			\tristan{this should move, not sure where for now: 
-			Because every computer has its own memory and system configurations, 
-			one IO Controller object and one Memory Manager object are created 
-			for each simulated host.}
 			
-			As mentioned, in our model, a file read/write can be complete by read/write 
+			As mentioned, in our model, a file read/write can be completed by read/write 
 			chunk-by-chunk until entire file is read/written.
 			To read or write a chunk of file, a simulated application sends a request to the 
 			IOController instance on the node where the requested file is stored.
@@ -430,20 +583,19 @@
 			
 			We use our dedicated cluster hosted at Concordia University to conduct 
 			the experiments. The cluster consists of one login node, 8 compute nodes 
-			and 4 storage nodes connected with two network switches. The login node 
-			has one Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 137~GB (128~GiB) of RAM, 
-			1.8TB of storage of XFS file system, 13~GB of tmpfs file system and 385 TB of 
-			Lustre shared file system. Each compute node has two 16 cores Intel(R) 
-			Xeon(R) Gold 6130 CPU @ 2.10GHz, 275~GB (256~GiB) of RAM and 6 SSDs, 
-			450~GB each with XFS file system, 378~GB of tmpfs and 126~GB of devtmpfs file system.
+			and 4 storage nodes connected with a network bandwidth of 3GBps. 
+			The login node has one Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 
+			137~GB (128~GiB) of RAM, 1.8TB of storage of XFS file system, 
+			13~GB of tmpfs file system and 385 TB of Lustre shared file system. 
+			Each compute node has two 16 cores Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 
+			275~GB (256~GiB) of RAM and 6 SSDs, 450~GB each with XFS file system, 
+			378~GB of tmpfs and 126~GB of devtmpfs file system.
 			Lustre file system is configured with one metadata target with 854~GB 
 			of storage, 44 object storage targets with 8.7~TB of storage each. 
-			The cluster is run on CentOS 8.1 with the Slurm Workload Manager installed. 
+			The cluster is run on CentOS 8.1 with NFS version 4. 
 			We use \textbf{\textit{atop}} and \textbf{\textit{collectl}} as tools to 
 			monitor and collect memory status and disk throughput 
 			on the cluster. 
-			\textcolor{red}{[Add network description here, include number of disks 
-			on all nodes ,maybe add a diagram]}
 			
 			In simulated platform description, because the disk bandwidths in SimGrid 
 			are symmetrical, we measure the read/write bandwidths on our cluster and 
@@ -494,11 +646,22 @@
 			The results are compared in total makespan of the pipelines, 
 			cumulative read time and cumulative write time.
 			
-			\subsubsection{Evaluation on remote storage}
+			\subsubsection{Evaluation on NFS}
 			
-		    Since remote storage is common in HPC, we conduct another experiment with 
-		    the same scenario as in the multi-threaded experiment, except that files 
-		    are stored on a node and read by another node. 
+		    Since network file systems are very common in HPC, we conduct 
+		    the next experiment with the same scenario as in the multi-threaded experiment, 
+		    except that files are stored on a node, read and written by another node. 
+		    The compute node is the node used in the multi-threaded experiment, 
+		    and the capacity of the disk used on the storage node is 400 GB.
+		    
+		    In NFS, client cache and server cache are enabled in reading, but only 
+		    server write-through cache is involved in writing. 
+		    Although write-through does not have any impacts writing performance, 
+		    caching data on server side allows server to avoid disk reads, which are 
+		    significantly longer than cache reads.
+		    Thus, we simulate page cache for reading on both client and server node.
+		    In writing, write-though is simulated with data being written directly to 
+		    server storage and then added to server cache. 
 		    
 		    \subsubsection{Simulation of a real application}
 
@@ -515,20 +678,9 @@
 			read/write time and total makespan.
 
 	\section{Results}
-	
-		\begin{itemize}
-
-			\item Quantitative results: 
-				\begin{itemize}
-					\item Relative errors of simulation time and memory used compared to real results.
-					\item Simulation time compared to SimGrid and original WRENCH.
-				\end{itemize} 
-
-			\item Ability of the model to generalize memory trends (dirty data, cache used) and disk throughput.
-
-			\end{itemize}
-			
-		The benchmark results of bandwidths and the values used in the simulators are shown in \ref{table:benchmark}. These configurations are used in all experiments. 
+	\label{results}			
+		The benchmark results of bandwidths and the values used in the simulators 
+		in our all experiments are shown in \ref{table:benchmark}. 
 		
 		\begin{table}
 		\centering
@@ -538,8 +690,11 @@
 		\hline
 			Memory read  & 6860	& 4812	 & 4812\\
 			Memory write & 2764	& 4812 & 4812\\
-			Disk read & ~510 & 465 & 465\\
-			Disk write & ~420 & 465	 & 465\\
+			Local disk read & 510 & 465 & 465\\
+			Local disk write & 420 & 465	 & 465\\
+			Remote disk read & 515 & - & 445\\
+			Remote disk write & 375 & - & 445\\
+			Network bandwidth & 3000 & - & 3000\\
 		\hline
 		\end{tabular}
 		\caption{Bandwidth benchmark results and simulator configurations}
@@ -579,9 +734,9 @@
 			of individual I/O activities. 
 			Our pipeline consists of 3 tasks, and each task reads an input file, 
 			performs some computation, and writes output file. 
-			Thus, there are 6 sequential I/O activities, \textit{read1} and \textit{write1} 
-			from the first task, \textit{read2} and \textit{write2} the second task, 
-			and \textit{read3}, \textit{write3} from the last task.
+			Thus, there are 6 sequential I/O activities, \textit{Read 1} and \textit{Write 1} 
+			from the first task, \textit{Read 2} and \textit{Write 2} the second task, 
+			and \textit{Read 3}, \textit{Write3} from the last task.
 			
 			In general, with all input sizes in the experiment, the simulation errors 
 			of simulators with page cache model (Python and WRENCH with page cache simulators) 
@@ -589,7 +744,7 @@
 			The reason is, in original WRENCH, because page cache is not simulated, 
 			data is only read/written with disk bandwidth, which is much slower 
 			than memory bandwidths, leading to simulated I/O time longer than in reality.
-			Especially, the simulation time errors of \textit{read3} in the simulators 
+			Especially, the simulation time errors of \textit{Read 3} in the simulators 
 			with page cache are just under the error in original WRENCH. 
 		
 			\begin{figure*}
@@ -646,7 +801,7 @@
 				\centering
    				\includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
 			\end{subfigure}		
-			\caption{I/O time with different numbers of concurrent pipeline}
+			\caption{I/O time of concurrent pipelines with local storage}
 			\label{fig:multi_local}
 			\end{figure*}		
 			
@@ -680,18 +835,53 @@
 			
 		\subsection{Remote storage}
 		
+			\begin{figure*}		
+			\begin{subfigure}{\linewidth}
+				\centering
+   				\includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
+			\end{subfigure}		
+			\caption{I/O time of concurrent pipelines with NFS}
+			\label{fig:multi_nfs}
+			\end{figure*}
+		
+			Similarly, the results with from the experiment with NFS are described 
+			by the average I/O time shown in Figure~\ref{fig:multi_nfs}.
+			In general, the average I/O time reflect a very similar level of accuracy 
+			to the previous experiment results when the I/O time of pipelines 
+			is very close to the real execution. 
+			The simulated read time if a bit off when the number of pipelines 
+			surpasses 22, with 264 GB of data in total. 
+			This is due to the impact of simulated cache eviction when 
+			the page cache is saturated, which has been seen in 
+			Figure~\ref{fig:single_error} with 100 GB of input. 
+			When it comes to write time, original WRENCH and WRENCH with page cache 
+			results are identical when both are writing directly to disk.
+		
 		\subsection{Real application}
 
-
 	\section{Discussion and Future Work}
-		\begin{itemize}
-			\item Read order: disk, inactive list, then active list. 
-			\item Cache eviction mechanism not evicting active list, leads to evicting file being written.
-			\item Sensitivity of the simulator on the variation of memory and disk bandwidth. 
-			\item Our model does not support random I/O and readahead.
-			\item Disk state save/restore when hosts are turned on/off.
-		\end{itemize}
-	\section{CFI for cluster}
+	\label{discussion}			
+			In computing infrastructures, especially those use for data-intensive applications, 
+			page cache undoubtedly has certain impacts on performance. 
+			Conducting simulation experiments is an effective approach to predict, 
+			evaluate the performance of not only application, scheduler but also 
+			infrastructure settings. 
+			Unfortunately, page cache is missing in many simulation tools for HPC systems. 
+			In this study, we proposed a simulation model of I/O with page cache, 
+			implement it with SimGrid using WRENCH, and evaluate the results 
+			with different experiments. 
+			The results shows our achievements in terms of simulation accuracy 
+			and the application potential in practice. 
+			On the other hands, the model exposed some limitations that can be 
+			further improved.
+			
+			Our short term future work will be re-evaluate the model with asymmetrical 
+			disk bandwidths that will be released in the next SimGrid version.
+			The next step is to study the detail in cache eviction mechanism to achieve 
+			better simulation results. 
+			We also plan to support random I/O and file readahead, as well as 
+			saving and restoring disk state when hosts are turned on/off.	 
+
 \bibliographystyle{plain}
 \bibliography{citation}
 
