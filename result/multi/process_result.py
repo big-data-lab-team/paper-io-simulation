@@ -126,5 +126,3 @@ def result_nfs():
     plt.savefig("figures/multi_nfs.svg", format="svg")
 
     plt.show()
-
-result_nfs()
