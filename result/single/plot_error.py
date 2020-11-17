@@ -20,7 +20,7 @@ def grouped_bar_chart(ax, labels, xlabel, ylabel, *argv):
 
 
 def plot_task_error(ax, size):
-    labels = ["read_1", "write_1", "read_2", "write_2", "read_3", "write_3"]
+    labels = ["Read 1", "Write 1", "Read 2", "Write 2", "Read 3", "Write 3"]
 
     # atop_file =     "log/cluster/100gb/atop_mem.log"
     real_time_log = "real/%dgb/timestamps.csv" % size
@@ -38,14 +38,15 @@ def plot_task_error(ax, size):
     ax.set_title("%d GB" % size)
 
 
-plt.rcParams.update({'font.size': 8})
-fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
-plot_task_error(ax1, 20)
-plot_task_error(ax2, 100)
+def plot_error():
+    plt.rcParams.update({'font.size': 8})
+    fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
+    plot_task_error(ax1, 20)
+    plot_task_error(ax2, 100)
 
-lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
-#
-# plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
-# plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
-# plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
-# plt.show()
+    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+
+    plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+    plt.show()
