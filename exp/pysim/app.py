@@ -25,8 +25,8 @@ def export_time(task_list, filename):
             writer.writerow([task_list[i][0], task_list[i][1], task_list[i][2]])
 
 
-mm = MemoryManager(268600, 268600, read_bw=6860, write_bw=2765)
-storage = Storage(450000, read_bw=510, write_bw=420)
+mm = MemoryManager(268600, 268600, read_bw=4812, write_bw=4812)
+storage = Storage(450000, read_bw=465, write_bw=465)
 kernel = IOManager(mm, storage, dirty_ratio=0.4)
 
 input_size = 100000
@@ -76,7 +76,7 @@ plot_sim.plot_pysim_log(mm.get_log(), task_time, "input = %d MB \nmem_rb = %d MB
                                            "disk_rb = %d MBps\ndisk_wb = %d MBps"
                       % (input_size, mm.read_bw, mm.write_bw,
                      storage.read_bw, storage.write_bw),
-                      xmin=0, xmax=800, ymin=-10000, ymax=280000)
+                      xmin=0, xmax=1300, ymin=-10000, ymax=280000)
 
 export_mem(mm.get_log(), "export/%dgb_sim_mem.csv" % (input_size / 1000))
 export_time(tasks, "export/%dgb_sim_time.csv" % (input_size / 1000))

@@ -7,12 +7,14 @@ function die(){
     echo $*
     exit 1
 }
-
 type inkscape &>/dev/null || die "Cannot find inkscape"
-for i in figures/*.svg
+for folder in figures result/single/figures result/multi/figures
 do
-    name=$(basename $i .svg)
-    command="inkscape $i -o figures/${name}.pdf"
-    echo ${command} 
-    ${command} || die "Failed"
+    for i in $folder/*.svg
+    do
+        name=$(basename $i .svg)
+        command="inkscape $i -o ${folder}/${name}.pdf"
+        echo ${command}
+        ${command} || die "Failed"
+    done
 done

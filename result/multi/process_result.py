@@ -17,9 +17,10 @@ def parse_single_pipeline(filename):
     return min(df["read_start"]), max(df["write_end"]), readtime, writetime
 
 
-def aggregate_result(dir, no_pipeline):
+def aggregate_result(folder, no_pipeline):
     """
 
+    :param folder:
     :param no_pipeline:
     :return: makespan, total_readtime, total_writetime
     """
@@ -28,7 +29,7 @@ def aggregate_result(dir, no_pipeline):
     readtime = 0
     writetime = 0
     for i in range(no_pipeline):
-        filename = "%s/indv_logs/time_pipeline_%d_%d.csv" % (dir, no_pipeline, i + 1)
+        filename = "%s/time_pipeline_%d_%d.csv" % (folder, no_pipeline, i + 1)
         start, end, read, write = parse_single_pipeline(filename)
         makespan += end - start
         readtime += read
@@ -37,21 +38,22 @@ def aggregate_result(dir, no_pipeline):
     return no_pipeline, makespan, readtime, writetime
 
 
-def export_real_results(filename):
-    with open(filename, 'w', newline='') as csvfile:
+def export_real_results(folder, filename):
+    file = "%s%s" % (folder, filename)
+    with open(file, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["no_pipeline", "makespan", "readtime", "writetime"])
         for i in range(32):
-            writer.writerow(list(aggregate_result(i + 1)))
+            writer.writerow(list(aggregate_result(folder, i + 1)))
 
 
-def export_simgrid_result(dir, filename):
-    exported_file = "%s/%s" % (dir, filename)
+def export_simgrid_result(folder, filename):
+    exported_file = "%s%s" % (folder, filename)
     with open(exported_file, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["no_pipeline", "makespan", "readtime", "writetime"])
         for i in range(32):
-            dump_file = "%s/dump_%d.json" % (dir, i + 1)
+            dump_file = "%sdump_%d.json" % (folder, i + 1)
             writer.writerow(list(parse_simgrid_result(dump_file, i + 1)))
 
 
@@ -67,42 +69,60 @@ def parse_simgrid_result(filename, no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-def plot_prop(propname, title, average=False):
-    real_df = pd.read_csv("real/aggregated_result_real.csv")
-    simg_org_df = pd.read_csv("wrench_org/aggregated.csv")
-    simg_ext_df = pd.read_csv("wrench_ext/aggregated.csv")
+def suplot_prop(ax, exp_folder, propname, title):
+    real_df = pd.read_csv("%s/real/aggregated.csv" % exp_folder)
+    simg_org_df = pd.read_csv("%s/wrench/original/aggregated.csv" % exp_folder)
+    simg_ext_df = pd.read_csv("%s/wrench/pagecache/aggregated.csv" % exp_folder)
 
-    plt.figure()
-    plt.title(title)
+    ax.set_title(title)
 
-    if average:
-        plt.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], label="reality")
-        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], label="original WRENCH")
-        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], label="WRENCH-Ext")
-    else:
-        plt.plot(real_df["no_pipeline"], real_df[propname], label="reality")
-        plt.plot(simg_org_df["no_pipeline"], simg_org_df[propname], label="original WRENCH")
-        plt.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname], label="WRENCH-Ext")
+    ax.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], color="k", label="Real execution")
+    ax.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], color="tab:orange",
+            label="Original WRENCH")
+    ax.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], color="tab:cyan",
+            label="WRENCH with page cache")
 
-    plt.xlabel("number of pipelines")
-    plt.ylabel("time (s)")
+    ax.set_xlabel("number of pipelines")
+    ax.set_ylabel("time (s)")
 
-    plt.legend()
-    if average:
-        plt.savefig("figures/%s_avg.pdf" % propname, format="pdf")
-        plt.savefig("figures/%s_avg.svg" % propname, format="svg")
-    else:
-        plt.savefig("figures/%s.pdf" % propname, format="pdf")
-        plt.savefig("figures/%s.svg" % propname, format="svg")
+
+def result_local():
+    export_real_results("local/real/", "aggregated.csv")
+    export_simgrid_result("local/wrench/original/", "aggregated.csv")
+    export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
+    plt.rcParams.update({'font.size': 8})
+    fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
+
+    suplot_prop(ax1, "local", "readtime", "average read time")
+    suplot_prop(ax2, "local", "writetime", "average write time")
+
+    ax1.set_ylim(bottom=0, top=1500)
+    ax2.set_ylim(bottom=0, top=1500)
+
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+    plt.savefig("figures/multi_local.pdf", format="pdf")
+    plt.savefig("figures/multi_local.svg", format="svg")
 
     plt.show()
 
 
-export_simgrid_result("wrench_org", "aggregated.csv")
-export_simgrid_result("wrench_ext", "aggregated.csv")
+def result_nfs():
+    export_real_results("remote/real/", "aggregated.csv")
+    export_simgrid_result("remote/wrench/original/", "aggregated.csv")
+    export_simgrid_result("remote/wrench/pagecache/", "aggregated.csv")
+    plt.rcParams.update({'font.size': 8})
+    fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
 
-plot_prop("makespan", "Total makespan")
-plot_prop("readtime", "Cumulative read time")
-plot_prop("readtime", "Average read time", average=True)
-plot_prop("writetime", "Cumulative write time")
-plot_prop("writetime", "Average write time", average=True)
+    suplot_prop(ax1, "remote", "readtime", "average read time")
+    suplot_prop(ax2, "remote", "writetime", "average write time")
+
+    ax1.set_ylim(bottom=0, top=1500)
+    ax2.set_ylim(bottom=0, top=1500)
+
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+    plt.savefig("figures/multi_nfs.pdf", format="pdf")
+    plt.savefig("figures/multi_nfs.svg", format="svg")
+
+    plt.show()
