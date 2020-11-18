@@ -9,6 +9,7 @@
 \usepackage{hyperref}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{ulem}
 
 \algblock{Input}{EndInput}
 \algnotext{EndInput}
@@ -17,6 +18,8 @@
 \newcommand{\Desc}[2]{\State \makebox[2em][l]{#1}#2}
 
 \newcommand{\tristan}[1]{\color{orange}\textbf{From Tristan:}#1\color{black}}
+\newcommand{\english}[1]{\uwave{#1}}
+
 \newcommand{\valerie}[1]{\color{blue}\textbf{From Valerie:}#1\color{black}}
 
 
@@ -26,9 +29,9 @@
 \author{\IEEEauthorblockN{Hoang-Dung Do$^1$, Val\'erie Hayot-Sasson$^1$, Rafael Ferreira da Silva$^3$, Henri Casanova$^2$, Tristan Glatard$^1$
   }\\
   \IEEEauthorblockA{
-    $^1$Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada \\
-     $^2$Department of Information and Computer Sciences, University of Hawai‘i at Manoa, U.S.A \\
-     $^3$Department of Computer Science, University of Southern California, Los Angeles, CA, USA
+    $^1$Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada\\
+     $^2$Department of Information and Computer Sciences, University of Hawai‘i at Manoa, USA\\
+     $^3$Department of Computer Science, University of Southern California, Los Angeles, USA
   }
 }
 
@@ -50,16 +53,27 @@
 		of running applications on real infrastructures. 
 		Although simulators are built with individual simulation model for each computing 
 		resource, the majority does not take page cache into consideration, 
-		which can lead to low simulation accuracy in many cases. 
+		which can lead to low simulation accuracy in many cases. \tristan{The
+		 ideas are fine, but I don't find them well ordered. I think your intro 
+		could adopt this logic (1) Computing systems are key to the processing of Big Data, (2) page 
+		cache is critical to I/O performance, (3) page cache is not simulated so how 
+		can we expect Big Data applications on computing systems to be well simulated? 
+		This problem definition should take 2-3 sentences, the bulk of the abstract should be on the paper, not the context.
+		}
 		
 		In this paper, we propose a simulation model page cache to simulate I/O 
-		with key features of page cache. 
+		with key features of page cache. \tristan{The model consists of ...}
 		The model is build with the consideration to allow it to be integrated to 
 		existing simulation tools. 
-		We also implement the model with SimGrid using WRENCH. 
-		Then we create some simulators for different use cases. 
+		We also implement the model with SimGrid using WRENCH \tristan{people
+		 may not know what these things are, characterize them. For instance:
+		  "using WRENCH, a SimGrid-based workflow simulator."}. 
+		Then we create some simulators for different use cases \tristan{be more specific: characterize the use cases.}. 
 		Finally, we analyze the results, compare them to results of the existing 
-		tool as well as real execution. 
+		tool as well as real execution \tristan{This is too general, 
+		you should explain specifically what you found: how is your simulator better than plain simgrid?}.
+		\tristan{A conclusion sentence is missing on the impact of your work: how 
+		could it be used? what doors does it open? why is it important work?} 
 		
 	\end{abstract}		 
 
@@ -71,7 +85,10 @@
 		Storing and processing such a massive amount of data require large 
 		computing infrastructures. 
 		Data processing is a complex process whose the performance is affected 
-		by many factors and hindered by bottlenecks in the systems.
+		by many factors and hindered by bottlenecks in the systems. \tristan{The previous
+		sentences are true but a 
+		bit general, everybody knows that, it's a boring way to open a paper. 
+		Your first sentences could be more specific to the simulation of big data applications.}
 		One of the bottlenecks that should be taken into consideration is disk access 
 		time due to hardware limitations. 
 		Beside hardware technical improvements, architectural solutions have been 
@@ -81,8 +98,8 @@
 		I/O performance by keeping data in memory for future accesses,
 		has been proving the effectiveness when employed in computer systems. 
 		
-		Studying in optimizing not only the utilization of page cache but also other 
-		computing resources is a need that has never been overlooked.
+		\english{Studying in optimizing not only the utilization of page cache but also other 
+		computing resources is a need that has never been overlooked.}
 		The research on computing infrastructures to maximize performance, 
 		shorten processing time, and minimize costs gets involved with experiments. 
 		However, real platforms are complex and not built for the experimental 
@@ -91,13 +108,13 @@
 		An alternative approach is to used simulation tools developed for research 
 		and experimental purposes.
 		The obvious advantages of using simulation are the freedom of choosing 
-		simulated infrastructures, reproducible results and low costs.
+		simulated infrastructures, reproducible results and low costs \tristan{The message of the previous 5 sentences could be summarized in 1 or 2.}.
 		These simulators are developed and integrated with simulation models 
 		of computing resources including CPU, network and storage.
-		However, some reviews over many simulators report that there has been 
+		However \tristan{why "however" and why is this trade-off important?}, some reviews over many simulators report that there has been 
 		a trade-off between accuracy and scalability due to the level of details in 
 		simulation models \cite{casanova2014simgrid} \cite{byrne2017review}.
-		Moreover, different simulators are developed by and for a specific community,
+		Moreover, different simulators are developed by and for a specific community \tristan{such as? not sure it's important for our purpose},
 		which hinders them from being used in cross-domain.
 		SimGrid is a simulation framework developed with the objectives of  
 		balancing between accuracy and scalability, as well as versatility. 
@@ -106,13 +123,13 @@
 		operations, its simulation model is absent in many simulators. 
 		Some simulation tools try to model the page cache with cached data, 
 		but their models lack of some key features \cite{nunez2012simcan} 
-		\cite{nunez2012icancloud}. 
+		\cite{nunez2012icancloud} \tristan{which ones?}. 
 		Moreover, these simulators have a problem in scalability with 
 		long simulation time regarding to their very detailed level of simulation.
 		Some other works are able to capture some important features of page cache, 
-		but they focus on very specific domains \cite{xu2018saving}.
+		but they focus on very specific domains \cite{xu2018saving} \tristan{such as?}.
 		
-		In this paper, we propose a simulation model of I/O with page cache.
+		In this paper, we propose a simulation model of I/O with page cache \tristan{you should mention what the paper is about earlier in the intro}.
 		The model is integrated in WRENCH, an open-source library built 
 		on top of SimGrid with more abstract API. 
 		Then we evaluate our model with four simulators in four 
@@ -135,8 +152,8 @@
 		
 		\subsection{Page cache}							
 			
-			In Linux, page cache is a part of memory, which includes pages referring to 
-			physical pages on disk \cite{linuxdev3rd2010}. 
+			In Linux, page cache is a part of memory that includes pages referring to 
+			physical pages on disk \cite{linuxdev3rd2010} \tristan{This sounds like a definition but is too vague.}. 
 			The goal of the page cache is to avoid disk I/O by keeping data in memory 
 			for later accesses, minimize I/O time since disk accesses are considerably 
 			slower than memory accesses.
@@ -147,42 +164,42 @@
 			The first is \textit{direct~I/O} or \textit{no-write}, which means the page cache 
 			is not involved in write operations. 
 			The second is \textit{write-through}, in which data goes \textit{through} 
-			page cache to disk is. In this case, data is written to both page cache and disk. 
-			In the third strategy, which is \textit{write-back}, data are written directly 
+			page cache to disk is \tristan{is what?}. In this case, data is written to both page cache and disk. 
+			In the third strategy, called \textit{write-back}, data are written directly 
 			to disk as \textit{dirty} pages and these pages will be periodically flushed 
-			to disk later by a \textit{writeback} process and then marked as not dirty. 
+			to disk later by a \textit{writeback} \tristan{spell writeback consistently (dash or no dash?)} process and then marked as not dirty. 
 			The write-back strategy is considered to outperform write-through as well as 
-			direct I/O since it delays disk writes and perform in batch later 
+			direct I/O since it delays disk writes \english{ and perform in batch later }
 			\cite{linuxdev3rd2010}. 
 			
 			In write-back, one of the keys is the cache eviction mechanism, which 
 			removes pages from the page cache when available memory is insufficient. 
 			The kernel chooses clean pages from page cache to evict. 
-			If the clean pages are inadequate, dirty pages are flushed to disk, 
+			If the clean pages are inadequate \tristan{why would they be so?}, dirty pages are flushed to disk, 
 			marked as clean and available for eviction. 
 			Different cache eviction algorithms have been developed and proposed
 			\cite{owda2014comparison}.
 			In Linux kernel, a \textit{two lists strategy (LRU/2)} is implemented based on 
 			the least-recently-used (LRU) scheme, with an \textit{active list} only containing 
 			pages accesses more than once, and an \textit{inactive list} containing 
-			pages available for eviction. 
+			pages available for eviction \tristan{and accessed how many times?}. 
 			Pages are moved from inactive list to active list if they are 
 			accessed when residing in the inactive list. 
-			The lists work on LRU manner, pages are added to the tail and removed 
+			The lists work in LRU manner, pages are added to the tail and removed 
 			from the top. 
 			The lists are also kept balanced by moving pages from the active list
 			to the inactive list when the active list grows too large. 
 			 
 		\subsection{Simulators}
 			
-			There has been the research and development of many simulation tools 
+			\english{There has been the research and development of many simulation tools 
 			and frameworks for cloud computing with the goal to simulate cloud, grid, 
-			HPC platforms, etc. 
-			A number of the most famous existing simulators have been analyzed 
+			HPC platforms, etc.} 
+			\english{A number of the most famous} existing simulators have been analyzed 
 			and compared in some reviews (e.g., \cite{byrne2017review}, \cite{casanova2014simgrid}). 
 			These simulators provide simulation models of CPU, network, storage 
-			with different approaches and levels of details.
-			Some simulators are at packet-level, which allows to achieve 
+			with different approaches and levels of details \tristan{what do the reviews conclude?}.
+			Some simulators are at packet-level \tristan{for the network, not a general statement}, which allows to achieve 
 			high simulation accuracy with fine-grain details such as storage simulation 
 			in \textit{DiskSim} or network simulation in \textit{CloudSim} 
 			and \textit{iCanCloud} \cite{casanova2014simgrid}. 
@@ -194,13 +211,14 @@
 			but also to achieve versatility, which allows the use of the framework 
 			to simulate applications in multiple domains \cite{casanova2014simgrid}.
 			
-			However, I/O with page cache model has not been provided in SimGrid. 
+			However, I/O with page cache model has not been provided in SimGrid \tristan{has it been in other simulators?}. 
 			It only simulates storage with capacity and bandwidths.
-			Lebre \textit{et al.} adds a storage simulation extension to SimGrid 
+			Lebre \textit{et al.} \tristan{it looks like you're targeting this author, just use the reference as for the other works} adds a storage simulation extension to SimGrid 
 			to simulate file system,  but the page cache is not taken into account 
 			\cite{lebre2015}. 
-			SIMCAN is the simulation framework that models I/O with page cache 
-			with data on disk can be kept in page cache \cite{nunez2012simcan}.
+			SIMCAN is the \tristan{the or a?} simulation framework that models I/O with page cache 
+			\english{with data on disk can be kept in page cache} \cite{nunez2012simcan} \tristan{This paragraph started with Simgrid, so it gives the impression that 
+			all these simulators are in simgrid but I don't think they are. Revise.}.
 			Memory is also modeled in iCanCloud simulator with a component in charge 
 			of managing memory accesses and cached data \cite{nunez2012icancloud}, 
 			but one of the issues is scalability due to its sophisticated model.
@@ -213,7 +231,7 @@
 			In this study, we chose SimGrid to implement our I/O with page cache model
 			due to the balancing between accuracy and scalibility, the versatility allowing it 
 			to be adopted in different domains, and the design enabling this 
-			framework to be extended with new models. 
+			framework to be extended with new models. \tristan{you could also mention that it's open source and has been maintained over the past years}
 			The main issue users have to face when using SimGrid is everything has to be 
 			implemented from scratch due to its low-level API. 
 			To ease this challenge, WRENCH, an open-source library, is built on top 
@@ -222,30 +240,30 @@
 			We integrate our model in WRENCH and use the SimGrid API to interact with 
 			simulated storage resource.
 			This approach allows us to leverage existing features in WRENCH and SimGrid.
-			The first is the process control, synchronization of resource consumption by 
+			\english{The first} is the process control, synchronization of resource consumption by 
 			concurrent processes handled by the simulation core in SimGrid. 
-			The second is the existing SimGrid storage model with capacity and 
+			\english{The second} is the existing SimGrid storage model with capacity and 
 			bandwidth properties, which are similar to the characteristics of memory.
-			The third is dropping the burden of implementation with the high level 
+			\english{The third} is dropping the burden of implementation with the high level 
 			of abstraction in WRENCH. 
 			
 	\section{Method}
 	\label{method}	
 
 		In this section, we present our approach to model file read and write with
-		I/O to page cache, cache eviction and data flushing mechanisms implemented 
-		in the Linux kernel. We also detail the design of our simulators and their
+		I/O \tristan{"read and write with I/O" seems redundant} to page cache, cache eviction and data flushing mechanisms implemented 
+		in the Linux kernel. We also detail the design of our simulators \tristan{are there multiple simulators?} and their
 		implementation. Finally, we describe experimental scenarios to evaluate
 		our simulation model on real applications using a standalone Python
 		prototype, SimGrid framework using original WRENCH and the WRENCH version 
-		that is integrated with our simulation model (WRENCH-Ext).
+		that is integrated with our simulation model (WRENCH-Ext) \tristan{Introduce the simulator names first, then talk about experiments.}.
 
 		\subsection{Principle of the simulator}
 	
             We separate our simulation model in two components, the IO
 			Controller and the Memory Manager, which together simulate 
 			file read/write mechanisms in Linux (Figure~\ref{fig:interaction}). 
-			The Memory Manager simulates I/Os to cache, flushing, periodical flushing, 
+			The Memory Manager simulates I/Os to cache, flushing, periodical flushing \tristan{why is periodical flushing different from flushing?}, 
 			and cache eviction, whereas the IO Controller simulates file reads and writes. 
 			Simulated applications can simply interact with the IO Controller instead of 
 			calling simulated storage directly as is the case with current simulators.
@@ -259,20 +277,20 @@
 			\subsubsection{Memory simulation model}
 			
 			We leverage existing storage simulation models to simulate the memory,
-			which is characterized with storage capacity, distinguished read/write 
+			which is characterized with storage capacity, \english{distinguished} read/write 
 			bandwidths and device latency. 
-			All of these features are dealt within models in simulation 
-			frameworks, which makes storage models applicable to memory \cite{lebre2015}. 
+			\english{All of these features are dealt within models in simulation 
+			frameworks, which makes storage models applicable to memory} \cite{lebre2015}. 
 			In addition, leveraging existing disk models allows us 
 			to take advantage of bandwidth sharing between concurrent disk I/O to 
 			simulate parallel memory accesses.
 
 			Memory Manager simulates two parallel threads. The first thread is the 
-			main thread where activities of applications are simulated, and responsible 
+			main thread where activities of applications are simulated \tristan{unclear, what are "activities of applications"?}, and responsible 
 			for the simulation of data flushing, cache eviction and I/Os to cache. 
 			The second thread is a simulated background thread, in which Memory Manager 
 			periodically searches and flushes expired dirty data in page cache LRU lists 
-			to disks. 
+			to disks \tristan{how about periodical eviction?}. 
 
 			In Linux kernel, the page cache LRU lists contain file pages. However, 
 			due to the large number of file pages, managing lists of pages may 
@@ -293,7 +311,7 @@
    				\caption{Simulation of page cache LRU lists with data blocks}	\label{fig:lrulist}
 			\end{figure}	
 			
-			Now, page cache LRU lists can be modeled with two lists of data blocks: 
+			\english{Now,} page cache LRU lists can be modeled with two lists of data blocks: 
 			an active list and an inactive list, ordered by last access time 
 			(earliest first, see Figure~\ref{fig:lrulist}).
 			As in the kernel, our simulator keeps the size of the active list under
@@ -301,8 +319,8 @@
             used data blocks from the active list to the inactive list.
 			Modeling page cache LRU lists as lists of data blocks reduces the
 			overhead of the simulator, as data blocks are obviously less
-			numerous than file pages, while achieving the accuracy in I/O time
-			simulation that can be seen in the later section.
+			numerous than file pages, \english{while achieving the accuracy in I/O time
+			simulation that can be seen in the later section}.
 			
 			Given an arbitrary file, at a specific time, it can be partially cached, 
 			completely cached, or uncached.
