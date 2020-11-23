@@ -78,9 +78,9 @@ def suplot_prop(ax, exp_folder, propname, title):
 
     ax.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], color="k", label="Real execution")
     ax.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], color="tab:orange",
-            label="Original WRENCH")
+            label="WRENCH")
     ax.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], color="tab:cyan",
-            label="WRENCH with page cache")
+            label="WRENCH-Ext")
 
     ax.set_xlabel("number of pipelines")
     ax.set_ylabel("time (s)")

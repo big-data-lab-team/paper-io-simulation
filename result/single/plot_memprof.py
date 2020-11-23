@@ -13,7 +13,7 @@ def compare_size(axes, real_time_file, real_mem_file,
 
     # SIMULATION RESULTS
     sim_subplot(axes[1], pysim_time_file, pysim_mem_file, "Python simulator", bar_alpha=0.2)
-    sim_subplot(axes[2], simgrid_time_file, simgrid_mem_file, "WRENCH with page cache simulator", bar_alpha=0.2)
+    sim_subplot(axes[2], simgrid_time_file, simgrid_mem_file, "WRENCH-Ext simulator", bar_alpha=0.2)
 
     for ax in axes:
         ax.set_xlim(right=xmax, left=xmin)
