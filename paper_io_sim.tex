@@ -566,22 +566,22 @@
 			\begin{itemize}
 				\item $t_{r}$ is the data read time
 				\item $t_{w}$ is the data write time
-				\item $D$ is the amount of data to read/write
+				\item $D$ is the amount of data to read or write
 				\item $b_r$ is the read bandwidth of the device
 				\item $b_w$ is the write bandwidth of the device
 			\end{itemize}			
 
-			Since bandwidth sharing is not simulated, this prototype doesn't support 
+			Since bandwidth sharing is not simulated, this prototype does not support 
 			concurrency: it is limited to single-threaded pipelines running on systems 
 			with a single-core CPU. We use it in a first validation of our simulation 
 			model, against a real sequential pipeline running on a real system.
-			Source code of our Python prototype is available at 
+			The source code of our Python prototype is available at 
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}
 			
 			Having the model validated, we create simulators for different use cases 
 			using WRENCH.
 			We integrate our I/O model in the original WRENCH by implementing 
-			the core of the model separately from existing WRENCH components, 
+			the core of the model separately from existing WRENCH components \tristan{why?}, 
 			then providing an API for users to call to our simulation model. 
 			We also add an optional command line argument so that users will be able 
 			to choose use or not to use the model \tristan{this sentence is too verbose, check verbosity overall, many 
@@ -601,24 +601,26 @@
 		
         	The goal of our experiments is to evaluate our page cache 
 			simulation in single-threaded and multi-threaded applications
-			accessing data on different types of file system. We use a pipeline
+			accessing data on different types of file systems \tristan{"different types" is vague, first thing I thought of was zfs vs ext4 that you don't discuss. Use "local and network" fs instead.}. 
+			We use a pipeline
 			of sequential tasks where each task reads an input file, increments
 			every byte of the input to emulate real processing and avoid caching
-			effects, and writes the result to disk. The output of the previous
+			effects \tristan{ambiguous: you're simulating caching effects, you don't want to avoid them. I'd just remove that note and leave "emulate real processing". You could comment on 
+			the close-to-zero execution time though, since modeling execution time is out of your scope.}, and writes the result to disk. The output of the previous
 			task is the input of the next task. We also use a real application 
             pipeline \textcolor{red}{[Maybe briefly describe this application's purpose (e.g. a standard fMRI preprocessing piepeline)]}, to evaluate the applicability of our simulation model. 
 			
-			We use our dedicated cluster hosted at Concordia University to conduct 
-			the experiments. The cluster consists of one login node, 8 compute nodes 
-			and 4 storage nodes connected with a network bandwidth of 3GBps. 
+			We use a dedicated cluster hosted at Concordia University to conduct 
+			the experiments. The cluster consists of one login node, 8 compute nodes \tristan{it now has 9 if you add the GPU node}
+			and 4 storage nodes connected with a network bandwidth of 3GBps \tristan{put the Gbps value, 3GBps is unusual as a network bandwidth.}. 
 			The login node has one Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 
 			137~GB (128~GiB) of RAM, 1.8TB of storage of XFS file system, 
-			13~GB of tmpfs file system and 385 TB of Lustre shared file system. 
+			13~GB of tmpfs file system and 385 TB of Lustre shared file system \tristan{why do you need to describe the login node in such details?}. 
 			Each compute node has two 16 cores Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz, 
 			275~GB (256~GiB) of RAM and 6 SSDs, 450~GB each with XFS file system, 
 			378~GB of tmpfs and 126~GB of devtmpfs file system.
 			Lustre file system is configured with one metadata target with 854~GB 
-			of storage, 44 object storage targets with 8.7~TB of storage each. 
+			of storage, 44 object storage targets with 8.7~TB of storage each \tristan{why do we care about Lustre?}. 
 			The cluster is run on CentOS 8.1 with NFS version 4. 
 			We use \textbf{\textit{atop}} and \textbf{\textit{collectl}} as tools to 
 			monitor and collect memory status and disk throughput 
