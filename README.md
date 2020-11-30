@@ -34,11 +34,18 @@ To run the Python simulator, use the source code in [/exp/pysim/](/exp/pysim/)  
 
 - **WRENCH simulator**: The log files of the WRENCH simulator shoule be place in [result/single/wrench/original/](result/single/wrench/original/) 
 for original WRENCH and [result/single/wrench/pagecache/](result/single/wrench/pagecache/) for WRENCH with page cache.
-To run the WRENCH simulator, use this source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test/examples/basic-examples/io-pagecache) and follow the instructions in README file.
+To run the WRENCH simulator, use this source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/) and follow the instructions in README file.
 
 3. Multi-threaded simulation log
 
-- The log files of the WRENCH simulator shoule be place in [result/multi/local/wrench/original/](result/multi/local/wrench/original/) for original WRENCH 
-and in [result/multi/local/wrench/pagecache/](result/multi/local//wrench/pagecache/) for WRENCH with page cache.
+- The log files of the WRENCH simulator should be place in [result/multi/local/wrench/original/](result/multi/local/wrench/original/) for original WRENCH 
+and in [result/multi/local/wrench/pagecache/](result/multi/local/wrench/pagecache/) for WRENCH with page cache.
 
-- To run the WRENCH simulators, use the source code [example](https://github.com/dohoangdzung/wrench/tree/io_chunk_test/examples/basic-examples/io-pagecache) and follow the instructions in README file.
+- To run the WRENCH simulators, use the source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/) and follow the instructions in README file.
+
+4. NFS simulation log
+
+- The log files of the WRENCH simulator should be place in [result/multi/nfs/wrench/original/](result/multi/nfs/wrench/original/) for original WRENCH 
+and in [result/multi/nfs/wrench/pagecache/](result/multi/nfs/wrench/pagecache/) for WRENCH with page cache.
+
+- To run the WRENCH simulators, use the source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/) and follow the instructions in README file.
