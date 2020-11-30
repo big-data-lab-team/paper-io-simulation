@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import csv
 import json
+import seaborn as sns
 
 
 def parse_single_pipeline(filename):
@@ -69,37 +70,51 @@ def parse_simgrid_result(filename, no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-def suplot_prop(ax, exp_folder, propname, title):
-    real_df = pd.read_csv("%s/real/aggregated.csv" % exp_folder)
-    simg_org_df = pd.read_csv("%s/wrench/original/aggregated.csv" % exp_folder)
-    simg_ext_df = pd.read_csv("%s/wrench/pagecache/aggregated.csv" % exp_folder)
+def suplot_prop(ax, real_dir, wrench_dir, propname, title, rep_no=1):
+    simg_org_df = pd.read_csv("%s/original/aggregated.csv" % wrench_dir)
+    simg_ext_df = pd.read_csv("%s/pagecache/aggregated.csv" % wrench_dir)
+    no_pipeline_df = simg_org_df["no_pipeline"]
+
+    real_df = pd.DataFrame()
+    for i in range(rep_no):
+        df = pd.read_csv("%s/%d/aggregated.csv" % (real_dir, i + 1))
+        real_df[i + 1] = df[propname]
+
+    mean_df = real_df.mean(axis=1)
+    max_df = real_df.max(axis=1)
+    min_df = real_df.min(axis=1)
 
     ax.set_title(title)
 
-    ax.plot(real_df["no_pipeline"], real_df[propname] / real_df["no_pipeline"], color="k", label="Real execution")
-    ax.plot(simg_org_df["no_pipeline"], simg_org_df[propname] / simg_org_df["no_pipeline"], color="tab:orange",
-            label="WRENCH")
-    ax.plot(simg_ext_df["no_pipeline"], simg_ext_df[propname] / simg_ext_df["no_pipeline"], color="tab:cyan",
-            label="WRENCH-Ext")
+    ax.plot(no_pipeline_df, mean_df / no_pipeline_df, color="k", linewidth=1, label="Real execution mean")
+    ax.plot(no_pipeline_df, max_df / no_pipeline_df, color="k", linewidth=1, alpha=0.5)
+    ax.plot(no_pipeline_df, min_df / no_pipeline_df, color="k", linewidth=1, alpha=0.5)
+    ax.fill_between(no_pipeline_df, min_df / no_pipeline_df, max_df / no_pipeline_df, facecolor='lightgrey', alpha=0.5,
+                    label="Real execution")
+
+    ax.plot(no_pipeline_df, simg_org_df[propname] / no_pipeline_df, linewidth=1, color="tab:orange", label="WRENCH")
+    ax.plot(no_pipeline_df, simg_ext_df[propname] / no_pipeline_df, linewidth=1, color="tab:cyan", label="WRENCH-Ext")
 
     ax.set_xlabel("number of pipelines")
     ax.set_ylabel("time (s)")
 
 
-def result_local():
-    export_real_results("local/real/", "aggregated.csv")
+def result_local(rep_no=1):
+    for i in range(rep_no):
+        export_real_results("local/real/%d/" % (i + 1), "aggregated.csv")
+
     export_simgrid_result("local/wrench/original/", "aggregated.csv")
     export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
     plt.rcParams.update({'font.size': 8})
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
 
-    suplot_prop(ax1, "local", "readtime", "average read time")
-    suplot_prop(ax2, "local", "writetime", "average write time")
+    suplot_prop(ax1, "local/real/", "local/wrench/", "readtime", "average read time", rep_no=rep_no)
+    suplot_prop(ax2, "local/real/", "local/wrench/", "writetime", "average write time", rep_no=rep_no)
 
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
 
-    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=2)
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
     plt.savefig("figures/multi_local.pdf", format="pdf")
     plt.savefig("figures/multi_local.svg", format="svg")
@@ -107,20 +122,22 @@ def result_local():
     plt.show()
 
 
-def result_nfs():
-    export_real_results("remote/real/", "aggregated.csv")
-    export_simgrid_result("remote/wrench/original/", "aggregated.csv")
-    export_simgrid_result("remote/wrench/pagecache/", "aggregated.csv")
+def result_nfs(rep_no=1):
+    for i in range(rep_no):
+        export_real_results("nfs/real/%d/" % (i + 1), "aggregated.csv")
+
+    export_simgrid_result("nfs/wrench/original/", "aggregated.csv")
+    export_simgrid_result("nfs/wrench/pagecache/", "aggregated.csv")
     plt.rcParams.update({'font.size': 8})
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
 
-    suplot_prop(ax1, "remote", "readtime", "average read time")
-    suplot_prop(ax2, "remote", "writetime", "average write time")
+    suplot_prop(ax1, "nfs/real/", "nfs/wrench/", "readtime", "average read time", rep_no=rep_no)
+    suplot_prop(ax2, "nfs/real/", "nfs/wrench/", "writetime", "average write time", rep_no=rep_no)
 
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
 
-    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=3)
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=2)
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
     plt.savefig("figures/multi_nfs.pdf", format="pdf")
     plt.savefig("figures/multi_nfs.svg", format="svg")
