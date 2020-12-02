@@ -611,8 +611,8 @@
 			In this work, we use Python 3.7 to implement the single-threaded simulator, 
 			SimGrid 3.25 and WRENCH 1.6 for more multi-threaded simulators. 
 			SimGrid source code is available at \url{https://framagit.org/simgrid/simgrid}, 
-			and WRENCH is at \url{https://github.com/dohoangdzung/wrench/tree/io_nfs} 	
-			\textcolor{red}{Update later with the commit used in the simulator}
+			and WRENCH is at 
+			\url{https://github.com/wrench-project/wrench/tree/master/src/wrench/services/memory}.
 			
 		\subsection{Experiments}
 		
@@ -654,8 +654,9 @@
 			In our experiments, the CPU speed is set to 1 Gflops. 
 			Finally, because WRENCH simulates applications base on network-communication, 
 			we use an infinite bandwidth to eliminate network latency for local I/Os.
-			The details of simulated platform is available here: 
-			\url{https://github.com/dohoangdzung/wrench/blob/io_chunk_test/examples/basic-examples/io-pagecache/single_host.xml}
+			The details of simulated platform and the source code of the simulator 
+			are available here: 
+			\url{https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache}
 			
 			\subsubsection{Single-threaded evaluation}
 			
@@ -923,8 +924,11 @@
 			
 			Our short term future work will be re-evaluate the model with asymmetrical 
 			disk bandwidths that will be released in the next SimGrid version.
-			The next step is to study the detail in cache eviction mechanism to achieve 
-			better simulation results. 
+			The next step is to study the detail in cache eviction mechanism to make 
+			the our simulation results closer to reality. 
+			Another point that needs to be further improved is the ability to configure  
+			different anonymous memory usage levels of applications since it affects  
+			the amount of cache used.
 			We also plan to support random I/O and file readahead, as well as 
 			saving and restoring disk state when hosts are turned on/off.	 
 
