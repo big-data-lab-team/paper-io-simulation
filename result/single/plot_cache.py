@@ -19,7 +19,7 @@ def plot_cache(real_file, sim_file):
     ax1 = df_real[index].plot.bar(stacked=True, rot=0, color="tab:cyan", edgecolor="k", ax=ax1,
                                   title="Real execution")
     ax2 = df_sim[index].plot.bar(stacked=True, rot=0, color="tab:cyan", edgecolor="k", ax=ax2,
-                                 title="WRENCH with page cache", legend=False)
+                                 title="WRENCH-Ext", legend=False)
 
     ax1.set_xlabel("tasks")
     ax2.set_xlabel("tasks")
