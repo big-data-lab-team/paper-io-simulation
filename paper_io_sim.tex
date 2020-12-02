@@ -657,6 +657,7 @@
 			The details of simulated platform and the source code of the simulator 
 			are available here: 
 			\url{https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache}
+			\tristan{Our experiments use commit abcd}
 			
 			\subsubsection{Single-threaded evaluation}
 			
@@ -672,7 +673,8 @@
 			We use the input sizes of 20~GB, 50~GB, 75~GB, 100~GB and run 
 			the pipeline on the cluster.
 			The pipeline is simulated with the Python prototype simulator, 
-			original WRENCH and WRENCH-Ext simulator. 
+			original WRENCH and WRENCH-Ext simulator \tristan{name your simulator something 
+			that refers to page cache, maybe WRENCH-cache}. 
 			
 			\subsubsection{Multi-threaded evaluation}
 
@@ -727,7 +729,8 @@
 	\section{Results}
 	\label{results}			
 		The benchmark results of bandwidths and the values used in the simulators 
-		in our all experiments are shown in \ref{table:benchmark}. 
+		in our all experiments are shown in Table~\ref{table:benchmark} \tristan{This isn't results, it should go in II.C, 
+		next to the paragraph where you talk about symmetrical bandwidths}. 
 		
 		\begin{table}
 		\centering
@@ -744,7 +747,7 @@
 			Network bandwidth & 3000 & - & 3000\\
 		\hline
 		\end{tabular}
-		\caption{Bandwidth benchmark results and simulator configurations}
+		\caption{Bandwidth benchmark results and simulator configurations \tristan{add a sentence of explanation. Make the table fit in 1 column}}
 		\label{table:benchmark}
 		\end{table}		
 		
@@ -752,18 +755,18 @@
 
 			Memory behaviors of real pipeline execution and simulators are recorded 
 			and the memory profiling results with 20GB and 100GB input files 
-			are illustrated in Figure~\ref{fig:single_memprof}. 
+			are illustrated in Figure~\ref{fig:single_memprof} \tristan{convoluted writing}. 
 			The bars in the figures present activities in tasks (read, compute and write), 
-			while the lines describe memory status throughout run time of the pipeline. 
+			while the lines describe memory status throughout run time of the pipeline \tristan{move any description of graphical features to the figure caption}. 
 			Because the results with 20Gb, 50GB, 100GB are analogous, we only include 
-			the results with 20GB and 100GB in this paper. 
+			the results with 20GB and 100GB in this paper \tristan{analogous is not the right word}. 
 			
 			As shown in the figures, the makespans of the simulated pipeline are 
 			close to the makespan of the real execution with similar patterns of I/O time 
 			real execution and simulation. 
 			But more importantly, with all input sizes, similar trends can also be found 
 			in the lines describing memory status in simulators and the real execution. 
-			The akin movements of amount of cache used (purple lines) in reality 
+			The similar evolutions of amount of cache used (purple lines) in reality 
 			and simulation show that the use of page cache is well reproduced by the simulators. 
 			The amount of dirty data ( red lines) also follow similar trends, 
 			which means not only the amount dirty data, but also the flushing and 
@@ -800,7 +803,7 @@
 				\centering
    				\includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
 			\end{subfigure}
-			\caption{Memory profiling results with different input file sizes}
+			\caption{Memory profiling results with different input file sizes \tristan{put the simulation/real conditions on the side, make them larger and use the same color code as below (pink for real, etc). Put the memory values on top, similar to how they are in the graphs below. }}
 			\label{fig:single_memprof}	
 			\begin{subfigure}{\linewidth}
 				\centering
@@ -813,7 +816,7 @@
    				\includegraphics[width=\linewidth]{result/single/figures/cached_files.pdf}
 			\end{subfigure}	
 			\label{fig:single_cache}
-   			\caption{Amount of file data in cache after each I/O activity with 100GB of input}
+   			\caption{Amount of file data in cache after each I/O activity with 100GB of input \tristan{Make a grouped histogram (1 histogram with two bars, one for real, one for simulation). Add a grouped histogram for 20GB. Use the same color code everywhere: real should be pink.}}
 			\end{figure*}			
 
 			This longer read can be explained with the amount of cached data of files 
@@ -918,7 +921,7 @@
 			implement it with SimGrid using WRENCH, and evaluate the results 
 			with different experiments. 
 			The results shows our achievements in terms of simulation accuracy 
-			and the application potential in practice. 
+			and the application potential in practice \tristan{what do you conclude? can we use your simulator to study big data applications on hpc clusters? under what conditions?}. 
 			On the other hands, the model exposed some limitations that can be 
 			further improved.
 			
