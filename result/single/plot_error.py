@@ -33,8 +33,8 @@ def plot_task_error(ax, size):
     simgrid_ext_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_ext_log)]
 
     grouped_bar_chart(ax, labels, "", "error (%)",
-                      ("Python simulator", py_error, "tab:pink"), ("Original WRENCH", simgrid_org_error, 'tab:orange'),
-                      ("WRENCH simulator with page cache", simgrid_ext_error, 'tab:cyan'))
+                      ("Python simulator", py_error, "tab:pink"), ("WRENCH", simgrid_org_error, 'tab:orange'),
+                      ("WRENCH-Ext", simgrid_ext_error, 'tab:cyan'))
     ax.set_title("%d GB" % size)
 
 
