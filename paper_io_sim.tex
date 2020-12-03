@@ -248,59 +248,52 @@
 
 		In this section, we present our approach to model file read and write with 
 		page cache, cache eviction and data flushing mechanisms implemented 
-		in the Linux kernel. 
-		We also detail the design of our simulator and its implementation. 
-		Because the simulator is implemented with SimGrid using WRENCH, we 
-		name the simulator as WRENCH-Ext, along with the WRENCH simulator,
-		which is created with original WRENCH.
-		Finally, we describe experimental scenarios to evaluate our simulation model 
-		using a standalone Python prototype, WRENCH and WRENCH-Ext simulator. 
+		in the Linux kernel. We also detail the design and implementation of two simulators:
+		(1) a standalone Python prototype used to evaluate the model independently of any other 
+		library, and (2) WRENCH-cache, an extension of WRENCH with our page cache model.
+		Finally, we describe experimental scenarios to evaluate our simulations in various configurations.
 
 		\subsection{Principle of the simulator}
 	
-            We separate our simulation model in two components, the IO
+			We separate our simulation model in two components, the IO
 			Controller and the Memory Manager, which together simulate 
-			file read/write mechanisms in Linux (Figure~\ref{fig:interaction}). 
-			The Memory Manager simulates I/Os to cache, flushing, periodical flushing, 
-			and cache eviction, whereas the IO Controller simulates file reads and writes. 			
-			To read or write a chunk of file, a simulated application sends a request 
-			to the IOController.
-			Based on the memory status in Memory Manager, the IOController 
-			orchestrates cache and disk reads/writes, flushing, cache eviction 
-			to simulate I/O time.
+			file read and write mechanisms in Linux (Figure~\ref{fig:interaction}). 
+			To read or write a file chunk, a simulated application sends a request 
+			to the IOController. The IOController determines the amount of memory required by the operation,
+			interacts with the Memory Manager accordingly, reads or write to cache through the Memory Manager, 
+			and finally reads or writes on disk if necessary.
+			The Memory Manager simulates flushing, eviction, and I/O to cache.
 
 			\begin{figure}
    				\centering
    				\includegraphics[width=0.85\columnwidth]{figures/interaction.pdf}
 				   \caption{Overview of the simulated writeback page cache.
-				   Application sends file read and file write requests to IOController, 
-				   then IOController manages orchestrate flushing, eviction, cache and 
-				   disk accesses to fulfill the requests with the MemoryManager object. 
-				   Memory and Disk are responsible for simulating I/O time.}
+				   Applications send file read or write requests to the
+				   IOController that orchestrates flushing, eviction, cache
+				   and disk accesses with the MemoryManager. Storage
+				   devices (memory and disk) simulate file transfers with
+				   bandwidth sharing. \tristan{Could you annotate arrows to
+				   make them more explicit?}.}
 				   \label{fig:interaction}
 			\end{figure}
 
 			\subsubsection{Memory simulation model}
 			
-			We leverage existing storage simulation models to simulate the memory,
-			which is characterized with storage capacity, read and write bandwidths 
-			and device latency. 
-			These features are captured in simulation frameworks and applicable 
-			to memory simulation \cite{lebre2015}. 
-			In addition, leveraging existing disk models allows us 
-			to take advantage of bandwidth sharing between concurrent disk I/O to 
+			We leverage existing storage simulation models~\cite{lebre2015} to simulate the memory,
+			characterized by its storage capacity, read and write bandwidths,
+			and device latency.
+			Leveraging existing storage models allows us 
+			to take advantage of bandwidth sharing between concurrent I/Os to 
 			simulate parallel memory accesses.
 
 			\paragraph*{Memory Manager}
-			Memory Manager simulates two parallel threads presented in \ref{fig:interaction}.
-			The first thread is the main thread, which is responsible for the simulation 
-			of data flushing, cache eviction and I/Os to cache. 
-			The second thread is a simulated background thread, in which Memory Manager 
-			periodically searches and flushes expired dirty data in page cache LRU lists 
-			to disks. 
+			The Memory Manager simulates  two parallel threads: the first and main one simulates 
+			flushing, eviction, and cache I/Os synchronously; the second one is a background thread that  
+			periodically searches for expired dirty data in page cache LRU lists 
+			and flushes them to disk.
 
 			\paragraph*{Page cache LRU lists}
-			In Linux kernel, the page cache LRU lists contain file pages. However, 
+			In the Linux kernel, the page cache LRU lists contain file pages. However, 
 			due to the large number of file pages, managing lists of pages may 
 			require significant computation overhead. 
 			Thus, we introduce the concept of a data block as a unit to represent data 
