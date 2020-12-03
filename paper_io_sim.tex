@@ -257,7 +257,7 @@
 	
 			We separate our simulation model in two components, the IO
 			Controller and the Memory Manager, which together simulate 
-			file read and write mechanisms in Linux (Figure~\ref{fig:interaction}). 
+			file read and write mechanisms in Linux (Fig.~\ref{fig:interaction}). 
 			To read or write a file chunk, a simulated application sends a request 
 			to the IOController. The IOController determines the amount of memory required by the operation,
 			interacts with the Memory Manager accordingly, reads or write to cache through the Memory Manager, 
@@ -294,8 +294,8 @@
 
 			\paragraph*{Page cache LRU lists}
 			In the Linux kernel, the page cache LRU lists contain file pages. However, 
-			due to the large number of file pages, managing lists of pages may 
-			require significant computation overhead. 
+			due to the large number of file pages, managing lists of pages 
+			induces substantial overheads.
 			Thus, we introduce the concept of a data block as a unit to represent data 
 			cached in memory. A data block is a subset of file pages stored in
             page cache that were accessed in the same I/O operation. 
@@ -309,14 +309,14 @@
 			\begin{figure}
    				\centering
    				\includegraphics[width=\columnwidth]{figures/lru_lists.pdf}
-   				\caption{Simulation of page cache LRU lists with data blocks}	\label{fig:lrulist}
+   				\caption{Model of page cache LRU lists with data blocks.}	\label{fig:lrulist}
 			\end{figure}	
 			
-			With the data block definition, page cache LRU lists can be modeled with 
-			two lists of data blocks: an active list and an inactive list, ordered by 
-			last access time (earliest first, see Figure~\ref{fig:lrulist}).
-			As in the kernel, our simulator keeps the size of the active list under
-			twice the size of the inactive list by moving least recently 
+			We model page cache LRU lists as 
+			two lists of data blocks, an active list and an inactive list, both ordered by 
+			last access time (earliest first, Fig.~\ref{fig:lrulist}).
+			As in the kernel, our simulator limits the size of the active list to
+			twice the size of the inactive list, by moving least recently 
             used data blocks from the active list to the inactive list.
 			Modeling page cache LRU lists as lists of data blocks reduces the
 			overhead of the simulator, as data blocks are obviously less
@@ -345,7 +345,7 @@
             but not file random access.
             Thus, we simplify the data read order, in which uncached data is read 
             from disk first, and cached data is only read after all uncached data is read 
-            (left to right in Figure~\ref{fig:read_order}).
+            (left to right in Fig.~\ref{fig:read_order}).
             When a chunk of uncached data is read, a new clean block is created 
             and put at the top of the inactive list. 
             For a chunk of cached data, one or more existing data blocks in two 
