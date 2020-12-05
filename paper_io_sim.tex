@@ -39,30 +39,26 @@
 
 	\begin{abstract}
 		
-		The explosive development of Big Data era seen in recent years results in 
-		growing needs in data storing, data analysis. 
-		Although large computing systems with powerful computing capability 
-		have been increasingly used to process big datasets, there is still a bottleneck 
-		in disk I/O. 
-		Memory page cache is a solution applied to minimize disk accesses and 
-		improve the I/O performance. 
-		Despite of the fact that simulation tools for HPC have been developed to 
+		The rapid emergence of Big Data seen in recent years has resulted in a 
+		growing needs for efficient data storing and optimized data analysis. 
+		Despite relying on large computing infrastructures with powerful computing capability 
+		to process these large datasets, an I/O bottleneck remains. 
+        One widely-used approach to minimize the costs of data transfers during
+        regular use is through the employment of the page cache.
+		While many simulation tools have been developed to 
 		support studies in computing systems optimization, page cache simulation 
-		has not been fully captured, or absent in these simulators. 
+		has not been fully captured or remains absent from these simulators. 
 		The lack of ability to simulate I/O with page cache leads to inaccurate 
-		simulation results in many situations, especially in data intensive applications. 
+		simulation results in many situations, especially when dealing with data intensive applications. 
 		
-		In this paper, we propose a I/O simulation model with key features of the page cache.
-		The model consists of simulation algorithms of I/O, main components 
-		and mechanisms of page cache.
-		We also implement the model with SimGrid, a simulation framework for 
+		In this paper, we propose a I/O simulation model that characterizes the key features of the page cache.
+		We have implemented the model with SimGrid, a simulation framework for 
 		distributed systems, using WRENCH, a SimGrid-based workflow simulator. 
-		Then we create simulators for applications in single-threaded, multi-threaded,
-		network file system and neuroimaging usecases.
-		Finally, we analyze the results, compare to the results of base-line WRENCH 
-		simulator as well as real execution.
+        Our simulator is compatible with both single-threaded and multithreaded applications,
+        and can simulate both writeback and writethrough cache that can factor into local
+        and network-based filesystems.
 		The results show that our simulator not only achieves higher accuracy than 
-		original WRENCH, but also simulates well the status of memory and 
+		original WRENCH, but also effectively simulates memory contents and 
 		page cache during I/O operations. 
 		Through this study, our effort is to contribute an analytical model 
 		of the page cache, which can also be integrated to other simulators 
