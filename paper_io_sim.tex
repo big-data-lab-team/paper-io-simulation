@@ -12,6 +12,15 @@
 \usepackage{ulem}
 \usepackage{tabularx}
 
+% Fix link colors
+\hypersetup{
+    colorlinks = true,
+    linkcolor=red,
+    citecolor=red,
+    urlcolor=blue,
+    linktocpage % so that page numbers are clickable in toc
+}
+
 \algblock{Input}{EndInput}
 \algnotext{EndInput}
 \algblock{Output}{EndOutput}
@@ -355,7 +364,6 @@
 
     \subsubsection{Flushing and eviction}
 
-    \paragraph*{Flushing}
     The main simulated thread in the Memory Manager can flush the
     cache to write dirty data to disk. The data flushing simulation
     function takes the amount of data to flush as parameter. While
@@ -367,8 +375,7 @@
     block be partially flushed, the block is split in two blocks,
     one that is flushed and one that remains dirty. Flushing time
     to disk is simulated with the storage model.
-    
-    \paragraph*{Cache eviction}
+
     Similarly to data flushing, our cache eviction simulation runs in
     the main thread. It frees up the page cache by traversing and deleting 
     least recently used clean data blocks in the inactive list.
@@ -401,7 +408,6 @@
         \end{algorithmic}
     \end{algorithm}
 
-    \paragraph*{Periodical flushing}
     Periodical flushing is simulated in the Memory Manager
     background thread. As in the Linux kernel, a dirty block
     in our model is considered expired if (1) it is dirty, and (2)
@@ -431,7 +437,7 @@
             \Input
                 \Desc{cs}{chunk size}
                 \Desc{fn}{file name}
-                \Desc{fs}{file size (assume to fit in memory)}
+                \Desc{fs}{file size (assumed to fit in memory)}
                 \Desc{mm}{MemoryManager object}
                 \Desc{sm}{storage simulation model}
                \EndInput
@@ -447,30 +453,29 @@
                 \State mm.cache\_read(cache\_read)  
             \EndIf
         \end{algorithmic}
-    \end{algorithm}            
-    As mentioned previously, our model reads and writes file chunks in a round-robin 
-    fashion.
-    When a simulated application reads a file chunk, it sends a chunk read request 
-    to IOController.             
-    The algorithm to simulate a chunk read implemented in IOController 
-    is described in Algorithm~\ref{alg:read}.   
-    First, we calculate the amount of uncached data that needs to be read 
-    from disk, and the remaining amount is read from cache (line 7-8).
-    We assume that after a file is read, there are two copies of the file in memory 
-    (one in cache, one in anonymous memory). 
-    Unfortunately, SimGrid lacks of application memory management and WRENCH 
-    only use the memory capacity to check if the applications can be run. 
-    Thus, in our model, when a chunk is read, one copy of the chunk 
-    occupies anonymous memory, and the uncached part of that chunk is 
-    read into cache.    
-    The amount of required memory to read the chunk is calculated and 
-    if there is not enough memory available, Memory Manager is called to 
-    flush dirty data to disk and simulate flushing time with memory model (line 9). 
-    This flushing is complemented by eviction in the Memory Manager (line 10). 
-    Then, if there is uncached data, a disk read is simulated with disk model (line 12), 
-    and this data of the file is added to cache (line 13).
-    Finally, if cached data is read, Memory Manager is called to simulate a cache read  
-    and update the corresponding data blocks in cache (line 16).
+    \end{algorithm}
+    As mentioned previously, our model reads and writes file chunks in a
+    round-robin fashion. To read a file chunk, simulated applications send
+    chunk read requests to the IOController which processes them using
+    Algorithm~\ref{alg:read}. First, we calculate the amount of uncached
+    data that needs to be read from disk, and the remaining amount is read
+    from cache (line 7-8). The amount of memory required to read the chunk
+    is calculated, corresponding to a copy of the chunk in anonymous memory
+    and a copy of the chunk in cache \tristan{Create a variable
+    "required\_mem" in the algorithm to clarify}.
+    \tristan{add a call to mm in the algorithm to increment anonymous memory. Mention in the experiments that anonymous memory is flushed after each task.}
+    If there is not enough available memory, the Memory Manager is called
+    to flush dirty data (line 9). If necessary, flushing is complemented by
+    eviction (line 10). When called with negative arguments, functions
+    flush and evict simply return and do not do anything. Then, if there is
+    uncached data, a disk read is simulated with disk model (line 12)
+    \tristan{this is not consistent with the new Figure 1 where disk reads
+    are done by the mm}, and this data of the file is added to cache (line
+    13).
+    Finally, if cached data needs to be read, the Memory Manager is called
+    to simulate a cache read  
+    and update the corresponding data blocks accordingly (line 16).
+
     \begin{algorithm}\caption{File chunk write simulation of IOController}
     \label{alg:write}
         \small
@@ -490,41 +495,34 @@
             \If {mem\_amt $<$ cs}  \Comment{Write with disk bandwidth}
                 \State mm.flush(cs - mem\_amt)  
                 \State mm.evict(cs - mem\_amt  - mm.free\_mem) 
-                \State mm.add\_to\_cache(fn, min(cs - mem\_amt, mm.free\_mem))
-                \State sm.write(cs - mem\_amt)
+                \State mm.add\_to\_cache(fn, min(cs - mem\_amt, mm.free\_mem)) \tristan{why is data written to cache with "addtocache" here and with "write" at line 10?}
+                \State sm.write(cs - mem\_amt) \tristan{According to Fig 1 the IOController is not supposed to interact directly with sm}
             \EndIf
             
         \end{algorithmic}
     \end{algorithm}
-    Algorithm~\ref{alg:write} describes our simulation of chunk write in 
+    Algorithm~\ref{alg:write} describes our simulation of chunk writes in 
     the IOController. 
-    In the chunk write, data can be written to cache with memory bandwidth 
-    without waiting for flushing or being throttled before the amount of 
-    dirty data reaches dirty\_ratio, or otherwise written with disk bandwidth.
-    Thus, our algorithm initially checks the remaining amount of data that 
-    can be written as dirty data (line 6).
-    If this amount is greater than 0, MemoryManager is asked to evict 
-    data from cache to accommodate the written data (line 8). 
-    If the amount to evict calculated and passed in the evict function is less than 0, 
-    the eviction does nothing.
-    After evicting cache, the actual amount of data that can be written to 
-    page cache is calculated (line 9), a cache write is then simulated 
-    with this amount through memory model and data written is added to 
-    page cache LRU lists (line 10).
-    After dirty\_ratio is reached, dirty data has to be flushed before new data 
-    can be written to cache again. 
-    If there is remaining chunk data that has not been written, we flush and 
-    evict data from cache as much as possible so that the this data can be 
+    % Data is written to cache until the amount of dirty data in the cache 
+    % exceeds the dirty ratio times the amount of available memory. Data is then written to disk.
+    Our algorithm initially checks the  amount of data that 
+    can be written as dirty data given the dirty ratio (line 6).
+    If this amount is greater than 0, the Memory Manager is requested to evict 
+    data from cache if necessary (line 8) \tristan{the difference between available and free memory should be explained somewhere}.
+    After eviction, the amount of data that can be written to 
+    page cache is calculated (line 9), and a cache write is simulated (line 10).
+    To write the remaining data, we flush and 
+    evict data as possible so that this data can be 
     written to cache (line 13-14). 
-    Here, MemoryManager does not guarantee that the amount of flushed 
-    and evicted data is enough for the write of remaining data. 
+    The Memory Manager does not guarantee that the amount of flushed 
+    and evicted data is enough to write the remaining data. 
     In the case it is less than the required amount, the remaining data 
     being written to cache can be flushed and evicted right away. 
     Thus, the amount of remaining data written and kept in cache 
     after the write is limited by the amount free memory, and this amount 
-    is added to cache (line 15). 
+    is added to cache (line 15) \tristan{the previous two sentences are very unclear, I don't understand them so I can't reformulate.}. 
     Finally, the disk write is simulated with the remaining data amount (line 16), 
-    and the chunk write algorithm finishes.
+    and the chunk write algorithm finishes \tristan{see comment in algorithm}.
             
         \subsection{Implementation}
 
@@ -550,39 +548,36 @@
             \end{itemize}            
 
             Since bandwidth sharing was not simulated, this prototype does not support
-            concurrency: it is limited to single-threaded pipelines running on systems
-            with a single-core CPU. We used it in a first validation of our simulation
-            model, against a real sequential pipeline running on a real system.
-            The source code of our Python prototype is available at
-            \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}
+            concurrency: it is limited to single-threaded applications running on systems
+            with a single-core CPU. We used this prototype for a first validation of our simulation
+            model against a real sequential application running on a real system.
+            The source code this prototype is available at
+            \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}. We used Python 3.7.
 
-            Having the model validated, we created simulators for different use cases
-            using WRENCH.
-            We implemented our model separately from existing WRENCH components,
-            exposed an API for users, and added an command line argument to enable
-            the model in WRENCH.
-            This helps us to avoid unexpected impacts on WRENCH and
-            independently update the model in the future.
-            We then compared the results of the WRENCH, WRENCH-cache simulators
-            the results of real execution on a real system.
+            We also implemented our model in WRENCH, separately from existing WRENCH components. 
+            Page cache simulation is available through a user API and can be activated using a command-line argument.
+            We used SimGrid 3.25 and WRENCH 1.6. SimGrid source code is available at \url{https://framagit.org/simgrid/simgrid},
+            and WRENCH is at \url{https://github.com/wrench-project/wrench/tree/master/src/wrench/services/memory}.
+            \tristan{which commit did you use?}
 
-            In this work, we use Python 3.7 to implement the single-threaded simulator,
-            SimGrid 3.25 and WRENCH 1.6 for more multi-threaded simulators.
-            SimGrid source code is available at \url{https://framagit.org/simgrid/simgrid},
-            and WRENCH is at
-            \url{https://github.com/wrench-project/wrench/tree/master/src/wrench/services/memory}.
+\tristan{anything else interesting to mention about the implementation?}
 
         \subsection{Experiments}
 
-            The goal of our experiments is to evaluate our page cache
-            simulation in single-threaded and multi-threaded applications
-            accessing data on local and network file systems.
-            We use a pipeline of sequential tasks where each task reads an input file,
-            increments every byte of the input to emulate real processing, and writes
-            the result to disk.
-            The output of the previous task is the input of the next task.
-            We also use a real application pipeline \textcolor{red}{[Maybe briefly describe this application's purpose (e.g. a standard fMRI preprocessing piepeline)]},
-            to evaluate the applicability of our simulation model.
+
+        Our experiments compared real executions with the original WRENCH,
+        our WRENCH-cache extension, and our prototype Python simulator. We
+        evaluated our page cache simulation in single-threaded and
+        multi-threaded applications accessing data on local and network
+        file systems.
+
+            We used a pipeline of three sequential tasks where each task reads the output of the previous task,
+            increments every byte of the input to emulate real
+            processing, and writes the resulting data to disk. The first file was provided as input. We also used
+            a real application pipeline \textcolor{red}{[Maybe briefly
+            describe this application's purpose (e.g. a standard fMRI
+            preprocessing piepeline)]}, to evaluate the applicability of
+            our simulation model.
 
             We use a dedicated cluster hosted at Concordia University to conduct
             the experiments. The cluster consists of one login node, 9 compute nodes
