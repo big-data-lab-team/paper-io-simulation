@@ -38,9 +38,10 @@
 \maketitle
 
 	\begin{abstract}
+
 		
 		The rapid emergence of Big Data seen in recent years has resulted in a 
-		growing needs for efficient data storing and optimized data analysis. 
+		growing need for efficient data storing and optimized data analysis techniques. 
 		Despite relying on large computing infrastructures with powerful computing capability 
 		to process these large datasets, an I/O bottleneck remains. 
         One widely-used approach to minimize the costs of data transfers during
@@ -48,8 +49,8 @@
 		While many simulation tools have been developed to 
 		support studies in computing systems optimization, page cache simulation 
 		has not been fully captured or remains absent from these simulators. 
-		The lack of ability to simulate I/O with page cache leads to inaccurate 
-		simulation results in many situations, especially when dealing with data intensive applications. 
+		The inability to simulate I/O with page cache leads to inaccurate 
+		simulations in many situations, especially when dealing with data intensive applications. 
 		
 		In this paper, we propose a I/O simulation model that characterizes the key features of the page cache.
 		We have implemented the model with SimGrid, a simulation framework for 
@@ -62,69 +63,52 @@
 		page cache during I/O operations. 
 		Through this study, our effort is to contribute an analytical model 
 		of the page cache, which can also be integrated to other simulators 
-		to improve I/O simulation accuracy, with its practical results. 
+		to improve I/O simulation accuracy. 
 		
 	\end{abstract}		 
 
 	\section{Introduction}
 		
-		In recent years, as a result of the growing demand for Big Data processing 
-		on large computing infrastructures, there have been the research and development 
-		of simulation applications and frameworks for distributed systems. 
-		These simulation tools have shown their advantages in evaluation 
-		of algorithms, applications and solutions. 
-		Experimenting on real platforms exposes shortcomings due to limited and 
-		shared resources, operational costs, unstable environments and the result 
-		reproducibility difficulties.
-		On the contrary, simulators provide to researchers the freedom of choosing 
-		simulated infrastructures, reproducible results and low costs.
-		These simulators are developed and integrated with simulation models 
-		of computing resources including CPU, network and storage.
-		The ultimate goal that all simulators try to achieve is to accurately simulate 
-		applications. 
-		However, there is a trade-off between accuracy and scalability, which has been 
-		indicated in some reviews \cite{casanova2014simgrid} \cite{byrne2017review}. 
-		This means that in most ciscumstances, users have to, more or less, sacrifice 
-		accuracy for the scalability and performance when their platforms grow to 
-		hundreds or thousands nodes. 
-		
-		Beside computing resources such as CPU, network, storage, another 
-		important factor that has significant impacts on I/O performance is 
-		page cache. 
-		Page cache is an architectural solution employed in systems to tackle 
-		the problem of disk I/O bottleneck in data processing. 
-		Although this is not a radical solution for disk performance, it contributes 
-		to minimizing disk accesses and maximizing I/O performance. 
-		Surprisingly, page cache has not been fully modeled, if not completely absent, 
-		in simulation tools. 
-		Some simulators try to simulate I/O with page cache, but fail to capture the 
-		key features such as dirty data and cache eviction mechanism 
-		\cite{nunez2012simcan} \cite{nunez2012icancloud}.
-		Again, these simulators also have a problem in scalability with 
-		long simulation time regarding to their very detailed level of simulation. 
-		Other works are able to capture important features of page cache, 
-		but they focus on very specific domains, such as energy consumption 
-		in \cite{xu2018saving}.
+        The Linux Page Cache, introduced in kernel version 2.4, plays an important role in
+        the reduction of filesystem data transfer costs~\cite{pagecache}. With the page cache, previously
+        read data can be reread directly from memory and written data can be written to
+        memory before being asynchronously flushed to disk, resulting in improved I/O performance
+        on slower storage devices. The performance benefits that can be obtained from using the page
+        cache are determined by many factors including the total amount of memory,
+        the amount of data being written (i.e. dirty data), and the percentage of available memory available for
+        written data. All these factors are important when determining the impact of data transfers on
+        application performance, particularly in data intensive applications.
 
-		In this work, we propose a simulation model of I/O with page cache, 
-		implement it with SimGrid, a simulation framework for distributed computing, 
-		and WRENCH, an open-source library for developing workflow simulator 
-		built on top of SimGrid. 
-		One of the reasons for us to choose SimGrid is that it has a balance 
-		between accuracy and scalability. Moreover, the versatility of SimGrid 
-		enables it to be used in cross-domain \cite{casanova2014simgrid}. 
-		In addition, SimGrid has been actively maintained with updated documents. 
-		Then we evaluate our model with four simulators in four experiment scenarios. 
-		This paper is organized as follows. 
-		In Section \ref{relatedwork} we provide details of page cache 
-		existing simulation tools.
-		In Section \ref{relatedwork} we propose our I/O with page 
-		cache simulation model and how we implement it and our experiments 
-		to evaluate the model.  
-		Section \ref{results} compares the results of our model with the results 
-		of original WRENCH and real execution results. 
-		Finally, Section \ref{discussion} concludes and presents future 
-		work.  
+        Characterizing the performance of applications directly on computing infrastructure
+        has various shortcomings, which include, limited and shared resources, operational
+        costs, unstable environments, and the difficulties in producing reproducible results.
+        Simulations address these concerns by providing abstractions to the performance of computer
+        hardware, such as CPU, network and storage. As a result, simulations provide and
+        cost-effective, fast, easy and reproducible  way evaluate application performance
+        on different infrastructures without having to execute the code.
+
+
+        Page cache simulation is crucial when simulating data intensive applications,
+        which would rely on cache hits and writing to memory for additional performance.
+        While existing simulators can adequately characterize many different computing environments,
+        they lack much of the ability to adequately describe the page cache. Some
+        simulators try to simulator I/O with page cache, but fail to capture the key features such
+        as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
+        Other simulators, such as~\cite{xu2018}, capture the important feature of the
+        page cache, but are domain-specific. 
+
+		%However, there is a trade-off between accuracy and scalability, which has been 
+		%indicated in some reviews \cite{casanova2014simgrid} \cite{byrne2017review}. 
+		%This means that in most cicumstances, users have to, more or less, sacrifice 
+		%accuracy for the scalability and performance when their platforms grow to 
+		%hundreds or thousands nodes. 
+
+        In this paper, we present WRENCH-Cache, a simulation model of I/O with page
+        cache incorporated into WRENCH, a workflow management system simulator based of
+        the popular SimGrid framework. The goal of WRENCH-Cache is to provide users
+        with an accurate representation of a workflow execution, when file system page
+        cache is used. WRENCH-Cache is able to simulate both writeback and writethrough
+        cache which would normally be available to local and NFS-based filesystems.
 		
 	\section{Related Work}		
 	\label{relatedwork}	
