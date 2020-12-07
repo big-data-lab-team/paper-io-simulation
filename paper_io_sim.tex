@@ -545,7 +545,7 @@
                 \item $D$ is the amount of data to read or write
                 \item $b_r$ is the read bandwidth of the device
                 \item $b_w$ is the write bandwidth of the device
-            \end{itemize}            
+            \end{itemize}
 
             Since bandwidth sharing was not simulated, this prototype does not support
             concurrency: it is limited to single-threaded applications running on systems
@@ -564,46 +564,44 @@
 
         \subsection{Experiments}
 
-
-        Our experiments compared real executions with the original WRENCH,
-        our WRENCH-cache extension, and our prototype Python simulator. We
-        evaluated our page cache simulation in single-threaded and
-        multi-threaded applications accessing data on local and network
+        Our experiments compare real executions with the original WRENCH,
+        with our WRENCH-cache extension, and with our prototype Python simulator. We
+        evaluate our page cache simulation in single-threaded and
+        multi-threaded applications, accessing data on local and remote
         file systems.
 
-            We used a pipeline of three sequential tasks where each task reads the output of the previous task,
-            increments every byte of the input to emulate real
-            processing, and writes the resulting data to disk. The first file was provided as input. We also used
-            a real application pipeline \textcolor{red}{[Maybe briefly
-            describe this application's purpose (e.g. a standard fMRI
-            preprocessing piepeline)]}, to evaluate the applicability of
-            our simulation model.
+        We simulate an application with three single-core, sequential tasks
+        where each task reads the file produced by the previous task,
+        increments every byte of this file to emulate real processing, and
+        writes the resulting data to disk. We also use a real application
+        \textcolor{red}{[Maybe briefly describe this application's purpose
+        (e.g. a standard fMRI preprocessing piepeline)]}, to evaluate the
+        applicability of our simulation model.
 
-            We use a dedicated cluster hosted at Concordia University to conduct
-            the experiments. The cluster consists of one login node, 9 compute nodes
-            and 4 storage nodes connected with a network bandwidth of 25 Gbps.
-            Each compute node has two 16 cores Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz,
-            275~GB (256~GiB) of RAM and 6 SSDs, 450~GB each with XFS file system,
-            378~GB of tmpfs and 126~GB of devtmpfs file system.
-            The cluster is run on CentOS 8.1 with NFS version 4.
-            We use \textbf{\textit{atop}} and \textbf{\textit{collectl}} as tools to
-            monitor and collect memory status and disk throughput
-            on the cluster.
+        The real application runs on a dedicated cluster hosted at
+        Concordia University, with one login node, 9 compute nodes, and 4
+        storage nodes connected with a network bandwidth of 25 Gbps. Each
+        compute node has 2 $\times$ 16-core Intel(R) Xeon(R) Gold 6130 CPU
+        @ 2.10GHz, 275~GB (256~GiB) \tristan{are you sure it's not 256GB?
+        pls check.} of RAM, 6 $\times$ SSDs of 450~GB each with the XFS
+        file system, 378~GB of tmpfs, and 126~GB of devtmpfs file system.
+        Nodes run CentOS~8.1 with NFS version 4. We use the \texttt{atop}
+        and \texttt{collectl} tools to monitor and collect memory status
+        and disk throughput.
 
-            In simulated platform description, because the disk bandwidths in SimGrid
-            are symmetrical, we measure the read/write bandwidths on our cluster and
-            take the average bandwidths.
-            The benchmark results of bandwidths and the values used in the simulators
-            in our all experiments are shown in Table~\ref{table:benchmark}.
-
+        To parametrize our simulators, we benchmarked the bandwidths of
+        memory, local disk, remote disk (NFS), and network
+        (Table~\ref{table:benchmark}). Since SimGrid only supports
+        symmetrical bandwidths, we use the mean of the read and write
+        bandwidth values in our experiments.
             \begin{table}[htbp]
             \centering
-            \begin{tabularx}{\columnwidth}{|l
+            \begin{tabularx}{\columnwidth}{|c
             |>{\centering\arraybackslash}X
             |>{\centering\arraybackslash}X
             |>{\centering\arraybackslash}X|}
             \hline
-                Bandwidths (MBps)  & Cluster (real) & Python simulator & WRENCH simulator\\
+                Device  & Cluster (real) & Python simulator & WRENCH simulator\\
             \hline
                 Memory read  & 6860	& 4812	 & 4812\\
                 Memory write & 2764	& 4812 & 4812\\
@@ -614,90 +612,59 @@
                 Network bandwidth & 3000 & - & 3000\\
             \hline
             \end{tabularx}
-            \caption{Bandwidth benchmark results and simulator configurations.
-            The bandwidths used in simulators are average of read and write bandwidths
-            measured on the cluster.
-            Remote disk and network are not simulated in Python simulator.}
+            \caption{Bandwidth benchmarks (MBps) and simulator configurations.
+            The bandwidths used in the simulations are the average of the read and write bandwidths
+            measured in the cluster.
+            Remote disk and network accesses are not simulated in the Python simulator. \tristan{table could be prettified}}
             \label{table:benchmark}
             \end{table}
 
-            As the pipelines are single-core, we create simulated tasks,
-            each of them runs on only one core.
-            While in Python, computation time can be directly configured,
-            this time is injected to the WRENCH simulators with number of flops,
-            which is calculated with CPU speed and compute duration.
-            In our experiments, the CPU speed is set to 1 Gflops.
-            Finally, because WRENCH simulates applications base on network-communication,
-            we use an infinite bandwidth to eliminate network latency for local I/Os.
-            The details of simulated platform and the source code of the simulator
-            used in our experiments are available in this commit:
+            As our focus is on I/O rather than compute, we measured
+            application task durations on a cluster node and used these
+            durations in our simulation. For the Python simulator,
+            execution times were directly used in the simulation. For
+            WRENCH and WRENCH-cache, we determined the corresponding number
+            of flops on a 1~Gflops CPU and used these values in the
+            simulation (see Table~\ref{table:tasks} \tristan{add a table to describe execution times}). The final simulated
+            platform and application used in our experiment are avaiable at
             \url{https://github.com/wrench-project/wrench/tree/ec6b43561b95977002258c0fe37a4ecad8f1d33f/examples/basic-examples/io-pagecache}.
 
-            \subsubsection{Single-threaded evaluation}
 
-            The first experiment is single-threaded, where memory bandwidth
-            and disk bandwidth are dedicated.
-            Our goal is to compare the detailed simulation results of each task
-            in the pipeline including read/write time, memory behavior and
-            then validate the correctness of the simulation model.
+            % Finally, because WRENCH simulates applications base on network-communication,
+            % we use an infinite bandwidth to eliminate network latency for local I/Os.
 
-            The pipeline used in this experiment consists of three tasks,
-            each task reads a file, increases every byte and writes output file
-            to local disk.
-            We use the input sizes of 20~GB, 50~GB, 75~GB, 100~GB and run
-            the pipeline on the cluster.
-            The pipeline is simulated with the Python prototype simulator,
-            original WRENCH and WRENCH-cache simulator.
+            Our first experiment simply runs one instance of the
+            application on a single cluster node, with different input file
+            sizes (20~GB, 50~GB, 75~GB, 100~GB), and with all I/Os directed
+            to the same local disk.
 
-            \subsubsection{Multi-threaded evaluation}
+            Our second experiment runs concurrent instances of the
+            application on a single node, all application instances
+            operating on different files of size 3~GB stored in the same
+            local disk, sharing the disk bandwidth. We vary the number of
+            concurrent application instances from 1 to 32 since cluster
+            nodes have 32 CPU cores.
 
-            In the second scenario, we evaluate the simulator in a concurrent I/O, 
-            bandwidth-sharing scenario with a multi-threaded application.             
-            We vary the number of concurrent pipelines running on a multi-core host.  
-            
-            All the task in the pipelines read input files from and write output files 
-            to a local disk. 
-            As a compute node of the cluster has 32 cores CPU and 256~GB of RAM,  
-            we create 32 input files with the size of 3~GB each and vary the number of 
-            concurrent pipelines from 1 to 32. 
-            
-            Because implementation of a multi-threaded simulator in Python is 
-            expensive, and we have our model implemented in WRENCH, 
-            we only compare the results of simulators with original WRENCH, 
-            WRENCH-cache and real pipelines in this experiment. 
-            The results are compared in total makespan of the pipelines, 
-            cumulative read time and cumulative write time.
-            
-            \subsubsection{Evaluation on NFS}
-            
-            Since network file systems are very common in HPC, we conduct 
-            the next experiment with the same scenario as in the multi-threaded experiment, 
-            except that files are stored on a node, read and written by another node. 
-            The compute node is the node used in the multi-threaded experiment, 
-            and the capacity of the disk used on the storage node is 400 GB.
-            
-            In NFS, client cache and server cache are enabled in reading, but only 
-            server write-through cache is involved in writing. 
-            Although write-through does not have any impacts writing performance, 
-            caching data on server side allows server to avoid disk reads, which are 
-            significantly longer than cache reads.
-            Thus, we simulate page cache for reading on both client and server node.
-            In writing, write-though is simulated with data being written directly to 
-            server storage and then added to server cache. 
-            
-            \subsubsection{Simulation of a real application}
+            Our third experiment occurs in the same configuration as the
+            previous one, albeit on a 400-GB NFS-mounted remote disk
+            mounted from another compute node. \tristan{As is commonly
+            configured in HPC environments to avoid data loss,?} NFS client
+            and server read caches are enabled, but server writes are configured with
+            write-through cache instead of write back \tristan{how about client write
+            cache?}. Therefore, all the writes happen at disk bandwidth, but
+            reads can benefit from cache hits. We simulate write-through by
+            writing data directly to disk and adding them to the server
+            cache \tristan{it it part of the IOController? it would deserve
+            a few sentences in the methods.}.
 
-            Finally, we consider a real pipeline from the neuroimaging domain.             
-            \textcolor{red}{[Description of the real pipeline with nighres 
-            (including the workflow engine if it's Dask)]}.              
-            
-            We simulate this pipeline with simulators using original WRENCH and 
-            WRENCH-cache. 
-            The simulation results are then compared with the real results. 
-            Because our work focuses on I/O time, we assume that CPU time is 
-            correctly modeled and use the CPU time measured in the real pipelines 
-            to setup our simulated workflow. The results are compared in terms of 
-            read/write time and total makespan.
+            Finally, we simulate a real application from the neuroimaging
+            domain. \textcolor{red}{[Description of the real pipeline with
+            nighres (including the workflow engine if it's Dask)]}.
+            We simulate this pipeline with simulators using original WRENCH
+            and WRENCH-cache. Because our work focuses on I/O time, we
+            assume that CPU time is correctly modeled and use the CPU time
+            measured in the real pipelines to setup our simulated
+            application.
 
     \section{Results}
     \label{results}
