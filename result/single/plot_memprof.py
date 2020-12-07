@@ -6,23 +6,25 @@ import log_parse
 def compare_size(axes, real_time_file, real_mem_file,
                  pysim_time_file, pysim_mem_file,
                  simgrid_time_file, simgrid_mem_file,
-                 size, title, xmin, xmax, ymin, ymax):
+                 size, title, xmin, xmax, ymin, ymax,
+                 real_cond=None, py_cond=None, wrench_cond=None):
     # REAL RESULTS
     real_subplot(axes[0], real_time_file, real_mem_file, xmin, xmax, ymin, ymax, bar_alpha=0.2, linestyle="-",
-                 linewidth=1)
+                 linewidth=1, cond_text=real_cond)
 
     # SIMULATION RESULTS
-    sim_subplot(axes[1], pysim_time_file, pysim_mem_file, "Python simulator", bar_alpha=0.2)
-    sim_subplot(axes[2], simgrid_time_file, simgrid_mem_file, "WRENCH-Ext simulator", bar_alpha=0.2)
+    sim_subplot(axes[1], pysim_time_file, pysim_mem_file, "Python simulator", bar_alpha=0.2, cond_text=py_cond, color='deeppink')
+    sim_subplot(axes[2], simgrid_time_file, simgrid_mem_file, "WRENCH-cache simulator", bar_alpha=0.2,
+                cond_text=wrench_cond, color='darkcyan')
 
     for ax in axes:
         ax.set_xlim(right=xmax, left=xmin)
 
-    axes[2].set_xlabel("%d GB" % size)
+    axes[0].text(0.45 * xmax, 330, "%d GB" % size, fontsize=16)
 
 
 def real_subplot(subplot_ax, real_time_file, real_mem_file, xmin, xmax, ymin, ymax,
-                 bar_alpha=0.2, line_alpha=1, linestyle=".-", linewidth=1.5):
+                 bar_alpha=0.2, line_alpha=1, linestyle=".-", linewidth=1.5, cond_text=None):
     timestamps = log_parse.read_timelog(real_time_file, skip_header=False)
     atop_log = log_parse.read_atop_log(real_mem_file, dirty_ratio=0.4, dirty_bg_ratio=0.1)
     dirty_data = np.array(atop_log["total"])
@@ -56,10 +58,15 @@ def real_subplot(subplot_ax, real_time_file, real_mem_file, xmin, xmax, ymin, ym
                     label="dirty_ratio", alpha=line_alpha)
     # subplot_ax.plot(time, atop_log["dirty_bg_ratio"], color='r', linewidth=1, linestyle="-.", label="dirty_bg_ratio",
     #                 alpha=alpha)
-    subplot_ax.set_title("Real execution", fontsize=10)
+    subplot_ax.set_title("Real execution", fontsize=12)
+
+    if cond_text is not None:
+        subplot_ax.text(120, 125, cond_text, style='italic', fontsize=10,
+                        bbox={'alpha': 0.1, 'pad': 5})
 
 
-def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, line_alpha=1):
+def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, line_alpha=1, cond_text=None,
+                color=None):
     sim_time_log = log_parse.read_timelog(sim_time_file)
     sim_mem_log = log_parse.read_sim_log(sim_mem_file)
 
@@ -107,12 +114,20 @@ def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, l
     subplot_ax.plot(time, dirty_ratio, color='k', linewidth=1, linestyle="-.", label="dirty_ratio", alpha=line_alpha)
     # subplot_ax.plot(time, dirty_bg_ratio, color='r', linewidth=1, label="dirty_bg_ratio", alpha=alpha)
 
-    subplot_ax.set_title(title, fontsize=10)
+    subplot_ax.set_title(title, fontsize=12, fontdict={'color': color})
+
+    if cond_text is not None:
+        subplot_ax.text(135, 140, cond_text, style='italic', fontsize=10,
+                        bbox={'alpha': 0.2, 'pad': 5})
 
 
 def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
-    fig, axes = plt.subplots(figsize=(15, 8), ncols=2, nrows=3)
-    plt.subplots_adjust(left=0.07, bottom=0.08, right=0.95, top=0.85, wspace=0.12, hspace=0.3)
+    fig, axes = plt.subplots(figsize=(15, 9), ncols=2, nrows=3)
+    plt.subplots_adjust(left=0.07, bottom=0.08, right=0.95, top=0.82, wspace=0.12, hspace=0.3)
+
+    real_condition_desc = "memory read bw = 6860 MBps\nmemory write bw = 2764 MBps\ndisk read bw = 510 MBps\ndisk write bw = 420 MBps"
+    py_condition_desc = "memory bw = 4812MBps\ndisk bw = 465 MBps"
+    wrench_condition_desc = "memory bw = 4812MBps\ndisk bw = 465 MBps"
 
     compare_size([axes[0][0], axes[1][0], axes[2][0]],
                  real_time_file="real/%dgb/timestamps.csv" % input_sizes[0],
@@ -121,7 +136,10 @@ def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
                  pysim_mem_file="pysim/%dgb_sim_mem.csv" % input_sizes[0],
                  simgrid_time_file="wrench/pagecache/%dgb_sim_time.csv" % input_sizes[0],
                  simgrid_mem_file="wrench/pagecache/%dgb_sim_mem.csv" % input_sizes[0],
-                 size=input_sizes[0], title="", xmin=0, xmax=makespan[0], ymin=-1000, ymax=280000)
+                 size=input_sizes[0], title="", xmin=0, xmax=makespan[0], ymin=-1000, ymax=280000,
+                 real_cond=real_condition_desc,
+                 py_cond=py_condition_desc,
+                 wrench_cond=wrench_condition_desc)
     compare_size([axes[0][1], axes[1][1], axes[2][1]],
                  real_time_file="real/%dgb/timestamps.csv" % input_sizes[1],
                  real_mem_file="real/%dgb/atop_mem.log" % input_sizes[1],
@@ -133,8 +151,8 @@ def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
 
     lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.05, 4.2), ncol=3)
 
-    fig.text(0.5, 0.02, 'time (s)', ha='center')
-    fig.text(0.02, 0.5, 'memory (GB)', va='center', rotation='vertical')
+    fig.text(0.5, 0.02, 'time (s)', ha='center', fontsize=12)
+    fig.text(0.02, 0.45, 'memory (GB)', va='center', rotation='vertical', fontsize=12)
 
     plt.savefig("figures/single_memprof.svg", format="svg")
     plt.savefig("figures/single_memprof.pdf", format="pdf")
