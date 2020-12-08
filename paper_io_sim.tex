@@ -661,10 +661,11 @@
         Figure~\ref{fig:single_error} shows the relative error of simulated
         read and write times throughout the three application tasks. The
         page cache simulation model drastically reduces simulation errors
-        for all I/O operations except the first read that deals with
+        for all I/O operations except the first read as it only involves
         uncached data. Errors are reduced from an average of \texttt{xxx\%}
         in WRENCH to \texttt{yyy \%} in the Python prototype and
-        \texttt{zzz \%} in WRENCH-cache. The original WRENCH simulator significantly overestimates
+        \texttt{zzz \%} in WRENCH-cache \tristan{Dzung, update average percentages}.
+        Unsurprisingly, the original WRENCH simulator significantly overestimates
         read and write times, due to its lack of page cache simulation
         model.
 
