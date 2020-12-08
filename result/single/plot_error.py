@@ -25,18 +25,17 @@ def plot_task_error(ax, size):
     # atop_file =     "log/cluster/100gb/atop_mem.log"
     real_time_log = "real/%dgb/timestamps.csv" % size
     sim_py_log = "pysim/%dgb_sim_time.csv" % size
-    simgrid_org_log = "wrench/original/%dgb_sim_time.csv" % size
-    simgrid_ext_log = "wrench/pagecache/%dgb_sim_time.csv" % size
+    wrench_org_log = "wrench/original/%dgb_sim_time.csv" % size
+    wrench_ext_log = "wrench/pagecache/%dgb_sim_time.csv" % size
 
     py_error = [item * 100 for item in evaluate.task_time_error(real_time_log, sim_py_log)]
-    simgrid_org_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_org_log)]
-    simgrid_ext_error = [item * 100 for item in evaluate.task_time_error(real_time_log, simgrid_ext_log)]
+    wrench_org_error = [item * 100 for item in evaluate.task_time_error(real_time_log, wrench_org_log)]
+    wrench_ext_error = [item * 100 for item in evaluate.task_time_error(real_time_log, wrench_ext_log)]
 
     grouped_bar_chart(ax, labels, "", "error (%)",
-                      ("Python simulator", py_error, "tab:pink"), ("WRENCH", simgrid_org_error, 'tab:orange'),
-                      ("WRENCH-cache", simgrid_ext_error, 'tab:cyan'))
+                      ("Python simulator", py_error, "tab:pink"), ("WRENCH", wrench_org_error, 'tab:orange'),
+                      ("WRENCH-cache", wrench_ext_error, 'tab:cyan'))
     ax.set_title("%d GB" % size)
-
 
 def plot_error():
     plt.rcParams.update({'font.size': 7})
