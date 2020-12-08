@@ -156,4 +156,4 @@ def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
 
     plt.savefig("figures/single_memprof.svg", format="svg")
     plt.savefig("figures/single_memprof.pdf", format="pdf")
-    plt.show()
+    # plt.show()

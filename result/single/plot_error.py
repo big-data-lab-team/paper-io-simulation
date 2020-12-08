@@ -48,4 +48,4 @@ def plot_error():
     plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
-    plt.show()
+    # plt.show()

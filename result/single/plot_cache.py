@@ -61,4 +61,4 @@ def plot_cache_v2():
     plt.savefig("figures/cached_files.svg", format="svg")
     plt.savefig("figures/cached_files.pdf", format="pdf")
 
-    plt.show()
+    # plt.show()
