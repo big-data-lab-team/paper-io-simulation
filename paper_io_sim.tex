@@ -147,8 +147,11 @@
             \cite{linuxdev3rd2010}. 
             
             In writeback, one of the keys is the cache eviction mechanism, which is
-            triggered when available memory is insufficient to removes pages 
+            triggered when available memory is insufficient to remove pages 
             from page cache. 
+            The term \textit{available memory} here includes both free memory and 
+            the memory used but can be reclaimed by the kernel with flushing 
+            and eviction. 
             Because dirty pages are data written to page cache but yet to be 
             written to disk, dirty pages must be kept in page cache and only clean pages 
             are available for eviction.
@@ -249,11 +252,14 @@
     the Memory Manager to free memory through flushing or eviction,
     and to read or write to cache. The Memory Manager
     implements these operations, simulates periodical flushing
-    and eviction from cache, and reads or writes to disk when necessary.
+    and eviction from cache, and reads or writes to disk when necessary.  
+    In case write-through strategy is used, IO Controller can also interact directly 
+    with disk model to simulate disk writes.
+    
     \begin{figure}
            \centering
            \includegraphics[width=0.85\columnwidth]{figures/interaction.pdf}
-           \caption{Overview of the simulated writeback page cache \tristan{does it simulate only writeback? See comment in NFS section.}.
+           \caption{Overview of the page cache simulator.
            Applications send file read or write requests to the
            IO Controller that orchestrates flushing, eviction, cache
            and disk accesses with the Memory Manager. Concurrent accesses to storage
@@ -298,20 +304,13 @@
     As in the kernel, our simulator limits the size of the active list to
     twice the size of the inactive list, by moving least recently 
     used data blocks from the active list to the inactive list~\cite{gorman2004understanding, linuxdev3rd2010}.
-    % Modeling page cache LRU lists as lists of data blocks reduces the
-    % overhead of the simulator, as data blocks are obviously less
-    % numerous than file pages. At the same time, it achieves the accuracy in 
-    % I/O time simulation that can be seen in the later section.
-    % From Tristan: I don't think the sentences above are necessary,
-    % they are quite repetitive.
 
     At any given time, a file can be partially cached, completely cached,
-    or uncached at all. Cached data blocks may reside in one or both of the
+    or uncached at all. A cached data block can only reside in one of two 
     page cache LRU lists. The first time they are accessed, blocks are
     added to the inactive list. On subsequent accesses, blocks of the
-    inactive list are moved to \tristan{if they are moved then they can't
-    be in both lists} the top of the active list. Cached blocks written to
-    cache are marked as dirty until they are flushed to disk.
+    inactive list are moved to the top of the active list. Cached blocks 
+    written to cache are marked as dirty until they are flushed to disk.
 
     \subsubsection{Reads and writes}
 
@@ -337,8 +336,7 @@
            \centering
            \includegraphics[width=\columnwidth]{figures/read_order.pdf}
            \caption{File data read order. Data is read from left to right: uncached data 
-           is read first, followed by data from the inactive list, and finally data from the active list. \tristan{Colors 
-           shouldn't match that in Fig 1 as they dont represent the same thing.}}
+           is read first, followed by data from the inactive list, and finally data from the active list. }
            \label{fig:read_order}
     \end{figure}    
 
@@ -384,10 +382,10 @@
                \While{host is on}
                 \State blocks = expired\_blocks(exp, in) + expired\_blocks(exp, ac) 
                 \State flushing\_time = sm.write(blocks)
-                \State flag blocks as clean data \tristan{a bit informal}
+                \State for blk in blocks: blk.dirty = 0
                 \If{flushing\_time $<$ t}
                     \State sleep(t - flushing\_time)
-                \EndIf \tristan{else?}
+                \EndIf  % Else: do nothing, continue the loop
             \EndWhile
         \end{algorithmic}
     \end{algorithm}
@@ -425,17 +423,19 @@
                 \Desc{mm}{MemoryManager object}
                 \Desc{sm}{storage simulation model}
                \EndInput
-               \State disk\_read = min(cs, fs - mm.cached(fn)) \Comment{To be read from disk} 
-               \State cache\_read = cs - disk\_read \Comment{To be read from cache} 
-            \State mm.flush(cs + disk\_read - mm.free\_mem - mm.evictable, fn) 
-            \State mm.evict(cs + disk\_read - mm.free\_mem, fn) 
-            \If {disk\_read $>$ 0}  \Comment{Read uncached data}    
-                \State sm.read(disk\_read)  
-                \State mm.add\_to\_cache(disk\_read, fn)     
+               \State disk\_read = min(cs, fs - mm.cached(fn)) \Comment{To be read from disk}
+               \State cache\_read = cs - disk\_read \Comment{To be read from cache}
+               \State required\_mem = cs + disk\_read
+               \State mm.flush(cs + disk\_read - mm.free\_mem - mm.evictable, fn) 
+               \State mm.evict(cs + disk\_read - mm.free\_mem, fn) 
+               \If {disk\_read $>$ 0}  \Comment{Read uncached data}    
+               \State sm.read(disk\_read)  
+               \State mm.add\_to\_cache(disk\_read, fn)     
+               \EndIf
+               \If {cache\_read $>$ 0} \Comment{Read cached}
+               \State mm.cache\_read(cache\_read)  
             \EndIf
-            \If {cache\_read $>$ 0} \Comment{Read cached}
-                \State mm.cache\_read(cache\_read)  
-            \EndIf
+            \State mm.use\_anonymous\_mem(cs)
         \end{algorithmic}
     \end{algorithm}
     As mentioned previously, our model reads and writes file chunks in a
@@ -443,22 +443,19 @@
     chunk read requests to the IO Controller which processes them using
     Algorithm~\ref{alg:read}. First, we calculate the amount of uncached
     data that needs to be read from disk, and the remaining amount is read
-    from cache (line 7-8). The amount of memory required to read the chunk
+    from cache (line 6-7). The amount of memory required to read the chunk
     is calculated, corresponding to a copy of the chunk in anonymous memory
-    and a copy of the chunk in cache \tristan{Create a variable
-    "required\_mem" in the algorithm to clarify}.
-    \tristan{add a call to mm in the algorithm to increment anonymous memory. Mention in the experiments that anonymous memory is flushed after each task.}
+    and a copy of the chunk in cache (line 8). 
     If there is not enough available memory, the Memory Manager is called
     to flush dirty data (line 9). If necessary, flushing is complemented by
     eviction (line 10). Note that, when called with negative arguments, functions
-    \texttt{flush} and \texttt{evict} simply return and do not do anything. Then, if the block requires
-    uncached data, a disk read is simulated with the disk model (line 12)
-    \tristan{this is not consistent with the new Figure 1 where disk reads
-    are done by the mm}, and the data read is added to cache (line
-    13).
-    Finally, if cached data needs to be read, the Memory Manager is called
-    to simulate a cache read  
-    and update the corresponding data blocks accordingly (line 16).
+    \texttt{flush} and \texttt{evict} simply return and do not do anything. Then, if there is
+    uncached data, memory manager is called to read data from disk and add this 
+    data to cache (line 12).
+    If cached data needs to be read, the Memory Manager is called to simulate 
+    a cache read  and update the corresponding data blocks accordingly (line 15).
+    Finally, the memory manager is called to reduce the amount of free memory 
+    corresponding to the amount of anonymous memory used by application (line 17).
 
     \begin{algorithm}\caption{File chunk write simulation of IO Controller}
     \label{alg:write}
@@ -468,20 +465,21 @@
                 \Desc{cs}{chunk size}
                 \Desc{fn}{file name}
                 \Desc{mm}{MemoryManager object}
-                \Desc{sm}{storage simulation model}
                \EndInput
             \State remain\_dirty = dirty\_ratio * mm.avail\_mem - mm.dirty
             \If {remain\_dirty $>$ 0} \Comment{Write with memory bandwidth}
                 \State mm.evict(min(cs, remain\_dirty) - mm.free\_mem)
                 \State mem\_amt = min(cs, mm.free\_mem)
-                \State mm.write(fn, mem\_amt) 
+                \State mm.write\_to\_cache(fn, mem\_amt) 
             \EndIf
-            \If {mem\_amt $<$ cs}  \Comment{Write with disk bandwidth}
-                \State mm.flush(cs - mem\_amt)  
+            \State remaining = cs - mem\_amt
+            \While {remaining $>$ 0}  \Comment{Write with disk bandwidth}
+                \State mm.flush(cs - mem\_amt)
                 \State mm.evict(cs - mem\_amt  - mm.free\_mem) 
-                \State mm.add\_to\_cache(fn, min(cs - mem\_amt, mm.free\_mem)) \tristan{why is data written to cache with "addtocache" here and with "write" at line 10?}
-                \State sm.write(cs - mem\_amt) \tristan{According to Fig 1 the IO Controller is not supposed to interact directly with sm}
-            \EndIf
+                \State to\_cache = min(remaining, mm.free\_mem)
+                \State mm.write\_to\_cache(fn, to\_cache) 
+                \State remaining = remaining - to\_cache
+            \EndWhile
             
         \end{algorithmic}
     \end{algorithm}
@@ -490,24 +488,24 @@
     % Data is written to cache until the amount of dirty data in the cache 
     % exceeds the dirty ratio times the amount of available memory. Data is then written to disk.
     Our algorithm initially checks the  amount of data that 
-    can be written as dirty data given the dirty ratio (line 6).
+    can be written as dirty data given the dirty ratio (line 5).
     If this amount is greater than 0, the Memory Manager is requested to evict 
-    data from cache if necessary (line 8) \tristan{the difference between available and free memory should be explained the first time it is referred}.
+    data from cache if necessary (line 7).
     After eviction, the amount of data that can be written to 
-    page cache is calculated (line 9), and a cache write is simulated (line 10).
-    To write the remaining data, we flush and 
-    evict data as possible so that this data can be 
-    written to cache (line 13-14). 
-    The Memory Manager does not guarantee that the amount of flushed 
-    and evicted data is enough to write the remaining data. 
-    In the case it is less than the required amount, the remaining data 
-    being written to cache can be flushed and evicted right away. 
-    Thus, the amount of remaining data written and kept in cache 
-    after the write is limited by the amount free memory, and this amount 
-    is added to cache (line 15) \tristan{the previous two sentences are very unclear, I don't understand them so I can't reformulate.}. 
-    Finally, the disk write is simulated with the remaining data amount (line 16), 
-    and the chunk write algorithm finishes \tristan{see comment in algorithm}.
-            
+    page cache is calculated (line 8), and a cache write is simulated (line 9). 
+    If there is remaining data, this data is written to cache in a loop (line 12 - line 18).
+    In this loop, we flush and evict data as possible so that there will be 
+    available space for writing (line 13-14).  
+    After flushing and eviction, the amount of data that can be written 
+    is calculated (line 15) and a cache write is simulated (line 16). 
+    We update the remaining amount (line 17) and continue the loop until all data 
+    is written.
+
+    In addition to the chunk write simulation with writeback page cache above, 
+    we also add a chunk write function with write-through strategy to the IOController.
+    This function simply simulates a disk write with the amount of data passed in, 
+    then evicts cache if needed and adds this data to cache. 
+    
         \subsection{Implementation}
 
             To validate our simulation model, we created a simple prototype
@@ -539,10 +537,9 @@
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}. We used Python 3.7.
 
             We also implemented our model in WRENCH, separately from existing WRENCH components. 
-            We exposed page cache simulation through a user API, activated with a command-line argument.
-            We used SimGrid 3.25 and WRENCH 1.6. SimGrid source code is available at \url{https://framagit.org/simgrid/simgrid},
-            and WRENCH is at \url{https://github.com/wrench-project/wrench/tree/master/src/wrench/services/memory}.
-            \tristan{which commit did you use?}
+            We exposed page cache simulation through a user API, activated using a command-line argument.
+            We used SimGrid 3.25 which is available at \url{https://framagit.org/simgrid/simgrid}.
+            To implement the simulator, we used the WRENCH 1.6 version at this commit \url{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}.
 
 \tristan{anything else interesting to mention about the implementation?}
 
@@ -557,7 +554,14 @@
         We simulate an application that consists of three single-core, sequential tasks
         where each task reads the file produced by the previous task,
         increments every byte of this file to emulate real processing, and
-        writes the resulting data to disk. We also use a real application
+        writes the resulting data to disk. 
+        In real execution, we clear cache before starting the application to make sure 
+        the conditions are consistent, the cache is not in use and it is only used by 
+        our application.
+        In addition, the anonymous memory used by application 
+        is released after each task in the pipeline. 
+        Thus, we also release the memory used at the end of each task in our simulator.
+        We also use a real application
         \textcolor{red}{[Maybe briefly describe this application's purpose
         (e.g. a standard fMRI preprocessing piepeline)]}, to evaluate the
         applicability of our simulation model.
@@ -580,12 +584,12 @@
         bandwidth values in our experiments.
             \begin{table}[htbp]
             \centering
-            \begin{tabularx}{\columnwidth}{|c
+            \begin{tabularx}{\columnwidth}{|l
             |>{\centering\arraybackslash}X
             |>{\centering\arraybackslash}X
             |>{\centering\arraybackslash}X|}
             \hline
-                Device  & Cluster (real) & Python simulator & WRENCH simulator\\
+                Bandwidths  & Cluster (real) & Python simulator & WRENCH simulator\\
             \hline
                 Memory read  & 6860    & 4812     & 4812\\
                 Memory write & 2764    & 4812 & 4812\\
@@ -593,7 +597,7 @@
                 Local disk write & 420 & 465     & 465\\
                 Remote disk read & 515 & - & 445\\
                 Remote disk write & 375 & - & 445\\
-                Network bandwidth & 3000 & - & 3000\\
+                Network & 3000 & - & 3000\\
             \hline
             \end{tabularx}
             \caption{Bandwidth benchmarks (MBps) and simulator configurations.
@@ -609,10 +613,26 @@
             execution times were directly used in the simulation. For
             WRENCH and WRENCH-cache, we determined the corresponding number
             of flops on a 1~Gflops CPU and used these values in the
-            simulation (see Table~\ref{table:tasks} \tristan{add a table to describe execution times}). The final simulated
+            simulation (see Table~\ref{table:cputime}). The final simulated
             platform and application used in our experiment are avaiable at
             \url{https://github.com/wrench-project/wrench/tree/ec6b43561b95977002258c0fe37a4ecad8f1d33f/examples/basic-examples/io-pagecache}.
 
+            \begin{table}[htbp]
+            \centering
+            \begin{tabularx}{0.8\columnwidth}{|l|>{\centering\arraybackslash}X|}
+            \hline
+                Input size (GB)  & CPU time (second)\\
+            \hline
+                3 	 & 4.4 \\
+                20  & 28 \\
+                50  & 75 \\
+                75  & 110 \\
+                100  & 155 \\
+            \hline
+            \end{tabularx}
+            \caption{Task CPU time corresponding to input file size.}
+            \label{table:cputime}
+            \end{table}
 
             % Finally, because WRENCH simulates applications base on network-communication,
             % we use an infinite bandwidth to eliminate network latency for local I/Os.
@@ -631,16 +651,16 @@
             nodes have 32 CPU cores.
 
             Our third experiment occurs in the same configuration as the
-            previous one, albeit reading and writing on a 400-GB remote NFS disk
-            mounted from another compute node. \tristan{As is commonly
-            configured in HPC environments to avoid data loss,?} NFS client
-            and server read caches are enabled, but server writes are configured with
-            write-through cache instead of write back \tristan{how about client write
-            cache?}. Therefore, all the writes happen at disk bandwidth, but
+            previous one, albeit reading and writing on a 400-GB NFS-mounted remote disk
+            mounted from another compute node. As is commonly
+            configured in HPC environments to avoid data loss, in our simulator, 
+            NFS client and server read caches are enabled, but there is no cache 
+            for writing on client side and server writes are configured with
+            write-through cache instead of writeback. 
+            Therefore, all the writes happen at disk bandwidth, but
             reads can benefit from cache hits. We simulate write-through by
-            writing data directly to disk and adding them to the server
-            cache \tristan{it it part of the IO Controller? it would deserve
-            a few sentences in the methods.}.
+            writing data directly to disk and adding that data to the server
+            cache.
 
             Finally, we simulate a real application from the neuroimaging
             domain. \textcolor{red}{[Description of the real pipeline with
@@ -651,50 +671,10 @@
             measured in the real pipelines to setup our simulated
             application.
 
-            \tristan{mention that cache was flushed before each experiment}
-
     \section{Results}
     \label{results}
 
         \subsection{Single-threaded experiment}
-
-        Figure~\ref{fig:single_error} shows the relative error of simulated
-        read and write times throughout the three application tasks. The
-        page cache simulation model drastically reduces simulation errors
-        for all I/O operations except the first read that deals with
-        uncached data. Errors are reduced from an average of \texttt{xxx\%}
-        in WRENCH to \texttt{yyy \%} in the Python prototype and
-        \texttt{zzz \%} in WRENCH-cache. The original WRENCH simulator significantly overestimates
-        read and write times, due to its lack of page cache simulation
-        model.
-
-        % In this figure, \textit{file $<$i$>$} is the input of \textit{Read $<$i$>$} and
-        % output of \textit{Write $<$i-1$>$}.
-        With the input size of 20 GB, in both real execution and WRENCH-cache
-        simulator, there is no difference in the page cache since all files in the
-        pipeline can be entirely cached \tristan{what does this refer to? 
-        For 20 GB there is still some error in WRENCH-cache, what do you mean ``there is no difference in the page cache''?}.
-
-        With the input of 100 GB, the difference between real execution and WRENCH-cache
-        simulator can be seen in the amount of \textit{file 3} cache after \textit{Write 2}.
-        In real execution, after being written by \textit{Write 2},
-        \textit{file 3} is entirely in cache.
-        Thus, in \textit{Read 3}, \textit{file 3} is read with memory bandwidth.
-        However, in the WRENCH-cache simulator, only a part of \textit{file 3} is
-        cached after \textit{Write 2}, which means \textit{Write 2} reads a part of
-        \textit{file 3} from disk.
-        The reason for the difference is in our WRENCH-cache simulator,
-        with 100 GB of input, while \textit{file 3} is being written,
-        the page cache is saturated, eviction is then evoked to evict data
-        from page cache and make space available for \textit{file 3}.
-        However, because the evicted amount is less than required,
-        some \textit{file 3} data is evicted after being written, make \textit{file 3}
-        partially cached.
-        As a result, in \textit{Read 3}, only a part of \textit{file 3} is read from cache
-        with memory bandwidth, a part of it is read from disk with disk read bandwidth,
-        which is many times slower, leading to longer read time.
-
-
 
             Memory profiling results of real pipeline execution and simulators 
             with 20GB and 100GB input files are illustrated in Fig.~\ref{fig:single_memprof}.
@@ -719,7 +699,46 @@
             the third read is not correctly simulated, leading to longer simulated time
             than in real execution. This will be explained later in this section.
 
-
+             Figure~\ref{fig:single_error} shows the relative error of simulated
+             read and write times throughout the three application tasks. The
+             page cache simulation model drastically reduces simulation errors
+             for all I/O operations except the first read that deals with
+             uncached data. Errors are reduced from an average of 345\%
+             in WRENCH to 46\% in the Python prototype and 39\% in WRENCH-cache.
+             The original WRENCH simulator significantly overestimates
+             read and write times, due to its lack of page cache simulation
+             model.
+             Especially, the simulation time errors of \textit{Read 3} with 100 GB of input
+             in the simulators with page cache are just under the error in original WRENCH.
+             This longer read can be explained with the amount of cached data of files
+             at the beginning of the read in reality and simulators shown in
+             Fig.~\ref{fig:single_cache}.
+             % In this figure, \textit{file $<$i$>$} is the input of \textit{Read $<$i$>$} and
+             % output of \textit{Write $<$i-1$>$}.
+             With the input size of 20 GB, the amount of cached data of each files after 
+             every I/O operation is similar since the page cache can keep all these files.
+%             \tristan{what does this refer to?
+%             For 20 GB there is still some error in WRENCH-cache, what do you mean 
+%``there is no difference in the page cache''?}.
+%   Dzung: Some text was lost in a merge, I added it again.
+             With the input of 100 GB, the difference between real execution and WRENCH-cache
+             simulator can be seen in the amount of \textit{file 3} cache after \textit{Write 2}.
+             In real execution, after being written by \textit{Write 2},
+             \textit{file 3} is entirely in cache.
+             Thus, in \textit{Read 3}, \textit{file 3} is read with memory bandwidth.
+             However, in the WRENCH-cache simulator, only a part of \textit{file 3} is
+             cached after \textit{Write 2}, which means \textit{Write 2} reads a part of
+             \textit{file 3} from disk.
+             The reason for the difference is in our WRENCH-cache simulator,
+             with 100 GB of input, while \textit{file 3} is being written,
+             the page cache is saturated, eviction is then evoked to evict data
+             from page cache and make space available for \textit{file 3}.
+             However, because the evicted amount is less than required,
+             some \textit{file 3} data is evicted after being written, make \textit{file 3}
+             partially cached.
+             As a result, in \textit{Read 3}, only a part of \textit{file 3} is read from cache
+             with memory bandwidth, a part of it is read from disk with disk read bandwidth,
+             which is many times slower, leading to longer read time.
 
             \begin{figure*}
             \centering
