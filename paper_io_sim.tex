@@ -604,10 +604,10 @@
             \hline
                 Device  & Cluster (real) & Python simulator & WRENCH simulator\\
             \hline
-                Memory read  & 6860	& 4812	 & 4812\\
-                Memory write & 2764	& 4812 & 4812\\
+                Memory read  & 6860    & 4812     & 4812\\
+                Memory write & 2764    & 4812 & 4812\\
                 Local disk read & 510 & 465 & 465\\
-                Local disk write & 420 & 465	 & 465\\
+                Local disk write & 420 & 465     & 465\\
                 Remote disk read & 515 & - & 445\\
                 Remote disk write & 375 & - & 445\\
                 Network bandwidth & 3000 & - & 3000\\
@@ -667,107 +667,105 @@
             measured in the real pipelines to setup our simulated
             application.
 
+            \tristan{mention that cache was flushed before each experiment}
+
     \section{Results}
     \label{results}
 
         \subsection{Single-threaded experiment}
 
+        Figure~\ref{fig:single_error} shows the relative error of simulated
+        read and write times throughout the three application tasks. The
+        page cache simulation model drastically reduces simulation errors
+        for all I/O operations except the first read that deals with
+        uncached data. Errors are reduced from an average of \texttt{xxx\%}
+        in WRENCH to \texttt{yyy \%} in the Python prototype and
+        \texttt{zzz \%} in WRENCH-cache. The original WRENCH simulator significantly overestimates
+        read and write times, due to its lack of page cache simulation
+        model.
+
+        % In this figure, \textit{file $<$i$>$} is the input of \textit{Read $<$i$>$} and
+        % output of \textit{Write $<$i-1$>$}.
+        With the input size of 20 GB, in both real execution and WRENCH-cache
+        simulator, there is no difference in the page cache since all files in the
+        pipeline can be entirely cached \tristan{what does this refer to? 
+        For 20 GB there is still some error in WRENCH-cache, what do you mean ``there is no difference in the page cache''?}.
+
+        With the input of 100 GB, the difference between real execution and WRENCH-cache
+        simulator can be seen in the amount of \textit{file 3} cache after \textit{Write 2}.
+        In real execution, after being written by \textit{Write 2},
+        \textit{file 3} is entirely in cache.
+        Thus, in \textit{Read 3}, \textit{file 3} is read with memory bandwidth.
+        However, in the WRENCH-cache simulator, only a part of \textit{file 3} is
+        cached after \textit{Write 2}, which means \textit{Write 2} reads a part of
+        \textit{file 3} from disk.
+        The reason for the difference is in our WRENCH-cache simulator,
+        with 100 GB of input, while \textit{file 3} is being written,
+        the page cache is saturated, eviction is then evoked to evict data
+        from page cache and make space available for \textit{file 3}.
+        However, because the evicted amount is less than required,
+        some \textit{file 3} data is evicted after being written, make \textit{file 3}
+        partially cached.
+        As a result, in \textit{Read 3}, only a part of \textit{file 3} is read from cache
+        with memory bandwidth, a part of it is read from disk with disk read bandwidth,
+        which is many times slower, leading to longer read time.
+
+
+
             Memory profiling results of real pipeline execution and simulators 
-			with 20GB and 100GB input files are illustrated in Fig.~\ref{fig:single_memprof}.
-			Because the results with 20Gb, 50GB, 100GB shows a similar pattern,
-			we only include the results with 20GB and 100GB in this paper.
+            with 20GB and 100GB input files are illustrated in Fig.~\ref{fig:single_memprof}.
+            Because the results with 20Gb, 50GB, 100GB shows a similar pattern,
+            we only include the results with 20GB and 100GB in this paper.
 
-			As shown in the figures, the makespans of the simulated pipeline are
-			close to the makespan of the real execution with similar patterns of I/O time
-			real execution and simulation.
-			But more importantly, with all input sizes, similar trends can also be found
-			in the lines describing memory status in simulators and the real execution.
-			The similar evolutions of amount of cache used (purple lines) in reality
-			and simulation show that the use of page cache is well reproduced by the simulators.
-			The amount of dirty data (red lines) also follow similar trends,
-			which means not only the amount dirty data, but also the flushing and
-			periodical flushing mechanisms are accurately modeled in our simulators.
-			This can be seen in in the increase of the amount of dirty data during the writes
-			and the decrease during the reads and computations.
-			According to the results achieved with all input sizes in the experiment,
-			we can observe identical trends in reality and simulation with 20GB,
-			50GB and 75GB input files. However, with 100GB input file,
-			the third read is not correctly simulated, leading to longer simulated time
-			than in real execution. This will be explained later in this section.
+            As shown in the figures, the makespans of the simulated pipeline are
+            close to the makespan of the real execution with similar patterns of I/O time
+            real execution and simulation.
+            But more importantly, with all input sizes, similar trends can also be found
+            in the lines describing memory status in simulators and the real execution.
+            The similar evolutions of amount of cache used (purple lines) in reality
+            and simulation show that the use of page cache is well reproduced by the simulators.
+            The amount of dirty data (red lines) also follow similar trends,
+            which means not only the amount dirty data, but also the flushing and
+            periodical flushing mechanisms are accurately modeled in our simulators.
+            This can be seen in in the increase of the amount of dirty data during the writes
+            and the decrease during the reads and computations.
+            According to the results achieved with all input sizes in the experiment,
+            we can observe identical trends in reality and simulation with 20GB,
+            50GB and 75GB input files. However, with 100GB input file,
+            the third read is not correctly simulated, leading to longer simulated time
+            than in real execution. This will be explained later in this section.
 
-			The I/O time of tasks in simulators and real execution is also tracked and compared.
-			Fig.~\ref{fig:single_error} shows the relative error of simulated I/O time
-			of individual I/O activities.
-			Our pipeline consists of 3 tasks, and each task reads an input file,
-			performs some computation, and writes output file.
-			Thus, there are 6 sequential I/O activities, \textit{Read 1} and \textit{Write 1}
-			from the first task, \textit{Read 2} and \textit{Write 2} the second task,
-			and \textit{Read 3}, \textit{Write3} from the last task.
 
-			\begin{figure*}
-			\centering
-			\begin{subfigure}{\linewidth}
-				\centering
-   				\includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
-			\end{subfigure}
-			\caption{Memory profiling results with different input file sizes.
-			The bars in the figures present activities in tasks (read, compute and write),
-			the lines describe memory status throughout run time of the pipeline.}
-			\label{fig:single_memprof}
-			\begin{subfigure}{\linewidth}
-				\centering
-   				\includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
-			\end{subfigure}
-			\caption{Simulation errors with different input file sizes}
-			\label{fig:single_error}
-			\begin{subfigure}{\linewidth}
-				\centering
-   				\includegraphics[width=\linewidth]{result/single/figures/cached_files.pdf}
-			\end{subfigure}
-			\label{fig:single_cache}
-   			\caption{Amount of file data in cache after each I/O operation. 
-   			\textcolor{red}{Update real results of 20GB}}
-			\end{figure*}
 
-			In general, with all input sizes in the experiment, the simulation errors
-			of simulators with page cache model (Python and WRENCH-cache simulators)
-			are remarkably lower than the result with original WRENCH .
-			The reason is, in original WRENCH, because page cache is not simulated,
-			data is only read and written with disk bandwidth, which is much slower
-			than memory bandwidths, leading to simulated I/O time longer than in reality.
-			Especially, the simulation time errors of \textit{Read 3} with 100 GB of input
-			in the simulators with page cache are just under the error in original WRENCH.
-			This longer read can be explained with the amount of cached data of files
-			at the beginning of the read in reality and simulators shown in
-			Fig.~\ref{fig:single_cache}.
-			In this figure, \textit{file $<$i$>$} is the input of \textit{Read $<$i$>$} and
-			output of \textit{Write $<$i-1$>$}.
-			With the input size of 20 GB, in both real execution and WRENCH-cache
-			simulator, there is no difference in the page cache since all files in the
-			pipeline can be entirely cached.
-			With the input of 100 GB, the difference between real execution and WRENCH-cache
-			simulator can be seen in the amount of \textit{file 3} cache after \textit{Write 2}.
-			In real execution, after being written by \textit{Write 2},
-			\textit{file 3} is entirely in cache.
-			Thus, in \textit{Read 3}, \textit{file 3} is read with memory bandwidth.
-			However, in the WRENCH-cache simulator, only a part of \textit{file 3} is
-			cached after \textit{Write 2}, which means \textit{Write 2} reads a part of
-			\textit{file 3} from disk.
-			The reason for the difference is in our WRENCH-cache simulator,
-			with 100 GB of input, while \textit{file 3} is being written,
-			the page cache is saturated, eviction is then evoked to evict data
-			from page cache and make space available for \textit{file 3}.
-			However, because the evicted amount is less than required,
-			some \textit{file 3} data is evicted after being written, make \textit{file 3}
-			partially cached.
-			As a result, in \textit{Read 3}, only a part of \textit{file 3} is read from cache
-			with memory bandwidth, a part of it is read from disk with disk read bandwidth,
-			which is many times slower, leading to longer read time.
+            \begin{figure*}
+            \centering
+            \begin{subfigure}{\linewidth}
+                \centering
+                   \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
+            \end{subfigure}
+            \caption{Simulation errors with different input file sizes}
+            \label{fig:single_error}
+            \begin{subfigure}{\linewidth}
+                \centering
+                   \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
+            \end{subfigure}
+            \caption{Memory profiling results with different input file sizes.
+            The bars in the figures present activities in tasks (read, compute and write),
+            the lines describe memory status throughout run time of the pipeline.}
+            \label{fig:single_memprof}
+            \begin{subfigure}{\linewidth}
+                \centering
+                   \includegraphics[width=\linewidth]{result/single/figures/cached_files.pdf}
+            \end{subfigure}
+            \label{fig:single_cache}
+               \caption{Amount of file data in cache after each I/O operation. 
+               \textcolor{red}{Update real results of 20GB}}
+            \end{figure*}
 
-			In summary, in this single-threaded experiment, our model can accurately
-			simulate I/O time as well as the internal memory behavior.
-			This can help confirm that our model is on a right track and
-			it can be further improved to achieve higher accuracy.
+            In summary, in this single-threaded experiment, our model can accurately
+            simulate I/O time as well as the internal memory behavior.
+            This can help confirm that our model is on a right track and
+            it can be further improved to achieve higher accuracy.
 
         \subsection{Multi-threaded experiment}
 
