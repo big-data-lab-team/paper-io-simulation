@@ -637,20 +637,20 @@
             % Finally, because WRENCH simulates applications base on network-communication,
             % we use an infinite bandwidth to eliminate network latency for local I/Os.
 
-            Our first experiment simply runs one instance of the
+            Our first experiment (\textbf{Exp single-threaded}) simply runs one instance of the
             application on a single cluster node, with different input file
             sizes (20~GB, 50~GB, 75~GB, 100~GB), and with all I/Os directed
             to the same local disk. The goal is to validate the simulation model 
             in absence of any concurrent disk access.
 
-            Our second experiment runs concurrent instances of the
+            Our second experiment (\textbf{Exp concurrent}) runs concurrent instances of the
             application on a single node, all application instances
             operating on different files of size 3~GB stored in the same
             local disk, sharing the disk bandwidth. We vary the number of
             concurrent application instances from 1 to 32 since cluster
             nodes have 32 CPU cores.
 
-            Our third experiment occurs in the same configuration as the
+            Our third experiment (\textbf{Exp NFS}) occurs in the same configuration as the
             previous one, albeit reading and writing on a 400-GB NFS-mounted remote disk
             mounted from another compute node. As is commonly
             configured in HPC environments to avoid data loss, in our simulator, 
@@ -677,14 +677,15 @@
         \subsection{Single-threaded experiment}
 
         Figure~\ref{fig:single_error} shows the relative error of simulated
-        read and write times throughout the three application tasks. The
+        read and write times for the three successive application tasks in \textbf{Exp single-threaded}. The
         page cache simulation model drastically reduces simulation errors
-        for all I/O operations except the first read that deals with
+        for all I/O operations except the first read as it involves
         uncached data. Errors are reduced from an average of 345\%
-        in WRENCH to 46\% in the Python prototype and 39\% in WRENCH-cache.
-        The original WRENCH simulator significantly overestimates
+        in the original WRENCH to 46\% in the Python prototype and 39\% in WRENCH-cache.
+        Unsurprisingly, the original WRENCH simulator significantly overestimates
         read and write times, due to its lack of page cache simulation
         model.
+
         Especially, the simulation time errors of \textit{Read 3} with 100 GB of input
         in the simulators with page cache are just under the error in original WRENCH.
         This longer read can be explained with the amount of cached data of files
@@ -787,24 +788,29 @@
             \begin{subfigure}{\linewidth}
                 \centering
                    \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
-            \end{subfigure}
-            \caption{Simulation errors with different input file sizes}
-            \label{fig:single_error}
+                   \vspace*{-0.7cm}
+                   \caption{Simulation errors}
+                   \vspace*{0.5cm}
+                   \label{fig:single_error}
+                \end{subfigure}
             \begin{subfigure}{\linewidth}
                 \centering
+                %    Gray shades represent task phases (read, compute and write). 
+                %    Lines represent memory usage along pipeline execution time.}
                    \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
+                   \vspace*{-0.7cm}
+                   \caption{Memory profiles}
+                   \vspace*{0.5cm}
+                   \label{fig:single_memprof}
             \end{subfigure}
-            \caption{Memory profiling results with different input file sizes.
-            The bars in the figures present activities in tasks (read, compute and write),
-            the lines describe memory status throughout run time of the pipeline.}
-            \label{fig:single_memprof}
             \begin{subfigure}{\linewidth}
                 \centering
-                   \includegraphics[width=\linewidth]{result/single/figures/cached_files.pdf}
-            \end{subfigure}
-            \label{fig:single_cache}
-               \caption{Amount of file data in cache after each I/O operation. 
-               \textcolor{red}{Update real results of 20GB}}
+                   \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files.pdf}
+                   \caption{Cache contents}
+                %    \textcolor{red}{Update real results of 20GB}}
+                   \label{fig:single_cache}
+            \end{subfigure}\\
+            \caption{Single-threaded results}
             \end{figure*}
 
             In summary, in this single-threaded experiment, our model can accurately
