@@ -37,12 +37,18 @@
 
 \title{Simulating the Linux page cache in distributed applications with WRENCH}
 
-\author{\IEEEauthorblockN{Hoang-Dung Do$^1$, Val\'erie Hayot-Sasson$^1$, Rafael Ferreira da Silva$^3$, Henri Casanova$^2$, Tristan Glatard$^1$
+\author{
+  \IEEEauthorblockN{
+    Hoang-Dung Do\IEEEauthorrefmark{1},
+    Val\'erie Hayot-Sasson\IEEEauthorrefmark{1},
+    Rafael Ferreira da Silva\IEEEauthorrefmark{3},
+    Henri Casanova\IEEEauthorrefmark{2},
+    Tristan Glatard\IEEEauthorrefmark{1}
   }\\
   \IEEEauthorblockA{
-    $^1$Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada\\
-     $^2$Department of Information and Computer Sciences, University of Hawai‘i at Manoa, USA\\
-     $^3$Department of Computer Science, University of Southern California, Los Angeles, USA
+    \IEEEauthorrefmark{1}Department of Computer Science and Software Engineering, Concordia University, Montreal, Canada\\
+    \IEEEauthorrefmark{2}Department of Information and Computer Sciences, University of Hawai‘i at Manoa, USA\\
+    \IEEEauthorrefmark{3}Information Sciences Institute, University of Southern California, Marina Del Rey, CA, USA
   }
 }
 
@@ -50,19 +56,19 @@
 
     \begin{abstract}
 
-        
-        The rapid emergence of Big Data seen in recent years has resulted in a 
-        growing need for efficient data storing and optimized data analysis techniques. 
-        Despite relying on large computing infrastructures with powerful computing capability 
-        to process these large datasets, an I/O bottleneck remains. 
+
+        The rapid emergence of Big Data seen in recent years has resulted in a
+        growing need for efficient data storing and optimized data analysis techniques.
+        Despite relying on large computing infrastructures with powerful computing capability
+        to process these large datasets, an I/O bottleneck remains.
         One widely-used approach to minimize the costs of data transfers during
         regular use is through the employment of the Linux page cache.
-        While many simulation tools have been developed to 
-        support studies in computing systems optimization, page cache simulation 
-        has not been fully captured or remains absent from these simulators. 
-        The inability to simulate I/O with page cache leads to inaccurate 
-        simulations in many situations, especially when dealing with data-intensive applications. 
-        
+        While many simulation tools have been developed to
+        support studies in computing systems optimization, page cache simulation
+        has not been fully captured or remains absent from these simulators.
+        The inability to simulate I/O with page cache leads to inaccurate
+        simulations in many situations, especially when dealing with data-intensive applications.
+
         In this paper, we propose a I/O simulation model that characterizes
         the key features of the page cache. We have implemented the model
         with SimGrid, a simulation framework for distributed systems, using
@@ -112,15 +118,15 @@
         While existing simulators can adequately characterize many different computing environments,
         they lack much of the ability to adequately describe the page cache. Some
         simulators try to simulate I/O with page cache, but fail to capture the key features such
-        as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
+        as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}.
         Other simulators, such as~\cite{xu2018saving}, capture the important features of the
-        page cache, but are domain-specific. 
+        page cache, but are domain-specific.
 
-        %However, there is a trade-off between accuracy and scalability, which has been 
-        %indicated in some reviews \cite{casanova2014simgrid} \cite{byrne2017review}. 
-        %This means that in most cicumstances, users have to, more or less, sacrifice 
-        %accuracy for the scalability and performance when their platforms grow to 
-        %hundreds or thousands nodes. 
+        %However, there is a trade-off between accuracy and scalability, which has been
+        %indicated in some reviews \cite{casanova2014simgrid} \cite{byrne2017review}.
+        %This means that in most cicumstances, users have to, more or less, sacrifice
+        %accuracy for the scalability and performance when their platforms grow to
+        %hundreds or thousands nodes.
 
         In this paper, we present WRENCH-cache, a simulation model of I/O with page
         cache incorporated into WRENCH~\cite{casanova2018wrench}, a workflow management system simulator based on
@@ -134,9 +140,9 @@
 
     \section{Related Work}
     \label{relatedwork}
-        
+
         \subsection{Page cache}
-            
+
         To improve performance of disk accesses, the page cache was introduced to the Linux kernel. %It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}.
             The goal of the page cache is to try ensure that most I/O operations occur entirely
             within memory space rather than synchronously to and from the storage device.
@@ -151,103 +157,103 @@
             for file system writes, but the data is written synchronously from memory to disk. Writeback extends write-through
             by enabling asynchronous writes to disk, meaning that a write call will return once
             the data has been written to memory.
-            The writeback strategy is considered to outperform write-through as well as 
+            The writeback strategy is considered to outperform write-through as well as
             direct I/O as it delays disk writes to perform a bulk write at a later time
-            \cite{linuxdev3rd2010}. 
-            
+            \cite{linuxdev3rd2010}.
+
 
             Cache eviction and flushing strategies are integral to proper page cache functioning.
             Whenever space in memory becomes limited, either as a result of application memory
-            or page cache use, page cache data may be evicted. Only data that 
+            or page cache use, page cache data may be evicted. Only data that
             has been persisted to storage (clean pages) can be flagged for eviction and removed from
             memory. Written data that has not yet been persisted to disk (dirty data) must first
             be copied (flushed) to storage prior to eviction. When sufficient memory is
-            being occupied, the flushing process is synchronous. However, even when 
+            being occupied, the flushing process is synchronous. However, even when
             there is sufficient available memory, written data will be flushed to disk
             at a predefined interval through a process known as \textit{periodical flushing}.
-            Periodical flushing only flushes expired dirty pages, which remain dirty in 
-            page cache longer than an expiration time configured in the kernel. 
+            Periodical flushing only flushes expired dirty pages, which remain dirty in
+            page cache longer than an expiration time configured in the kernel.
             Different cache eviction algorithms have also been developed and proposed
             \cite{owda2014comparison}.
             The Linux kernel uses a two-list strategy to flag pages for eviction.
             The two-list strategy is based on a least recently used (LRU) policy
             and uses an active and inactive list in its implementation.
-            If accessed pages are not in the page cache, they are added to the inactive list. 
-            Should pages located on the inactive list be accessed, they will be moved from 
-            the inactive to the active list. 
+            If accessed pages are not in the page cache, they are added to the inactive list.
+            Should pages located on the inactive list be accessed, they will be moved from
+            the inactive to the active list.
             The lists are also kept balanced by moving pages from the active list
             to the inactive list when the active list grows too large.
-            Thus, the active list only contains pages which are accessed more than once 
-            and not evictable, while the inactive list includes pages accessed once only, 
-            or pages that have be accessed more than once but moved from the active list. 
+            Thus, the active list only contains pages which are accessed more than once
+            and not evictable, while the inactive list includes pages accessed once only,
+            or pages that have be accessed more than once but moved from the active list.
             Both lists operate using LRU eviction policies meaning the data that has
             not be accessed recently will be moved first.
-             
+
         \subsection{Simulators}
-            
+
             Many simulation frameworks exist to describe the behaviour of applications
             running on the various infrastructures available to users, such as personal computers,
             clouds and clusters.
-            These simulators are built with resource models such CPU, network and 
+            These simulators are built with resource models such CPU, network and
             storage, using various different approaches to describe the hardware.
-            For example, there is \textit{CloudSim} and \textit{iCanCloud} for packet-level network models 
+            For example, there is \textit{CloudSim} and \textit{iCanCloud} for packet-level network models
             and \textit{DiskSim} the simulates storage hardware functioning \tristan{add references}.
 
             Simulators must choose between scalability and accuracy when describing the
-            hardware~\cite{casanova2014simgrid}. 
-            Fine-grained models allow simulators to achieve high accuracy, 
-            but lead to scalability issues due to long simulation time 
-            when simulated platforms and applications grow. 
-            SimGrid is an open source simulation platform that has been developed 
-            not only to balance the trade-off between accuracy and scalability, 
-            but also to achieve versatility, allowing the use of the framework 
+            hardware~\cite{casanova2014simgrid}.
+            Fine-grained models allow simulators to achieve high accuracy,
+            but lead to scalability issues due to long simulation time
+            when simulated platforms and applications grow.
+            SimGrid is an open source simulation platform that has been developed
+            not only to balance the trade-off between accuracy and scalability,
+            but also to achieve versatility, allowing the use of the framework
             to simulate applications in multiple domains. WRENCH, a workflow management
             system simulator based on the SimGrid framework, provides a high-level API
             for simulating workflows, thus facilitating the integration of new models.
             \valerie{say more about wrench}
-            
-            Despite the fact that many sophisticated models for resources have been 
+
+            Despite the fact that many sophisticated models for resources have been
             integrated in simulators, and the page cache shows apparent impacts on I/O
-            performance, the simulation model of page cache is still missing in most 
+            performance, the simulation model of page cache is still missing in most
             of simulators.
-            For example, SimGrid only simulates I/O operations with storage bandwidths 
-            and capacity. 
-            SIMCAN is a simulation framework that models page cache by storing data 
-            accessed on disk in a block cache \cite{nunez2012simcan}. 
+            For example, SimGrid only simulates I/O operations with storage bandwidths
+            and capacity.
+            SIMCAN is a simulation framework that models page cache by storing data
+            accessed on disk in a block cache \cite{nunez2012simcan}.
             Page cache is also modeled in the iCanCloud simulator through a component which
             manages memory accesses and cached data \cite{nunez2012icancloud}. However,
             the scalability of the iCanCloud simulator is limited by its sophisticated model.
             Ultimately, none of these simulators provide any writeback cache simulator nor
             cache eviction policys through LRU lists.
-            Although cache replacement policies are applied in \cite{xu2018saving} to simulate 
-            in-memory caching, their simulator is specific to energy consumption of multi-tier 
+            Although cache replacement policies are applied in \cite{xu2018saving} to simulate
+            in-memory caching, their simulator is specific to energy consumption of multi-tier
             heterogenous networks.
-            
 
-            In this study, we use WRENCH 
+
+            In this study, we use WRENCH
             to implement our page cache model. We chose WRENCH due to accurate yet scalable implementation, resulting
             from its SimGrid backend, as well as its high-level API.
-            We have integrated our model in WRENCH and use the SimGrid API to interact with 
+            We have integrated our model in WRENCH and use the SimGrid API to interact with
             simulated storage resources.
-            This approach allows us to leverage existing features in WRENCH and SimGrid such as process control and synchronization of 
+            This approach allows us to leverage existing features in WRENCH and SimGrid such as process control and synchronization of
             resource consumption.
-            We also leverage the existing SimGrid storage model with capacity 
+            We also leverage the existing SimGrid storage model with capacity
             and bandwidth properties, which are similar to the characteristics of memory.
-            
+
     \section{Method}
     \label{method}
     We separate our simulation model in two components, the IO
-    Controller and the Memory Manager, which together simulate 
-    file reads and writes (Figure~\ref{fig:interaction}). 
+    Controller and the Memory Manager, which together simulate
+    file reads and writes (Figure~\ref{fig:interaction}).
     To read or write a file chunk, a simulated application sends a
     request to the IO Controller. The IO Controller interacts as needed with
     the Memory Manager to free memory by triggering flushing or eviction,
     and interact with cached data. The Memory Manager
     implements these operations, simulates periodical flushing
     and eviction from cache, and reads or writes to disk when necessary.
-    In case the write-through strategy is used, the IO Controller can also interact directly 
+    In case the write-through strategy is used, the IO Controller can also interact directly
     with disk model to simulate disk writes.
-    
+
     \begin{figure}
            \centering
            \includegraphics[width=0.85\columnwidth]{figures/interaction.pdf}
@@ -272,54 +278,54 @@
 
     \subsubsection{Page cache LRU lists}
 
-    In the Linux kernel, page cache LRU lists contain file pages. However, 
-    due to the large number of file pages, managing lists of pages 
+    In the Linux kernel, page cache LRU lists contain file pages. However,
+    due to the large number of file pages, managing lists of pages
     induces substantial overheads.
-    Therefore, we introduce the concept of a data block as a unit to represent data 
+    Therefore, we introduce the concept of a data block as a unit to represent data
     cached in memory. A data block is a subset of file pages stored in
-    page cache that were accessed in the same I/O operation. 
-    A data block has information about file name, block size, last access 
-    time, a dirty flag that represents whether the data is clean (0) 
+    page cache that were accessed in the same I/O operation.
+    A data block has information about file name, block size, last access
+    time, a dirty flag that represents whether the data is clean (0)
     or dirty (1), and an entry (creation) time.
-    Blocks can have different sizes and a given file can have multiple 
-    data blocks in page cache. In addition, a data block can be split into an 
+    Blocks can have different sizes and a given file can have multiple
+    data blocks in page cache. In addition, a data block can be split into an
     arbitrary number of smaller blocks.
     \begin{figure}
            \centering
            \includegraphics[width=\columnwidth]{figures/lru_lists.pdf}
            \caption{Model of page cache LRU lists with data blocks.}    \label{fig:lrulist}
-    \end{figure}    
-    
-    We model page cache LRU lists as 
-    two lists of data blocks, an active list and an inactive list, both ordered by 
+    \end{figure}
+
+    We model page cache LRU lists as
+    two lists of data blocks, an active list and an inactive list, both ordered by
     last access time (earliest first, see Figure~\ref{fig:lrulist}).
     As in the kernel, our simulator limits the size of the active list to
-    twice the size of the inactive list, by moving least recently 
+    twice the size of the inactive list, by moving least recently
     used data blocks from the active list to the inactive list~\cite{gorman2004understanding, linuxdev3rd2010}.
 
     At any given time, a file can be partially cached, completely cached,
-    or uncached at all. A cached data block can only reside in one of two 
+    or uncached at all. A cached data block can only reside in one of two
     page cache LRU lists. The first time they are accessed, blocks are
     added to the inactive list. On subsequent accesses, blocks of the
-    inactive list are moved to the top of the active list. Cached blocks 
+    inactive list are moved to the top of the active list. Cached blocks
     written to cache are marked as dirty until they are flushed to disk.
 
     \subsubsection{Reads and writes}
 
     Our simulation model supports chunk-by-chunk file accesses
-    with a user-defined chunk size. However, for simplicity, we assume that file pages are 
-    accessed in a round-robin fashion rather than fully randomly. 
+    with a user-defined chunk size. However, for simplicity, we assume that file pages are
+    accessed in a round-robin fashion rather than fully randomly.
     Therefore, when a file is read, cached data is read only after all uncached data was read, and data from the inactive list is read
     before data from the active list
     (data reads occur from left to right in Figure~\ref{fig:read_order}).
-    When a chunk of \emph{uncached} data is read, a new clean block is created 
-    and appended to the inactive list. 
+    When a chunk of \emph{uncached} data is read, a new clean block is created
+    and appended to the inactive list.
     When a chunk of \emph{cached} data is read, one or more existing data blocks in the LRU lists are accessed.
-    If these blocks are clean, we merge them together, update the access time and size of the resulting block, 
-    and append it to the active list. 
-    If the blocks are dirty, we move them independently to the active list, to preserve their entry time. 
+    If these blocks are clean, we merge them together, update the access time and size of the resulting block,
+    and append it to the active list.
+    If the blocks are dirty, we move them independently to the active list, to preserve their entry time.
     Because the chunk and block sizes may be different, there are situations
-    where a block is not entirely read. 
+    where a block is not entirely read.
     In this case, the block is split in two smaller blocks and one of them is re-accessed.
     % From Tristan: not sure where to put this nor if it's necessary:
     % , in which chunks are read/written
@@ -327,13 +333,13 @@
     \begin{figure}
            \centering
            \includegraphics[width=\columnwidth]{figures/read_order.pdf}
-           \caption{File data read order. Data is read from left to right: uncached data 
+           \caption{File data read order. Data is read from left to right: uncached data
            is read first, followed by data from the inactive list, and finally data from the active list. }
            \label{fig:read_order}
-    \end{figure}    
+    \end{figure}
 
-    For file writes, we assume that all data to be written is 
-    uncached. Thus, each time a chunk is written, we create a block of dirty data 
+    For file writes, we assume that all data to be written is
+    uncached. Thus, each time a chunk is written, we create a block of dirty data
     and append it to the inactive list.
 
     \subsubsection{Flushing and eviction}
@@ -351,16 +357,16 @@
     to disk is simulated by the storage model.
 
     The cache eviction simulation also runs in
-    the main thread. It frees up the page cache by traversing and deleting 
+    the main thread. It frees up the page cache by traversing and deleting
     least recently used clean data blocks in the inactive list.
-    The amount of data to evict is passed as a parameter and data blocks are deleted 
+    The amount of data to evict is passed as a parameter and data blocks are deleted
     from the inactive list until the evicted data reaches the required amount,
     or until there is no clean block left in the list.
     If the last evicted block does not have to be entirely evicted, the block is split in two blocks,
     and only one of them is evicted.
-    The cache eviction simulation does not contribute to the simulated time 
+    The cache eviction simulation does not contribute to the simulated time
     since cache eviction time is negligible in real systems \tristan{a reference would be welcome}.
-    
+
     \begin{algorithm}\caption{Periodical flushing simulation in IO Controller}\label{alg:pdflush}
         \small
         \begin{algorithmic}[1]
@@ -372,7 +378,7 @@
                 \Desc{sm}{storage simulation model}
                \EndInput
                \While{host is on}
-                \State blocks = expired\_blocks(exp, in) + expired\_blocks(exp, ac) 
+                \State blocks = expired\_blocks(exp, in) + expired\_blocks(exp, ac)
                 \State flushing\_time = sm.write(blocks)
                 \State for blk in blocks: blk.dirty = 0
                 \If{flushing\_time $<$ t}
@@ -386,24 +392,24 @@
     background thread. As in the Linux kernel, a dirty block
     in our model is considered expired if (1) it is dirty, and (2)
     the duration since its entry time is longer than a
-    predefined expiration time. 
-    Periodical flushing is simulated as an infinite loop in which 
-    the Memory Manager searches and flushes these expired dirty blocks to disk (Algorithm~\ref{alg:pdflush}). 
-    % From Tristan: the algorithm is quite straightforward, I don't think this is 
+    predefined expiration time.
+    Periodical flushing is simulated as an infinite loop in which
+    the Memory Manager searches and flushes these expired dirty blocks to disk (Algorithm~\ref{alg:pdflush}).
+    % From Tristan: the algorithm is quite straightforward, I don't think this is
     % necessary
-    % In each repetition, Memory Manager finds expired dirty blocks in two 
-    % page cache LRU lists (line 8), simulates writes of data of these blocks 
+    % In each repetition, Memory Manager finds expired dirty blocks in two
+    % page cache LRU lists (line 8), simulates writes of data of these blocks
     % to disk (line 9), and mark them as clean (line 10).
-    % If the flushing time does not exceed our time interval, the thread is put 
-    % to sleep for the remaining time (lines 11-13). 
-    % Then based on the state of the host at current simulated time, 
+    % If the flushing time does not exceed our time interval, the thread is put
+    % to sleep for the remaining time (lines 11-13).
+    % Then based on the state of the host at current simulated time,
     % the algorithm continues or finishes the loop.
     Because periodical flushing is simulated as a background thread, it can happen concurrently
-    with disk I/O initiated by the main thread. This is taken into account by the 
+    with disk I/O initiated by the main thread. This is taken into account by the
     storage model and reflected in simulated I/O time.
 
     \subsection{I/O Controller}
-     
+
     \begin{algorithm}\caption{File chunk read simulation in IO Controller}
     \label{alg:read}
         \small
@@ -418,14 +424,14 @@
                \State disk\_read = min(cs, fs - mm.cached(fn)) \Comment{To be read from disk}
                \State cache\_read = cs - disk\_read \Comment{To be read from cache}
                \State required\_mem = cs + disk\_read
-               \State mm.flush(cs + disk\_read - mm.free\_mem - mm.evictable, fn) 
-               \State mm.evict(cs + disk\_read - mm.free\_mem, fn) 
-               \If {disk\_read $>$ 0}  \Comment{Read uncached data}    
-               \State sm.read(disk\_read)  
-               \State mm.add\_to\_cache(disk\_read, fn)     
+               \State mm.flush(cs + disk\_read - mm.free\_mem - mm.evictable, fn)
+               \State mm.evict(cs + disk\_read - mm.free\_mem, fn)
+               \If {disk\_read $>$ 0}  \Comment{Read uncached data}
+               \State sm.read(disk\_read)
+               \State mm.add\_to\_cache(disk\_read, fn)
                \EndIf
                \If {cache\_read $>$ 0} \Comment{Read cached}
-               \State mm.cache\_read(cache\_read)  
+               \State mm.cache\_read(cache\_read)
             \EndIf
             \State mm.use\_anonymous\_mem(cs)
         \end{algorithmic}
@@ -437,16 +443,16 @@
     data that needs to be read from disk, and the remaining amount is read
     from cache (line 6-7). The amount of memory required to read the chunk
     is calculated, corresponding to a copy of the chunk in anonymous memory
-    and a copy of the chunk in cache (line 8). 
+    and a copy of the chunk in cache (line 8).
     If there is not enough available memory, the Memory Manager is called
     to flush dirty data (line 9). If necessary, flushing is complemented by
     eviction (line 10). Note that, when called with negative arguments, functions
     \texttt{flush} and \texttt{evict} simply return and do not do anything. Then, if there is
-    uncached data, memory manager is called to read data from disk and add this 
+    uncached data, memory manager is called to read data from disk and add this
     data to cache (line 12).
-    If cached data needs to be read, the Memory Manager is called to simulate 
+    If cached data needs to be read, the Memory Manager is called to simulate
     a cache read  and update the corresponding data blocks accordingly (line 15).
-    Finally, the memory manager is called to reduce the amount of free memory 
+    Finally, the memory manager is called to reduce the amount of free memory
     corresponding to the amount of anonymous memory used by application (line 17).
 
     \begin{algorithm}\caption{File chunk write simulation in IO Controller}
@@ -462,56 +468,56 @@
             \If {remain\_dirty $>$ 0} \Comment{Write with memory bandwidth}
                 \State mm.evict(min(cs, remain\_dirty) - mm.free\_mem)
                 \State mem\_amt = min(cs, mm.free\_mem)
-                \State mm.write\_to\_cache(fn, mem\_amt) 
+                \State mm.write\_to\_cache(fn, mem\_amt)
             \EndIf
             \State remaining = cs - mem\_amt
             \While {remaining $>$ 0}  \Comment{Write with disk bandwidth}
                 \State mm.flush(cs - mem\_amt)
-                \State mm.evict(cs - mem\_amt  - mm.free\_mem) 
+                \State mm.evict(cs - mem\_amt  - mm.free\_mem)
                 \State to\_cache = min(remaining, mm.free\_mem)
-                \State mm.write\_to\_cache(fn, to\_cache) 
+                \State mm.write\_to\_cache(fn, to\_cache)
                 \State remaining = remaining - to\_cache
             \EndWhile
-            
+
         \end{algorithmic}
     \end{algorithm}
-    Algorithm~\ref{alg:write} describes our simulation of chunk writes in 
-    the IO Controller. 
-    % Data is written to cache until the amount of dirty data in the cache 
+    Algorithm~\ref{alg:write} describes our simulation of chunk writes in
+    the IO Controller.
+    % Data is written to cache until the amount of dirty data in the cache
     % exceeds the dirty ratio times the amount of available memory. Data is then written to disk.
-    Our algorithm initially checks the  amount of data that 
+    Our algorithm initially checks the  amount of data that
     can be written as dirty data given the dirty ratio (line 5).
-    If this amount is greater than 0, the Memory Manager is requested to evict 
+    If this amount is greater than 0, the Memory Manager is requested to evict
     data from cache if necessary (line 7).
-    After eviction, the amount of data that can be written to 
-    page cache is calculated (line 8), and a cache write is simulated (line 9). 
+    After eviction, the amount of data that can be written to
+    page cache is calculated (line 8), and a cache write is simulated (line 9).
     If there is remaining data, this data is written to cache in a loop (line 12 - line 18).
-    In this loop, we flush and evict data as possible so that there will be 
-    available space for writing (line 13-14).  
-    After flushing and eviction, the amount of data that can be written 
-    is calculated (line 15) and a cache write is simulated (line 16). 
-    We update the remaining amount (line 17) and continue the loop until all data 
+    In this loop, we flush and evict data as possible so that there will be
+    available space for writing (line 13-14).
+    After flushing and eviction, the amount of data that can be written
+    is calculated (line 15) and a cache write is simulated (line 16).
+    We update the remaining amount (line 17) and continue the loop until all data
     is written.
 
-    In addition to the chunk write simulation with writeback page cache above, 
+    In addition to the chunk write simulation with writeback page cache above,
     we also add a chunk write function with write-through strategy to the IOController.
-    This function simply simulates a disk write with the amount of data passed in, 
-    then evicts cache if needed and adds this data to cache. 
-    
+    This function simply simulates a disk write with the amount of data passed in,
+    then evicts cache if needed and adds this data to cache.
+
         \subsection{Implementation}
 
             To validate our simulation model, we created a simple prototype
-            simulator independent of existing simulation frameworks and libraries. 
-            This allowed us to evaluate the accuracy and correctness of our 
-            model in a simple scenario before integrating it to the more complex 
-            WRENCH framework. 
-            In this prototype we used the following basic storage model for 
-            both memory and disk: 
+            simulator independent of existing simulation frameworks and libraries.
+            This allowed us to evaluate the accuracy and correctness of our
+            model in a simple scenario before integrating it to the more complex
+            WRENCH framework.
+            In this prototype we used the following basic storage model for
+            both memory and disk:
             \begin{align*}
-                & t_{r} = D / b_r \\ 
+                & t_{r} = D / b_r \\
                 & t_{w} = D / b_w\
-            \end{align*}        
-            
+            \end{align*}
+
             where:
             \begin{itemize}
                 \item $t_{r}$ is the data read time
@@ -528,7 +534,7 @@
             The source code this prototype is available at
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}. We used Python 3.7.
 
-            We also implemented our model in WRENCH, separately from existing WRENCH components. 
+            We also implemented our model in WRENCH, separately from existing WRENCH components.
             We exposed page cache simulation through a user API, activated using a command-line argument.
             We used SimGrid 3.25 which is available at \url{https://framagit.org/simgrid/simgrid}.
             To implement the simulator, we used the WRENCH 1.6 version at this commit \url{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}.
@@ -546,12 +552,12 @@
         We simulate an application that consists of three single-core, sequential tasks
         where each task reads the file produced by the previous task,
         increments every byte of this file to emulate real processing, and
-        writes the resulting data to disk. 
-        In real execution, we clear cache before starting the application to make sure 
-        the conditions are consistent, the cache is not in use and it is only used by 
+        writes the resulting data to disk.
+        In real execution, we clear cache before starting the application to make sure
+        the conditions are consistent, the cache is not in use and it is only used by
         our application.
-        In addition, the anonymous memory used by application 
-        is released after each task in the pipeline. 
+        In addition, the anonymous memory used by application
+        is released after each task in the pipeline.
         Thus, we also release the memory used at the end of each task in our simulator.
         We also use a real application
         \textcolor{red}{[Maybe briefly describe this application's purpose
@@ -632,7 +638,7 @@
             Our first experiment (\textit{Exp single-threaded}) simply runs one instance of the
             application on a single cluster node, with different input file
             sizes (20~GB, 50~GB, 75~GB, 100~GB), and with all I/Os directed
-            to the same local disk. The goal is to validate the simulation model 
+            to the same local disk. The goal is to validate the simulation model
             in absence of any concurrent disk access.
 
             Our second experiment (\textit{Exp concurrent}) runs concurrent instances of the
@@ -645,10 +651,10 @@
             Our third experiment (\textit{Exp NFS}) occurs in the same configuration as the
             previous one, albeit reading and writing on a 400-GB NFS-mounted remote disk
             mounted from another compute node. As is commonly
-            configured in HPC environments to avoid data loss, in our simulator, 
-            NFS client and server read caches are enabled, but there is no cache 
+            configured in HPC environments to avoid data loss, in our simulator,
+            NFS client and server read caches are enabled, but there is no cache
             for writing on client side and server writes are configured with
-            write-through cache instead of writeback. 
+            write-through cache instead of writeback.
             Therefore, all the writes happen at disk bandwidth, but
             reads can benefit from cache hits. We simulate write-through by
             writing data directly to disk and adding that data to the server
@@ -669,7 +675,7 @@
         \subsection{Single-threaded experiment}
 
         The page cache simulation model drastically reduces I/O simulation
-        errors in the three successive application tasks (Figure~\ref{fig:single_error}). The first read is not impacted 
+        errors in the three successive application tasks (Figure~\ref{fig:single_error}). The first read is not impacted
         as it only involves uncached data. Errors are reduced from an average
         of 345\% in the original WRENCH to 46\% in the Python prototype and
         39\% in WRENCH-cache. Unsurprisingly, the original WRENCH simulator
@@ -682,7 +688,7 @@
         100~GB file needs to be read and written to disk, the only storage
         device in WRENCH, as it does not fit in cache. Conversely,
         simulation errors of the Python prototype and WRENCH-cache are higher with
-        100~GB files than with 20~GB files, due to idiosyncracies in the kernel 
+        100~GB files than with 20~GB files, due to idiosyncracies in the kernel
         flushing and eviction strategies.
 
         Simulated memory profiles are highly consistent with the real ones
@@ -705,14 +711,14 @@
         simulated cache content exactly matches reality, owing to the fact
         that all files fit in page cache. With 100~GB files, a slight
         discrepancy is observed after Write 2, which explains the
-        simulation error previously mentioned in Read 3. In the real execution indeed, 
-        File 3 is entirely cached after Write 2, whereas in the simulated execution, part 
-        of it is on disk. This is due to the fact that the simulated flushing and eviction 
-        was triggered after File 3 was already written, while in reality these operations 
+        simulation error previously mentioned in Read 3. In the real execution indeed,
+        File 3 is entirely cached after Write 2, whereas in the simulated execution, part
+        of it is on disk. This is due to the fact that the simulated flushing and eviction
+        was triggered after File 3 was already written, while in reality these operations
         happened before File 3 was written \tristan{Dzung, pls check that. Also, why doesn't it happen irl?}.
 
         % We conclude from this experiment that our model can accurately
-        % simulate cached I/Os in a sequential context. The next experiment 
+        % simulate cached I/Os in a sequential context. The next experiment
         % evaluates our simulation with concurrent I/Os.
 
             \begin{figure*}
@@ -727,7 +733,7 @@
                 \end{subfigure}
             \begin{subfigure}{\linewidth}
                 \centering
-                %    Gray shades represent task phases (read, compute and write). 
+                %    Gray shades represent task phases (read, compute and write).
                 %    Lines represent memory usage along pipeline execution time.}
                    \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
                    \vspace*{-0.7cm}
@@ -763,11 +769,11 @@
             (Figure~\ref{fig:multi_local}). For reads, WRENCH-cache still
             slightly overestimates reality, due to the discrepancy between
             simulated and real read bandwidths mentioned before
-            (\tristan{check it's indeed mentioned. Dzung: is it correct?}). For writes, 
-            WRENCH-cache slightly underestimates reality for the same reason. The plateau 
+            (\tristan{check it's indeed mentioned. Dzung: is it correct?}). For writes,
+            WRENCH-cache slightly underestimates reality for the same reason. The plateau
             ending around 7 concurrent pipelines in the WRENCH-cache curve
-            marks the limit beyond which the page cache is saturated with dirty data 
-            and needs flushing \tristan{why is there no plateay irl?}. 
+            marks the limit beyond which the page cache is saturated with dirty data
+            and needs flushing \tristan{why is there no plateay irl?}.
 
         \subsection{Remote storage}
 
@@ -826,7 +832,8 @@
         \section{Acknowledgments}
 The computing platform used in the experiments was obtained with funding
 from the Canada Foundation for Innovation.
-\bibliographystyle{plain}
+
+\bibliographystyle{IEEEtran}
 \tristan{Check references, in particular capitalization}
 \bibliography{citation}
 
