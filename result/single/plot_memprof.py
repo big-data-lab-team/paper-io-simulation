@@ -158,7 +158,7 @@ def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
     fig.text(0.77, 0.06, 'time (s)', ha='center', fontsize=12)
     fig.text(0.08, 0.45, 'memory (GB)', va='center', rotation='vertical', fontsize=12)
     fig.text(0.91, 0.69, 'Real execution', fontsize=14, color='white', bbox={'pad': 5, 'color': '#90C987'}, rotation=-90)
-    fig.text(0.91, 0.405, 'Python prototype', fontsize=14, color='white', bbox={'pad': 5, 'color': '#994F88'}, rotation=-90)
+    fig.text(0.91, 0.405, 'Python prototype', fontsize=14, color='white', bbox={'pad': 5, 'color': '#7BAFDE'}, rotation=-90)
     fig.text(0.91, 0.145, 'WRENCH-cache', fontsize=14, color='white', bbox={'pad': 5, 'color': '#1965B0'}, rotation=-90)
     
     

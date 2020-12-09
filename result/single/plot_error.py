@@ -37,7 +37,7 @@ def plot_task_error(ax, size, ylabel):
     else:
         ylabel = ""
     grouped_bar_chart(ax, labels, "", ylabel,
-                      ("Python prototype", py_error, "#994F88"), ("WRENCH", wrench_org_error, '#7BAFDE'),
+                      ("Python prototype", py_error, "#7BAFDE"), ("WRENCH", wrench_org_error, '#994F88'),
                       ("WRENCH-cache", wrench_ext_error, '#1965B0'))
     ax.set_title("%d GB" % size)
 
