@@ -20,32 +20,43 @@ Figures are generated and saved in:
 If the log files are missing, or if you would like to run the experiments with your own configurations,
 you should run the real pipeline/simulators to generate these logs.
 
-1. Real execution
-- Single-threaded experiment: The log files of real execution should be placed in [result/single/real/](result/single/real/).
-- Multi-threaded experiment: The log files of real execution should be placed in [result/multi/real/](result/multi/real/).
+#### 1. Real execution
+
+##### 1.1 Single-threaded experiment.
+- Log files location: [result/single/real/](result/single/real/).
+
+##### 1.2 Multi-threaded experiment.
+- Log files location: [result/multi/local/real/](result/multi/local/real/).
+
+##### 1.3 NFS experiment.
+- Log files location: [result/multi/nfs/real/](result/multi/nfs/real/).
 
 If the log files are not available, or you want to generate your log files from your own experiment, 
 run pipeline on a real system using the source code in [exp/real/](exp/real/)
 
-2. Single-threaded simulation log
+#### 2. Single-threaded simulation
 
-- **Python simulator**: The log files of the Python simulator should be placed [result/single/pysim/](result/single/pysim/). 
-To run the Python simulator, use the source code in [/exp/pysim/](/exp/pysim/)  and follow the instructions in README file.
+##### 2.1 **Python simulator**
+- Log files location: [result/single/pysim/](result/single/pysim/). 
+- How to run: use the source code in [/exp/pysim/](/exp/pysim/), follow the instructions in README.
 
-- **WRENCH simulator**: The log files of the WRENCH simulator shoule be place in [result/single/wrench/original/](result/single/wrench/original/) 
-for original WRENCH and [result/single/wrench/pagecache/](result/single/wrench/pagecache/) for WRENCH with page cache.
-To run the WRENCH simulator, use this source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/) and follow the instructions in README file.
+##### 2.2 **Original WRENCH simulator**
+- Log files location: 
+    - Original WRENCH: [result/single/wrench/original/](result/single/wrench/original/) 
+    - WRENCH-cache: [result/single/wrench/pagecache/](result/single/wrench/pagecache/)
+- How to run: use this source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/),
+ follow the instructions in README.
 
-3. Multi-threaded simulation log
+#### 3. Multi-threaded simulation
+- Log files location: 
+    - Original WRENCH: [result/multi/local/wrench/original/](result/multi/local/wrench/original/) 
+    - WRENCH-cache: [result/multi/local/wrench/pagecache/](result/multi/local/wrench/pagecache/)
+- How to run: use the source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/),
+ follow the instructions in README.
 
-- The log files of the WRENCH simulator should be place in [result/multi/local/wrench/original/](result/multi/local/wrench/original/) for original WRENCH 
-and in [result/multi/local/wrench/pagecache/](result/multi/local/wrench/pagecache/) for WRENCH with page cache.
-
-- To run the WRENCH simulators, use the source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/) and follow the instructions in README file.
-
-4. NFS simulation log
-
-- The log files of the WRENCH simulator should be place in [result/multi/nfs/wrench/original/](result/multi/nfs/wrench/original/) for original WRENCH 
-and in [result/multi/nfs/wrench/pagecache/](result/multi/nfs/wrench/pagecache/) for WRENCH with page cache.
-
-- To run the WRENCH simulators, use the source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/) and follow the instructions in README file.
+#### 4. NFS simulation
+- Log files location: 
+    - Original WRENCH: [result/multi/nfs/wrench/original/](result/multi/nfs/wrench/original/)  
+    - WRENCH-cache: [result/multi/nfs/wrench/pagecache/](result/multi/nfs/wrench/pagecache/)
+- How to run: use the source code [example](https://github.com/wrench-project/wrench/tree/master/examples/basic-examples/io-pagecache/),
+ follow the instructions in README.
