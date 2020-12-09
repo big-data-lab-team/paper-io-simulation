@@ -16,7 +16,7 @@ def plot_cache(ax, real_file, sim_file, patterns, ylabel, color_real="#90C987", 
     df_sim[index].plot.bar(stacked=True, rot=0, edgecolor='blue', color=color_wrench, ax=ax, position=0, width=0.3, legend=False, linewidth=0.5)
 
     if ylabel:
-        ax.set_ylabel("amount (GB)")
+        ax.set_ylabel("memory (GB)")
     ax.set_xticklabels(columns)
 
     bars = ax.patches

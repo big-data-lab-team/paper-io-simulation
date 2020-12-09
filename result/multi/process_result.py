@@ -70,7 +70,7 @@ def parse_simgrid_result(filename, no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-def suplot_prop(ax, real_dir, wrench_dir, propname, title, rep_no=1):
+def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1):
     simg_org_df = pd.read_csv("%s/original/aggregated.csv" % wrench_dir)
     simg_ext_df = pd.read_csv("%s/pagecache/aggregated.csv" % wrench_dir)
     no_pipeline_df = simg_org_df["no_pipeline"]
@@ -86,17 +86,18 @@ def suplot_prop(ax, real_dir, wrench_dir, propname, title, rep_no=1):
 
     ax.set_title(title)
 
-    ax.plot(no_pipeline_df, mean_df / no_pipeline_df, color="k", linewidth=1, label="Real execution mean")
-    ax.plot(no_pipeline_df, max_df / no_pipeline_df, color="k", linewidth=1, alpha=0.5)
-    ax.plot(no_pipeline_df, min_df / no_pipeline_df, color="k", linewidth=1, alpha=0.5)
-    ax.fill_between(no_pipeline_df, min_df / no_pipeline_df, max_df / no_pipeline_df, facecolor='lightgrey', alpha=0.5,
-                    label="Real execution variation")
+    ax.plot(no_pipeline_df, mean_df / no_pipeline_df, color="#90C987", linewidth=2, label="Real execution mean")
+    # ax.plot(no_pipeline_df, max_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
+    # ax.plot(no_pipeline_df, min_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
+    ax.fill_between(no_pipeline_df, min_df / no_pipeline_df, max_df / no_pipeline_df, facecolor='#CAE0AB', alpha=0.5,
+                    label="Real execution min-max interval")
 
-    ax.plot(no_pipeline_df, simg_org_df[propname] / no_pipeline_df, linewidth=1, color="tab:orange", label="WRENCH")
-    ax.plot(no_pipeline_df, simg_ext_df[propname] / no_pipeline_df, linewidth=1, color="tab:cyan", label="WRENCH-cache")
+    ax.plot(no_pipeline_df, simg_org_df[propname] / no_pipeline_df, linewidth=2, color="#994F88", label="WRENCH")
+    ax.plot(no_pipeline_df, simg_ext_df[propname] / no_pipeline_df, linewidth=2, color="#1965B0", label="WRENCH-cache")
 
-    ax.set_xlabel("number of pipelines")
-    ax.set_ylabel("time (s)")
+    ax.set_xlabel("Concurrent applications")
+    if ylabel:
+        ax.set_ylabel("time (s)")
 
 
 def result_local(rep_no=1):
@@ -108,13 +109,13 @@ def result_local(rep_no=1):
     plt.rcParams.update({'font.size': 8})
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
 
-    suplot_prop(ax1, "local/real/", "local/wrench/", "readtime", "average read time", rep_no=rep_no)
-    suplot_prop(ax2, "local/real/", "local/wrench/", "writetime", "average write time", rep_no=rep_no)
+    suplot_prop(ax1, "local/real/", "local/wrench/", "readtime", "Read time", True, rep_no=rep_no)
+    suplot_prop(ax2, "local/real/", "local/wrench/", "writetime", "Write time", False, rep_no=rep_no)
 
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
 
-    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=2)
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.18), ncol=4)
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
     plt.savefig("figures/multi_local.pdf", format="pdf")
     plt.savefig("figures/multi_local.svg", format="svg")
@@ -131,14 +132,14 @@ def result_nfs(rep_no=1):
     plt.rcParams.update({'font.size': 8})
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
 
-    suplot_prop(ax1, "nfs/real/", "nfs/wrench/", "readtime", "average read time", rep_no=rep_no)
-    suplot_prop(ax2, "nfs/real/", "nfs/wrench/", "writetime", "average write time", rep_no=rep_no)
+    suplot_prop(ax1, "nfs/real/", "nfs/wrench/", "readtime", "Read time", True, rep_no=rep_no)
+    suplot_prop(ax2, "nfs/real/", "nfs/wrench/", "writetime", "Write time", False, rep_no=rep_no)
 
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
 
-    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.3), ncol=2)
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.1, 1.2), ncol=4)
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.1)
     plt.savefig("figures/multi_nfs.pdf", format="pdf")
     plt.savefig("figures/multi_nfs.svg", format="svg")
 

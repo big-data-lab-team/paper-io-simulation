@@ -35,7 +35,7 @@
 
 \begin{document}
 
-\title{Simulating the Linux page cache in distributed applications with the WRENCH library}
+\title{Simulating the Linux page cache in distributed applications with WRENCH}
 
 \author{\IEEEauthorblockN{Hoang-Dung Do$^1$, Val\'erie Hayot-Sasson$^1$, Rafael Ferreira da Silva$^3$, Henri Casanova$^2$, Tristan Glatard$^1$
   }\\
@@ -56,24 +56,29 @@
         Despite relying on large computing infrastructures with powerful computing capability 
         to process these large datasets, an I/O bottleneck remains. 
         One widely-used approach to minimize the costs of data transfers during
-        regular use is through the employment of the page cache.
+        regular use is through the employment of the Linux page cache.
         While many simulation tools have been developed to 
         support studies in computing systems optimization, page cache simulation 
         has not been fully captured or remains absent from these simulators. 
         The inability to simulate I/O with page cache leads to inaccurate 
-        simulations in many situations, especially when dealing with data intensive applications. 
+        simulations in many situations, especially when dealing with data-intensive applications. 
         
-        In this paper, we propose a I/O simulation model that characterizes the key features of the page cache.
-        We have implemented the model with SimGrid, a simulation framework for 
-        distributed systems, using WRENCH, a SimGrid-based workflow simulator. 
-        Our simulator is compatible with both single-threaded and multithreaded applications,
-        and can simulate both writeback and writethrough cache that can factor into local
-        and network-based filesystems.
-		
-	\end{abstract}		 
+        In this paper, we propose a I/O simulation model that characterizes
+        the key features of the page cache. We have implemented the model
+        with SimGrid, a simulation framework for distributed systems, using
+        WRENCH, a SimGrid-based workflow simulator. Our simulator is
+        compatible with both single-threaded and multithreaded
+        applications, and can simulate both writeback and writethrough
+        cache that can factor into local and network-based filesystems. We
+        evaluate it in different conditions, including sequential and
+        concurrent applications, as well as local and remote I/Os.
+        The page cache model reduces the simulation
+        error by up to an order of magnitude compared to cacheless simulations.
 
-	\section{Introduction}
-		
+    \end{abstract}
+
+    \section{Introduction}
+
         The Linux Page Cache plays an important role in
         the reduction of filesystem data transfer costs. With the page cache, previously
         read data can be reread directly from memory and written data can be written to
@@ -88,7 +93,7 @@
         has various shortcomings, which include, limited and shared resources, operational
         costs, unstable environments, and the difficulties in producing reproducible results.
         Simulations address these concerns by providing abstractions for the performance of computer
-        hardware, such as CPU, network and storage. Consequently, simulations provide and
+        hardware, such as CPU, network and storage. Consequently, simulations provide a
         cost-effective, fast, easy and reproducible  way evaluate application performance
         on different infrastructures without having to execute the code.
 
@@ -106,9 +111,9 @@
         starvation~\cite{zhuang2017}.
         While existing simulators can adequately characterize many different computing environments,
         they lack much of the ability to adequately describe the page cache. Some
-        simulators try to simulator I/O with page cache, but fail to capture the key features such
+        simulators try to simulate I/O with page cache, but fail to capture the key features such
         as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
-        Other simulators, such as~\cite{xu2018}, capture the important feature of the
+        Other simulators, such as~\cite{xu2018saving}, capture the important features of the
         page cache, but are domain-specific. 
 
         %However, there is a trade-off between accuracy and scalability, which has been 
@@ -117,19 +122,18 @@
         %accuracy for the scalability and performance when their platforms grow to 
         %hundreds or thousands nodes. 
 
-        In this paper, we present WRENCH-Cache, a simulation model of I/O with page
+        In this paper, we present WRENCH-cache, a simulation model of I/O with page
         cache incorporated into WRENCH~\cite{casanova2018wrench}, a workflow management system simulator based on
-        the popular SimGrid framework. The goal of WRENCH-Cache is to provide users
+        the popular SimGrid framework. The goal of WRENCH-cache is to provide users
         with an accurate representation of a workflow execution, when file system page
         cache is used, while providing a good balance between accuracy and scalability.
-        WRENCH-Cache is able to simulate both writeback and writethrough
+        WRENCH-cache is able to simulate both writeback and writethrough
         cache which would normally be available to local and NFS-based filesystems.
-        WRENCH-Cache can provide accurate simulations for large-scale parallel
+        WRENCH-cache can provide accurate simulations for large-scale parallel
         applications using the page cache.
-         
-		
-    \section{Related Work}        
-    \label{relatedwork}    
+
+    \section{Related Work}
+    \label{relatedwork}
         
         \subsection{Page cache}
             
@@ -148,7 +152,7 @@
             by enabling asynchronous writes to disk, meaning that a write call will return once
             the data has been written to memory.
             The writeback strategy is considered to outperform write-through as well as 
-            direct I/O as it delays disk writes to perform a bulk write at a later time.
+            direct I/O as it delays disk writes to perform a bulk write at a later time
             \cite{linuxdev3rd2010}. 
             
 
@@ -181,16 +185,16 @@
              
         \subsection{Simulators}
             
-            Many simulation frameworks exist to describe the behaviours of applications
+            Many simulation frameworks exist to describe the behaviour of applications
             running on the various infrastructures available to users, such as personal computers,
             clouds and clusters.
             These simulators are built with resource models such CPU, network and 
             storage, using various different approaches to describe the hardware.
             For example, there is \textit{CloudSim} and \textit{iCanCloud} for packet-level network models 
-            and \textit{DiskSim} the simulates storage hardware functioning.
+            and \textit{DiskSim} the simulates storage hardware functioning \tristan{add references}.
 
             Simulators must choose between scalability and accuracy when describing the
-            hardware.\cite{casanova2014simgrid}. 
+            hardware~\cite{casanova2014simgrid}. 
             Fine-grained models allow simulators to achieve high accuracy, 
             but lead to scalability issues due to long simulation time 
             when simulated platforms and applications grow. 
@@ -232,21 +236,16 @@
             
     \section{Method}
     \label{method}
-    In this section, we present our page cache simulation model for file I/O,
-    flusing, and eviction. We implement this model in two simulators:
-    (1) a standalone Python prototype, and (2) WRENCH-cache, an extension of the WRENCH library.
-    We also describe experimental scenarios to evaluate our simulators in various configurations.
-     
     We separate our simulation model in two components, the IO
     Controller and the Memory Manager, which together simulate 
-    file reads and writes in Linux (Figure~\ref{fig:interaction}). 
+    file reads and writes (Figure~\ref{fig:interaction}). 
     To read or write a file chunk, a simulated application sends a
     request to the IO Controller. The IO Controller interacts as needed with
-    the Memory Manager to free memory through flushing or eviction,
-    and to read or write to cache. The Memory Manager
+    the Memory Manager to free memory by triggering flushing or eviction,
+    and interact with cached data. The Memory Manager
     implements these operations, simulates periodical flushing
-    and eviction from cache, and reads or writes to disk when necessary.  
-    In case write-through strategy is used, IO Controller can also interact directly 
+    and eviction from cache, and reads or writes to disk when necessary.
+    In case the write-through strategy is used, the IO Controller can also interact directly 
     with disk model to simulate disk writes.
     
     \begin{figure}
@@ -263,7 +262,7 @@
     \subsection{Memory Manager}
 
     The Memory Manager simulates two parallel threads: the main one
-    implements flushing, eviction, and cache I/Os synchronously, whereas
+    implements flushing, eviction, and cached I/Os synchronously, whereas
     the second one, operating in the background, periodically searches for
     expired dirty data in page cache LRU lists and flushes them to disk. We
     use existing storage simulation models~\cite{lebre2015} to simulate disk and
@@ -362,7 +361,7 @@
     The cache eviction simulation does not contribute to the simulated time 
     since cache eviction time is negligible in real systems \tristan{a reference would be welcome}.
     
-    \begin{algorithm}\caption{Periodical flushing simulation}\label{alg:pdflush}
+    \begin{algorithm}\caption{Periodical flushing simulation in IO Controller}\label{alg:pdflush}
         \small
         \begin{algorithmic}[1]
             \Input
@@ -405,7 +404,7 @@
 
     \subsection{I/O Controller}
      
-    \begin{algorithm}\caption{File chunk read simulation of IO Controller}
+    \begin{algorithm}\caption{File chunk read simulation in IO Controller}
     \label{alg:read}
         \small
         \begin{algorithmic}[1]
@@ -450,7 +449,7 @@
     Finally, the memory manager is called to reduce the amount of free memory 
     corresponding to the amount of anonymous memory used by application (line 17).
 
-    \begin{algorithm}\caption{File chunk write simulation of IO Controller}
+    \begin{algorithm}\caption{File chunk write simulation in IO Controller}
     \label{alg:write}
         \small
         \begin{algorithmic}[1]
@@ -630,20 +629,20 @@
             % Finally, because WRENCH simulates applications base on network-communication,
             % we use an infinite bandwidth to eliminate network latency for local I/Os.
 
-            Our first experiment (\textbf{Exp single-threaded}) simply runs one instance of the
+            Our first experiment (\textit{Exp single-threaded}) simply runs one instance of the
             application on a single cluster node, with different input file
             sizes (20~GB, 50~GB, 75~GB, 100~GB), and with all I/Os directed
             to the same local disk. The goal is to validate the simulation model 
             in absence of any concurrent disk access.
 
-            Our second experiment (\textbf{Exp concurrent}) runs concurrent instances of the
+            Our second experiment (\textit{Exp concurrent}) runs concurrent instances of the
             application on a single node, all application instances
             operating on different files of size 3~GB stored in the same
             local disk, sharing the disk bandwidth. We vary the number of
             concurrent application instances from 1 to 32 since cluster
             nodes have 32 CPU cores.
 
-            Our third experiment (\textbf{Exp NFS}) occurs in the same configuration as the
+            Our third experiment (\textit{Exp NFS}) occurs in the same configuration as the
             previous one, albeit reading and writing on a 400-GB NFS-mounted remote disk
             mounted from another compute node. As is commonly
             configured in HPC environments to avoid data loss, in our simulator, 
@@ -669,112 +668,52 @@
 
         \subsection{Single-threaded experiment}
 
-        Figure~\ref{fig:single_error} shows the relative error of simulated
-        read and write times for the three successive application tasks in \textbf{Exp single-threaded}. The
-        page cache simulation model drastically reduces simulation errors
-        for all I/O operations except the first read as it involves
-        uncached data. Errors are reduced from an average of 345\%
-        in the original WRENCH to 46\% in the Python prototype and 39\% in WRENCH-cache.
-        Unsurprisingly, the original WRENCH simulator significantly overestimates
-        read and write times, due to its lack of page cache simulation
-        model.
+        The page cache simulation model drastically reduces I/O simulation
+        errors in the three successive application tasks (Figure~\ref{fig:single_error}). The first read is not impacted 
+        as it only involves uncached data. Errors are reduced from an average
+        of 345\% in the original WRENCH to 46\% in the Python prototype and
+        39\% in WRENCH-cache. Unsurprisingly, the original WRENCH simulator
+        significantly overestimates read and write times, due to its lack
+        of page cache simulation model. Results with files of 50~GB and 75~GBs
+        show similar behaviors and are not reported due to space limitations.
 
-        Especially, the simulation time errors of \textit{Read 3} with 100 GB of input
-        in the simulators with page cache are just under the error in original WRENCH.
-        This longer read can be explained with the amount of cached data of files
-        at the beginning of the read in reality and simulators shown in
-        Fig.~\ref{fig:single_cache}.
-        % In this figure, \textit{file $<$i$>$} is the input of \textit{Read $<$i$>$} and
-        % output of \textit{Write $<$i-1$>$}.
-        With the input size of 20 GB, the amount of cached data of each files after 
-        every I/O operation is similar since the page cache can keep all these files.
-%             \tristan{what does this refer to?
-%             For 20 GB there is still some error in WRENCH-cache, what do you mean 
-%``there is no difference in the page cache''?}.
-%   Dzung: Some text was lost in a merge, I added it again.
-        With the input of 100 GB, the difference between real execution and WRENCH-cache
-        simulator can be seen in the amount of \textit{file 3} cache after \textit{Write 2}.
-        In real execution, after being written by \textit{Write 2},
-        \textit{file 3} is entirely in cache.
-        Thus, in \textit{Read 3}, \textit{file 3} is read with memory bandwidth.
-        However, in the WRENCH-cache simulator, only a part of \textit{file 3} is
-        cached after \textit{Write 2}, which means \textit{Write 2} reads a part of
-        \textit{file 3} from disk.
-        The reason for the difference is in our WRENCH-cache simulator,
-        with 100 GB of input, while \textit{file 3} is being written,
-        the page cache is saturated, eviction is then evoked to evict data
-        from page cache and make space available for \textit{file 3}.
-        However, because the evicted amount is less than required,
-        some \textit{file 3} data is evicted after being written, make \textit{file 3}
-        partially cached.
-        As a result, in \textit{Read 3}, only a part of \textit{file 3} is read from cache
-        with memory bandwidth, a part of it is read from disk with disk read bandwidth,
-        which is many times slower, leading to longer read time.
+        WRENCH simulation errors are substantially lower with 100~GB
+        files than with 20~GB files, due to the fact that part of the
+        100~GB file needs to be read and written to disk, the only storage
+        device in WRENCH, as it does not fit in cache. Conversely,
+        simulation errors of the Python prototype and WRENCH-cache are higher with
+        100~GB files than with 20~GB files, due to idiosyncracies in the kernel 
+        flushing and eviction strategies.
 
+        Simulated memory profiles are highly consistent with the real ones
+        (Figure~\ref{fig:single_memprof}). With 20~GB files, memory
+        profiles almost exactly match the real ones, although dirty data
+        seems to be flushing faster in real life than in simulation
+        \tristan{any idea why?}, a behavior also observed with 100~GB files. With
+        100~GB files, used memory reaches total memory during the first write,
+        triggering dirty data flushing. Used memory drops to cached memory
+        when application tasks release anonymous memory. Simulated cached
+        memory is highly consistent with real values, except toward the end
+        of Read 3 where it slightly increases in simulation but not in
+        reality \tristan{why?}. As expected, dirty data remains under the
+        dirty ratio. The Python prototype and WRENCH-cache exhibit nearly
+        identical memory profiles, which reinforces the confidence in our
+        implementation.
 
-            Memory profiling results of real pipeline execution and simulators 
-            with 20GB and 100GB input files are illustrated in Fig.~\ref{fig:single_memprof}.
-            Because the results with 20Gb, 50GB, 100GB shows a similar pattern,
-            we only include the results with 20GB and 100GB in this paper.
+        The content of the simulated memory cache is also highly consistent
+        with reality (Figure~\ref{fig:single_cache}). With 20~GB files, the
+        simulated cache content exactly matches reality, owing to the fact
+        that all files fit in page cache. With 100~GB files, a slight
+        discrepancy is observed after Write 2, which explains the
+        simulation error previously mentioned in Read 3. In the real execution indeed, 
+        File 3 is entirely cached after Write 2, whereas in the simulated execution, part 
+        of it is on disk. This is due to the fact that the simulated flushing and eviction 
+        was triggered after File 3 was already written, while in reality these operations 
+        happened before File 3 was written \tristan{Dzung, pls check that. Also, why doesn't it happen irl?}.
 
-            As shown in the figures, the makespans of the simulated pipeline are
-            close to the makespan of the real execution with similar patterns of I/O time
-            real execution and simulation.
-            But more importantly, with all input sizes, similar trends can also be found
-            in the lines describing memory status in simulators and the real execution.
-            The similar evolutions of amount of cache used (purple lines) in reality
-            and simulation show that the use of page cache is well reproduced by the simulators.
-            The amount of dirty data (red lines) also follow similar trends,
-            which means not only the amount dirty data, but also the flushing and
-            periodical flushing mechanisms are accurately modeled in our simulators.
-            This can be seen in in the increase of the amount of dirty data during the writes
-            and the decrease during the reads and computations.
-            According to the results achieved with all input sizes in the experiment,
-            we can observe identical trends in reality and simulation with 20GB,
-            50GB and 75GB input files. However, with 100GB input file,
-            the third read is not correctly simulated, leading to longer simulated time
-            than in real execution. This will be explained later in this section.
-
-             Figure~\ref{fig:single_error} shows the relative error of simulated
-             read and write times throughout the three application tasks. The
-             page cache simulation model drastically reduces simulation errors
-             for all I/O operations except the first read that deals with
-             uncached data. Errors are reduced from an average of 345\%
-             in WRENCH to 46\% in the Python prototype and 39\% in WRENCH-cache.
-             The original WRENCH simulator significantly overestimates
-             read and write times, due to its lack of page cache simulation
-             model.
-             Especially, the simulation time errors of \textit{Read 3} with 100 GB of input
-             in the simulators with page cache are just under the error in original WRENCH.
-             This longer read can be explained with the amount of cached data of files
-             at the beginning of the read in reality and simulators shown in
-             Fig.~\ref{fig:single_cache}.
-             % In this figure, \textit{file $<$i$>$} is the input of \textit{Read $<$i$>$} and
-             % output of \textit{Write $<$i-1$>$}.
-             With the input size of 20 GB, the amount of cached data of each files after 
-             every I/O operation is similar since the page cache can keep all these files.
-%             \tristan{what does this refer to?
-%             For 20 GB there is still some error in WRENCH-cache, what do you mean 
-%``there is no difference in the page cache''?}.
-%   Dzung: Some text was lost in a merge, I added it again.
-             With the input of 100 GB, the difference between real execution and WRENCH-cache
-             simulator can be seen in the amount of \textit{file 3} cache after \textit{Write 2}.
-             In real execution, after being written by \textit{Write 2},
-             \textit{file 3} is entirely in cache.
-             Thus, in \textit{Read 3}, \textit{file 3} is read with memory bandwidth.
-             However, in the WRENCH-cache simulator, only a part of \textit{file 3} is
-             cached after \textit{Write 2}, which means \textit{Write 2} reads a part of
-             \textit{file 3} from disk.
-             The reason for the difference is in our WRENCH-cache simulator,
-             with 100 GB of input, while \textit{file 3} is being written,
-             the page cache is saturated, eviction is then evoked to evict data
-             from page cache and make space available for \textit{file 3}.
-             However, because the evicted amount is less than required,
-             some \textit{file 3} data is evicted after being written, make \textit{file 3}
-             partially cached.
-             As a result, in \textit{Read 3}, only a part of \textit{file 3} is read from cache
-             with memory bandwidth, a part of it is read from disk with disk read bandwidth,
-             which is many times slower, leading to longer read time.
+        % We conclude from this experiment that our model can accurately
+        % simulate cached I/Os in a sequential context. The next experiment 
+        % evaluates our simulation with concurrent I/Os.
 
             \begin{figure*}
             \centering
@@ -782,7 +721,7 @@
                 \centering
                    \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
                    \vspace*{-0.7cm}
-                   \caption{Simulation errors}
+                   \caption{Absolute relative simulation errors}
                    \vspace*{0.5cm}
                    \label{fig:single_error}
                 \end{subfigure}
@@ -792,65 +731,43 @@
                 %    Lines represent memory usage along pipeline execution time.}
                    \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
                    \vspace*{-0.7cm}
-                   \caption{Memory profiles}
+                   \caption{Memory profiles \tristan{Remove trailing whitespace for 20GB graphs (xmax should be about 160s, not 200s)}}
                    \vspace*{0.5cm}
                    \label{fig:single_memprof}
             \end{subfigure}
             \begin{subfigure}{\linewidth}
                 \centering
                    \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files.pdf}
-                   \caption{Cache contents}
+                   \caption{Cache contents \emph{after} application I/O operations}
                 %    \textcolor{red}{Update real results of 20GB}}
                    \label{fig:single_cache}
-            \end{subfigure}\\
+            \end{subfigure}
             \caption{Single-threaded results}
             \end{figure*}
 
-            In summary, in this single-threaded experiment, our model can accurately
-            simulate I/O time as well as the internal memory behavior.
-            This can help confirm that our model is on a right track and
-            it can be further improved to achieve higher accuracy.
 
-        \subsection{Multi-threaded experiment}
+
+        \subsection{Concurrent applications}
 
             \begin{figure*}
             \begin{subfigure}{\linewidth}
                 \centering
                 \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
             \end{subfigure}
-            \caption{I/O time of concurrent pipelines with local storage.}
+            \caption{Concurrent results with 3~GB files (averages on 5 repetitions)}
             \label{fig:multi_local}
             \end{figure*}
 
-            In this experiment, we run the real execution in 5 repetitions to
-            capture the variability on the cluster.
-            The results are analyzed in terms of average I/O time
-            of concurrent pipelines shown in Fig.~\ref{fig:multi_local}.
-
-            As is shown in the figure, when the number of pipelines increases,
-            the average read time raises accordingly because the amount of data
-            increases but memory and disk bandwidths are fixed and shared between pipelines.
-            In comparison with original WRENCH, the results from WRENCH-cache are closer
-            to reality.
-            Especially, when it comes to the average write time,
-            although the trend in reality is more complex, our WRENCH-cache
-            simulator can still capture the pattern in real execution.
-            In both, the average write time gradually increases before surging with the
-            same slopes after the number of pipelines reaches 10.
-            This can be explained that with less than 10 concurrent pipelines,
-            the page cache is not saturated, so all files can be written entirely to
-            cache with memory bandwidth in a short time.
-            After the page cache is saturated with dirty data (at around
-            10 concurrent pipelines in this experiment), this dirty data needs
-            to be flushed in order to make space available for writing new data to cache.
-            This dirty data is flushed to disk with disk bandwidth, which is much
-            slower than memory bandwidth.
-            The more pipelines we have, the more data needs to be written, the more data
-            needs to be flushed, leading to a sharper increase in the average write time.
-
-            To conclude, the results from WRENCH-cache simulator show that
-            our model can also simulate I/O with page cache accurately in a
-            multi-threaded application.
+            The page cache model notably reduce WRENCH's simulation error
+            for concurrent applications and local I/Os
+            (Figure~\ref{fig:multi_local}). For reads, WRENCH-cache still
+            slightly overestimates reality, due to the discrepancy between
+            simulated and real read bandwidths mentioned before
+            (\tristan{check it's indeed mentioned. Dzung: is it correct?}). For writes, 
+            WRENCH-cache slightly underestimates reality for the same reason. The plateau 
+            ending around 7 concurrent pipelines in the WRENCH-cache curve
+            marks the limit beyond which the page cache is saturated with dirty data 
+            and needs flushing \tristan{why is there no plateay irl?}. 
 
         \subsection{Remote storage}
 
@@ -859,58 +776,58 @@
                 \centering
                 \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
             \end{subfigure}
-            \caption{I/O time of concurrent pipelines with NFS}
+            \caption{NFS results with 3~GB files (averages on 5 repetitions)}
             \label{fig:multi_nfs}
             \end{figure*}
 
-            Similar to the previous experiment, the real execution with NFS is also
-            repeated for 5 times and the results are described with the average I/O time
-            shown in Fig.~\ref{fig:multi_nfs}.
-            In general, the average I/O time reflect a very similar level of accuracy
-            to the previous experiment results when the I/O time of pipelines
-            is very close to the real execution.
-            The simulated read time if a bit off when the number of pipelines
-            surpasses 22, with 264 GB of data in total.
-            This is due to the impact of simulated cache eviction when
-            the page cache is saturated, which has been seen in
-            Fig.~\ref{fig:single_error} with 100 GB of input.
-            When it comes to write time, original WRENCH and WRENCH-cache
-            results are identical when both are writing directly to disk.
+            Page cache simulation importantly reduces the simulation error
+            on remote storage as well (Figure~\ref{fig:multi_nfs}). This
+            manifests only for reads, as only write-through cache was
+            enabled in the NFS server. Both WRENCH and WRENCH-cache
+            underestimate write times due to the discrepancy between
+            simulated and real bandwidths mentioned previously. For reads,
+            this discrepancy only impacts the results beyond 22
+            applications since before this threshold, most reads result in cache
+            hits \tristan{Dzung, pls check that.}.
 
         \subsection{Real application}
+        \subsection{Overhead comparison}
+        \tristan{Dzung, add your overhead measures here.}
 
-    \section{Discussion and Future Work}
+    \section{Conclusion}
     \label{discussion}
-        In computing infrastructures, especially those use for data-intensive applications,
-        page cache undoubtedly has certain impacts on performance.
-        Conducting simulation experiments is an effective approach to predict,
-        evaluate the performance of not only application, scheduler but also
-        infrastructure settings.
-        Unfortunately, page cache is missing in many simulation tools for HPC systems.
-        In this study, we proposed a simulation model of I/O with page cache,
-        implement it with SimGrid using WRENCH, and evaluate the results
-        with different experiments.
-        The results shows that our model can result in better simulation accuracy than
-        the simulators in which page cache is not modeled.
-        Furthermore, this level of accuracy can be achieved without a fine-grained
-        level of details.
-        This may create opportunities for the model to be applied in simulation of
-        big data applications on HPC infrastructures, which leverage memory to
-        employ page cache as a disk cache.
-        Nevertheless, the model exposed some limitations that can be
-        further improved.
+        Page cache undoubtedly has important impacts on performance, in
+        particular for data-intensive applications. Numerical simulation is
+        an effective approach to predict and compare the performance of
+        applications, schedulers and infrastructures. However, page cache
+        is missing in many simulation tools for distributed systems. In
+        this study, we proposed a simulation model of I/Os with page cache,
+        we implemented it in the SimGrid-based WRENCH library, and we
+        evaluated its benefits in different conditions. Results show that
+        our model very substantially improves simulation accuracy,
+        decreasing absolute relative errors between simulated and real
+        performance by a factor close to 10 (see results of the
+        single-threaded experiment). Furthermore, this level of accuracy
+        can be achieved without a fine-grained level of details
+        \tristan{not sure what you mean}. Our page cache model is available
+        in WRENCH from commit \tristan{abcd}, ready to be used for the
+        simulation of Big Data applications.
 
-        Our short term future work will be re-evaluate the model with asymmetrical
-        disk bandwidths that will be released in the next SimGrid version.
-        The next step is to study the detail in cache eviction mechanism to make
-        the our simulation results closer to reality.
-        Another point that needs to be further improved is the ability to configure
-        different anonymous memory usage levels of applications since it affects
-        the amount of cache used.
-        We also plan to support random I/O and file readahead, as well as
-        saving and restoring disk state when hosts are turned on/off.
+        Simulation results could be made even more accurate by a deeper
+        investigation of cache eviction mechanisms \tristan{be more
+        specific}. The availability of asymmetrical bandwidths in the
+        forthcoming SimGrid release will also directly improve our
+        simulation accuracy. Relevant future work includes simulating
+        application memory consumption, random I/O, file readahead and
+        persistent disk storage.
 
+        \tristan{discussion could be fleshed out}
+
+        \section{Acknowledgments}
+The computing platform used in the experiments was obtained with funding
+from the Canada Foundation for Innovation.
 \bibliographystyle{plain}
+\tristan{Check references, in particular capitalization}
 \bibliography{citation}
 
 \end{document}
