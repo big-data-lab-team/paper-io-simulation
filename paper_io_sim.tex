@@ -35,7 +35,7 @@
 
 \begin{document}
 
-\title{Simulating the Linux page cache in distributed applications with the WRENCH library}
+\title{Simulating the Linux page cache in distributed applications with WRENCH}
 
 \author{\IEEEauthorblockN{Hoang-Dung Do$^1$, Val\'erie Hayot-Sasson$^1$, Rafael Ferreira da Silva$^3$, Henri Casanova$^2$, Tristan Glatard$^1$
   }\\
@@ -56,24 +56,29 @@
         Despite relying on large computing infrastructures with powerful computing capability 
         to process these large datasets, an I/O bottleneck remains. 
         One widely-used approach to minimize the costs of data transfers during
-        regular use is through the employment of the page cache.
+        regular use is through the employment of the Linux page cache.
         While many simulation tools have been developed to 
         support studies in computing systems optimization, page cache simulation 
         has not been fully captured or remains absent from these simulators. 
         The inability to simulate I/O with page cache leads to inaccurate 
-        simulations in many situations, especially when dealing with data intensive applications. 
+        simulations in many situations, especially when dealing with data-intensive applications. 
         
-        In this paper, we propose a I/O simulation model that characterizes the key features of the page cache.
-        We have implemented the model with SimGrid, a simulation framework for 
-        distributed systems, using WRENCH, a SimGrid-based workflow simulator. 
-        Our simulator is compatible with both single-threaded and multithreaded applications,
-        and can simulate both writeback and writethrough cache that can factor into local
-        and network-based filesystems.
-		
-	\end{abstract}		 
+        In this paper, we propose a I/O simulation model that characterizes
+        the key features of the page cache. We have implemented the model
+        with SimGrid, a simulation framework for distributed systems, using
+        WRENCH, a SimGrid-based workflow simulator. Our simulator is
+        compatible with both single-threaded and multithreaded
+        applications, and can simulate both writeback and writethrough
+        cache that can factor into local and network-based filesystems. We
+        evaluate it in different conditions, including sequential and
+        concurrent applications, as well as local and remote I/Os.
+        The page cache model reduces the simulation
+        error by up to an order of magnitude compared to cacheless simulations.
 
-	\section{Introduction}
-		
+    \end{abstract}
+
+    \section{Introduction}
+
         The Linux Page Cache plays an important role in
         the reduction of filesystem data transfer costs. With the page cache, previously
         read data can be reread directly from memory and written data can be written to
@@ -88,7 +93,7 @@
         has various shortcomings, which include, limited and shared resources, operational
         costs, unstable environments, and the difficulties in producing reproducible results.
         Simulations address these concerns by providing abstractions for the performance of computer
-        hardware, such as CPU, network and storage. Consequently, simulations provide and
+        hardware, such as CPU, network and storage. Consequently, simulations provide a
         cost-effective, fast, easy and reproducible  way evaluate application performance
         on different infrastructures without having to execute the code.
 
@@ -106,9 +111,9 @@
         starvation~\cite{zhuang2017}.
         While existing simulators can adequately characterize many different computing environments,
         they lack much of the ability to adequately describe the page cache. Some
-        simulators try to simulator I/O with page cache, but fail to capture the key features such
+        simulators try to simulate I/O with page cache, but fail to capture the key features such
         as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
-        Other simulators, such as~\cite{xu2018}, capture the important feature of the
+        Other simulators, such as~\cite{xu2018saving}, capture the important features of the
         page cache, but are domain-specific. 
 
         %However, there is a trade-off between accuracy and scalability, which has been 
@@ -117,19 +122,18 @@
         %accuracy for the scalability and performance when their platforms grow to 
         %hundreds or thousands nodes. 
 
-        In this paper, we present WRENCH-Cache, a simulation model of I/O with page
+        In this paper, we present WRENCH-cache, a simulation model of I/O with page
         cache incorporated into WRENCH~\cite{casanova2018wrench}, a workflow management system simulator based on
-        the popular SimGrid framework. The goal of WRENCH-Cache is to provide users
+        the popular SimGrid framework. The goal of WRENCH-cache is to provide users
         with an accurate representation of a workflow execution, when file system page
         cache is used, while providing a good balance between accuracy and scalability.
-        WRENCH-Cache is able to simulate both writeback and writethrough
+        WRENCH-cache is able to simulate both writeback and writethrough
         cache which would normally be available to local and NFS-based filesystems.
-        WRENCH-Cache can provide accurate simulations for large-scale parallel
+        WRENCH-cache can provide accurate simulations for large-scale parallel
         applications using the page cache.
-         
-		
-    \section{Related Work}        
-    \label{relatedwork}    
+
+    \section{Related Work}
+    \label{relatedwork}
         
         \subsection{Page cache}
             
@@ -148,7 +152,7 @@
             by enabling asynchronous writes to disk, meaning that a write call will return once
             the data has been written to memory.
             The writeback strategy is considered to outperform write-through as well as 
-            direct I/O as it delays disk writes to perform a bulk write at a later time.
+            direct I/O as it delays disk writes to perform a bulk write at a later time
             \cite{linuxdev3rd2010}. 
             
 
@@ -181,16 +185,16 @@
              
         \subsection{Simulators}
             
-            Many simulation frameworks exist to describe the behaviours of applications
+            Many simulation frameworks exist to describe the behaviour of applications
             running on the various infrastructures available to users, such as personal computers,
             clouds and clusters.
             These simulators are built with resource models such CPU, network and 
             storage, using various different approaches to describe the hardware.
             For example, there is \textit{CloudSim} and \textit{iCanCloud} for packet-level network models 
-            and \textit{DiskSim} the simulates storage hardware functioning.
+            and \textit{DiskSim} the simulates storage hardware functioning \tristan{add references}.
 
             Simulators must choose between scalability and accuracy when describing the
-            hardware.\cite{casanova2014simgrid}. 
+            hardware~\cite{casanova2014simgrid}. 
             Fine-grained models allow simulators to achieve high accuracy, 
             but lead to scalability issues due to long simulation time 
             when simulated platforms and applications grow. 
@@ -232,21 +236,16 @@
             
     \section{Method}
     \label{method}
-    In this section, we present our page cache simulation model for file I/O,
-    flusing, and eviction. We implement this model in two simulators:
-    (1) a standalone Python prototype, and (2) WRENCH-cache, an extension of the WRENCH library.
-    We also describe experimental scenarios to evaluate our simulators in various configurations.
-     
     We separate our simulation model in two components, the IO
     Controller and the Memory Manager, which together simulate 
-    file reads and writes in Linux (Figure~\ref{fig:interaction}). 
+    file reads and writes (Figure~\ref{fig:interaction}). 
     To read or write a file chunk, a simulated application sends a
     request to the IO Controller. The IO Controller interacts as needed with
-    the Memory Manager to free memory through flushing or eviction,
-    and to read or write to cache. The Memory Manager
+    the Memory Manager to free memory by triggering flushing or eviction,
+    and interact with cached data. The Memory Manager
     implements these operations, simulates periodical flushing
-    and eviction from cache, and reads or writes to disk when necessary.  
-    In case write-through strategy is used, IO Controller can also interact directly 
+    and eviction from cache, and reads or writes to disk when necessary.
+    In case the write-through strategy is used, the IO Controller can also interact directly 
     with disk model to simulate disk writes.
     
     \begin{figure}
@@ -263,7 +262,7 @@
     \subsection{Memory Manager}
 
     The Memory Manager simulates two parallel threads: the main one
-    implements flushing, eviction, and cache I/Os synchronously, whereas
+    implements flushing, eviction, and cached I/Os synchronously, whereas
     the second one, operating in the background, periodically searches for
     expired dirty data in page cache LRU lists and flushes them to disk. We
     use existing storage simulation models~\cite{lebre2015} to simulate disk and
@@ -823,7 +822,12 @@
         persistent disk storage.
 
         \tristan{discussion could be fleshed out}
+
+        \section{Acknowledgments}
+The computing platform used in the experiments was obtained with funding
+from the Canada Foundation for Innovation.
 \bibliographystyle{plain}
+\tristan{Check references, in particular capitalization}
 \bibliography{citation}
 
 \end{document}
