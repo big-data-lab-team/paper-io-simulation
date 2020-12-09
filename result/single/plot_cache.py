@@ -10,8 +10,10 @@ def plot_cache(ax, real_file, sim_file, patterns, ylabel, color_real="#90C987", 
     df_real = pd.read_csv(real_file, index_col="task")
     df_sim = pd.read_csv(sim_file, index_col="task")
 
-    df_real[index].plot.bar(stacked=True, rot=0, color=color_real, edgecolor="k", ax=ax, position=1, width=0.3, legend=False, linewidth=0.5)
-    df_sim[index].plot.bar(stacked=True, rot=0, color=color_wrench, edgecolor="k", ax=ax, position=0, width=0.3, legend=False, linewidth=0.5)
+    # plt.rcParams.update({'hatch.color': 'green'})
+    df_real[index].plot.bar(stacked=True, rot=0, edgecolor='green', color=color_real, ax=ax, position=1, width=0.3, legend=False, linewidth=0.5)
+    # plt.rcParams.update({'hatch.color': 'blue'})
+    df_sim[index].plot.bar(stacked=True, rot=0, edgecolor='blue', color=color_wrench, ax=ax, position=0, width=0.3, legend=False, linewidth=0.5)
 
     if ylabel:
         ax.set_ylabel("amount (GB)")
