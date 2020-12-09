@@ -10,21 +10,21 @@ def compare_size(axes, real_time_file, real_mem_file,
                  real_cond=None, py_cond=None, wrench_cond=None):
     # REAL RESULTS
     real_subplot(axes[0], real_time_file, real_mem_file, xmin, xmax, ymin, ymax, bar_alpha=0.2, linestyle="-",
-                 linewidth=1, cond_text=real_cond)
+                 linewidth=3, cond_text=real_cond)
 
     # SIMULATION RESULTS
-    sim_subplot(axes[1], pysim_time_file, pysim_mem_file, "Python simulator", bar_alpha=0.2, cond_text=py_cond, color='deeppink')
-    sim_subplot(axes[2], simgrid_time_file, simgrid_mem_file, "WRENCH-cache simulator", bar_alpha=0.2,
+    sim_subplot(axes[1], pysim_time_file, pysim_mem_file, "Python prototype", bar_alpha=0.2, cond_text=py_cond, color='deeppink')
+    sim_subplot(axes[2], simgrid_time_file, simgrid_mem_file, "WRENCH-cache", bar_alpha=0.2,
                 cond_text=wrench_cond, color='darkcyan')
 
     for ax in axes:
         ax.set_xlim(right=xmax, left=xmin)
 
-    axes[0].text(0.45 * xmax, 330, "%d GB" % size, fontsize=16)
+    axes[0].text(0.45 * xmax, 300, "%d GB" % size, fontsize=14)
 
 
 def real_subplot(subplot_ax, real_time_file, real_mem_file, xmin, xmax, ymin, ymax,
-                 bar_alpha=0.2, line_alpha=1, linestyle=".-", linewidth=1.5, cond_text=None):
+                 bar_alpha=0.2, line_alpha=1, linestyle=".-", linewidth=2, cond_text=None):
     timestamps = log_parse.read_timelog(real_time_file, skip_header=False)
     atop_log = log_parse.read_atop_log(real_mem_file, dirty_ratio=0.4, dirty_bg_ratio=0.1)
     dirty_data = np.array(atop_log["total"])
@@ -44,25 +44,26 @@ def real_subplot(subplot_ax, real_time_file, real_mem_file, xmin, xmax, ymin, ym
                                label="write" if i == 1 else "")
 
     # app_cache = list(np.array(app_mem) + np.array(cache_used))
-    subplot_ax.plot(time, atop_log["total"], color='k', linewidth=1, linestyle=":", label="Total memory",
+    subplot_ax.plot(time, atop_log["total"], color='black', linewidth=linewidth, label="Total memory",
                     alpha=line_alpha)
-    subplot_ax.plot(time, atop_log["used_mem"], color='g', linewidth=linewidth, linestyle=linestyle,
-                    label="Used memory", alpha=line_alpha)
-    subplot_ax.plot(time, atop_log["cache"], color='purple', linewidth=linewidth, linestyle=linestyle,
-                    label="Cache", alpha=line_alpha)
-    subplot_ax.plot(time, atop_log["dirty_data"], color='r', linewidth=linewidth, linestyle=linestyle,
-                    label="Dirty data", alpha=line_alpha)
-    subplot_ax.plot(time, atop_log["avai_mem"], color='b', linewidth=linewidth, linestyle=linestyle,
-                    label="Available memory", alpha=line_alpha)
-    subplot_ax.plot(time, atop_log["dirty_ratio"], color='k', linewidth=linewidth, linestyle="-.",
+    subplot_ax.plot(time, atop_log["dirty_ratio"], color='black', linewidth=linewidth, linestyle=":",
                     label="dirty_ratio", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["used_mem"], color='#72190E', linewidth=linewidth, linestyle=linestyle,
+                    label="Used memory", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["cache"], color='#DC050C', linewidth=linewidth, linestyle=linestyle,
+                    label="Cache", alpha=line_alpha)
+    subplot_ax.plot(time, atop_log["dirty_data"], color='#F4A736', linewidth=linewidth, linestyle=linestyle,
+                    label="Dirty data", alpha=line_alpha)
+    # subplot_ax.plot(time, atop_log["avai_mem"], color='#FDB36', linewidth=linewidth, linestyle=linestyle,
+    #                 label="Available memory", alpha=line_alpha)
+
     # subplot_ax.plot(time, atop_log["dirty_bg_ratio"], color='r', linewidth=1, linestyle="-.", label="dirty_bg_ratio",
     #                 alpha=alpha)
-    subplot_ax.set_title("Real execution", fontsize=12)
+    # subplot_ax.set_title("Real execution", fontsize=12)
 
-    if cond_text is not None:
-        subplot_ax.text(120, 125, cond_text, style='italic', fontsize=10,
-                        bbox={'alpha': 0.1, 'pad': 5})
+    # if cond_text is not None:
+    #     subplot_ax.text(120, 125, cond_text, style='italic', fontsize=10,
+    #                     bbox={'alpha': 0.1, 'pad': 5})
 
 
 def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, line_alpha=1, cond_text=None,
@@ -106,24 +107,26 @@ def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, l
             subplot_ax.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k", alpha=0.25)
             subplot_ax.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="k", alpha=0.4)
 
-    subplot_ax.plot(time, total, color='k', linewidth=1, linestyle=":", label="Total memory", alpha=line_alpha)
-    subplot_ax.plot(time, used, color='g', linewidth=1, label="Used memory", alpha=line_alpha)
-    subplot_ax.plot(time, cache, color='purple', linewidth=1, label="Cache", alpha=line_alpha)
-    subplot_ax.plot(time, dirty, color='r', linewidth=1, label="Dirty data", alpha=line_alpha)
-    subplot_ax.plot(time, available, color='b', linewidth=1, label="Available memory", alpha=line_alpha)
-    subplot_ax.plot(time, dirty_ratio, color='k', linewidth=1, linestyle="-.", label="dirty_ratio", alpha=line_alpha)
+    lw = 3
+    subplot_ax.plot(time, total, color='black', linewidth=lw,  label="Total memory", alpha=line_alpha)
+    subplot_ax.plot(time, dirty_ratio, color='black', linewidth=lw, linestyle=":", label="dirty_ratio", alpha=line_alpha)
+    subplot_ax.plot(time, used, color='#72190E', linewidth=lw, label="Used memory", alpha=line_alpha)
+    subplot_ax.plot(time, cache, color='#DC050C', linewidth=lw, label="Cache", alpha=line_alpha)
+    subplot_ax.plot(time, dirty, color='#F4A736', linewidth=lw, label="Dirty data", alpha=line_alpha)
+    # subplot_ax.plot(time, available, color='#FDB366', linewidth=lw, label="Available memory", alpha=line_alpha)
     # subplot_ax.plot(time, dirty_bg_ratio, color='r', linewidth=1, label="dirty_bg_ratio", alpha=alpha)
 
-    subplot_ax.set_title(title, fontsize=12, fontdict={'color': color})
+    # subplot_ax.set_title(title, fontsize=12, fontdict={'color': color})
 
-    if cond_text is not None:
-        subplot_ax.text(135, 140, cond_text, style='italic', fontsize=10,
-                        bbox={'alpha': 0.2, 'pad': 5})
+    # if cond_text is not None:
+    #     subplot_ax.text(135, 140, cond_text, style='italic', fontsize=10,
+    #                     bbox={'alpha': 0.2, 'pad': 5})
 
 
 def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
     fig, axes = plt.subplots(figsize=(15, 9), ncols=2, nrows=3)
-    plt.subplots_adjust(left=0.07, bottom=0.08, right=0.95, top=0.82, wspace=0.12, hspace=0.3)
+    plt.subplots_adjust(wspace=0.1)
+    plt.rcParams.update({'font.size': 9})
 
     real_condition_desc = "memory read bw = 6860 MBps\nmemory write bw = 2764 MBps\ndisk read bw = 510 MBps\ndisk write bw = 420 MBps"
     py_condition_desc = "memory bw = 4812MBps\ndisk bw = 465 MBps"
@@ -149,11 +152,15 @@ def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
                  simgrid_mem_file="wrench/pagecache/%dgb_sim_mem.csv" % input_sizes[1],
                  size=input_sizes[1], title="", xmin=0, xmax=makespan[1], ymin=-1000, ymax=280000)
 
-    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.05, 4.2), ncol=3)
+    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.05, 3.75), ncol=8)
 
-    fig.text(0.5, 0.02, 'time (s)', ha='center', fontsize=12)
-    fig.text(0.02, 0.45, 'memory (GB)', va='center', rotation='vertical', fontsize=12)
-
-    plt.savefig("figures/single_memprof.svg", format="svg")
-    plt.savefig("figures/single_memprof.pdf", format="pdf")
+    fig.text(0.27, 0.06, 'time (s)', ha='center', fontsize=12)
+    fig.text(0.77, 0.06, 'time (s)', ha='center', fontsize=12)
+    fig.text(0.08, 0.45, 'memory (GB)', va='center', rotation='vertical', fontsize=12)
+    fig.text(0.91, 0.69, 'Real execution', fontsize=14, color='white', bbox={'pad': 5, 'color': '#90C987'}, rotation=-90)
+    fig.text(0.91, 0.405, 'Python prototype', fontsize=14, color='white', bbox={'pad': 5, 'color': '#994F88'}, rotation=-90)
+    fig.text(0.91, 0.145, 'WRENCH-cache', fontsize=14, color='white', bbox={'pad': 5, 'color': '#1965B0'}, rotation=-90)
+    
+    plt.savefig("figures/single_memprof.svg", format="svg", bbox_inches='tight')
+    plt.savefig("figures/single_memprof.pdf", format="pdf", bbox_inches='tight')
     # plt.show()

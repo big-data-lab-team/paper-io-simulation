@@ -19,7 +19,7 @@ def grouped_bar_chart(ax, labels, xlabel, ylabel, *argv):
     ax.set_ylim(bottom=0, top=700)
 
 
-def plot_task_error(ax, size):
+def plot_task_error(ax, size, ylabel):
     labels = ["Read 1", "Write 1", "Read 2", "Write 2", "Read 3", "Write 3"]
 
     # atop_file =     "log/cluster/100gb/atop_mem.log"
@@ -32,18 +32,24 @@ def plot_task_error(ax, size):
     wrench_org_error = [item * 100 for item in evaluate.task_time_error(real_time_log, wrench_org_log)]
     wrench_ext_error = [item * 100 for item in evaluate.task_time_error(real_time_log, wrench_ext_log)]
 
-    grouped_bar_chart(ax, labels, "", "error (%)",
-                      ("Python simulator", py_error, "tab:pink"), ("WRENCH", wrench_org_error, 'tab:orange'),
-                      ("WRENCH-cache", wrench_ext_error, 'tab:cyan'))
+    if ylabel:
+        ylabel = "error (%)"
+    else:
+        ylabel = ""
+    grouped_bar_chart(ax, labels, "", ylabel,
+                      ("Python prototype", py_error, "#994F88"), ("WRENCH", wrench_org_error, '#7BAFDE'),
+                      ("WRENCH-cache", wrench_ext_error, '#1965B0'))
     ax.set_title("%d GB" % size)
 
 def plot_error():
-    plt.rcParams.update({'font.size': 7})
-    fig, (ax1, ax2) = plt.subplots(figsize=(10, 2.2), ncols=2, nrows=1)
-    plot_task_error(ax1, 20)
-    plot_task_error(ax2, 100)
+    fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.8, wspace=0.1)
+    plt.rcParams.update({'font.size': 9})
 
-    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.35), ncol=3)
+    plot_task_error(ax1, 20, ylabel=True)
+    plot_task_error(ax2, 100, ylabel=False)
+
+    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.12, 1.25), ncol=3)
 
     plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
