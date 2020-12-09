@@ -69,19 +69,13 @@
         Our simulator is compatible with both single-threaded and multithreaded applications,
         and can simulate both writeback and writethrough cache that can factor into local
         and network-based filesystems.
-        The results show that our simulator not only achieves higher accuracy than 
-        original WRENCH, but also effectively simulates memory contents and 
-        page cache during I/O operations. 
-        Through this study, our effort is to contribute an analytical model 
-        of the page cache, which can also be integrated to other simulators 
-        to improve I/O simulation accuracy. 
-        
-    \end{abstract}         
+		
+	\end{abstract}		 
 
-    \section{Introduction}
-        
-        The Linux Page Cache, introduced in kernel version 2.4, plays an important role in
-        the reduction of filesystem data transfer costs~\cite{pagecache}. With the page cache, previously
+	\section{Introduction}
+		
+        The Linux Page Cache plays an important role in
+        the reduction of filesystem data transfer costs. With the page cache, previously
         read data can be reread directly from memory and written data can be written to
         memory before being asynchronously flushed to disk, resulting in improved I/O performance
         on slower storage devices. The performance benefits that can be obtained from using the page
@@ -93,14 +87,23 @@
         Characterizing the performance of applications directly on computing infrastructure
         has various shortcomings, which include, limited and shared resources, operational
         costs, unstable environments, and the difficulties in producing reproducible results.
-        Simulations address these concerns by providing abstractions to the performance of computer
-        hardware, such as CPU, network and storage. As a result, simulations provide and
+        Simulations address these concerns by providing abstractions for the performance of computer
+        hardware, such as CPU, network and storage. Consequently, simulations provide and
         cost-effective, fast, easy and reproducible  way evaluate application performance
         on different infrastructures without having to execute the code.
 
+        The amount of data-intensive applications has been on the rise as a result of
+        open-data and data sharing initiatives. Due to the sheer size of the data being
+        processed, these applications must be executed on large scale infrastructure
+        such as High Performance Computing (HPC) clusters or the cloud. Determining
+        which type of infrastructure is the most cost-effective for the particular
+        application can be tricky without the help of a simulator.
 
         Page cache simulation is crucial when simulating data intensive applications,
-        which would rely on cache hits and writing to memory for additional performance.
+        which rely on cache hits and writing to memory for additional performance.
+        Furthermore, simulating the page cache enables us to study important application-I/O
+        bottlenecks which can arise over the course of execution, such as page cache
+        starvation~\cite{zhuang2017}.
         While existing simulators can adequately characterize many different computing environments,
         they lack much of the ability to adequately describe the page cache. Some
         simulators try to simulator I/O with page cache, but fail to capture the key features such
@@ -114,90 +117,90 @@
         %accuracy for the scalability and performance when their platforms grow to 
         %hundreds or thousands nodes. 
 
-        In this paper, we present WRENCH-cache, a simulation model of I/O with page
-        cache incorporated into WRENCH, a workflow management system simulator based of
-        the popular SimGrid framework. The goal of WRENCH-cache is to provide users
+        In this paper, we present WRENCH-Cache, a simulation model of I/O with page
+        cache incorporated into WRENCH~\cite{casanova2018wrench}, a workflow management system simulator based on
+        the popular SimGrid framework. The goal of WRENCH-Cache is to provide users
         with an accurate representation of a workflow execution, when file system page
-        cache is used. WRENCH-cache is able to simulate both writeback and writethrough
+        cache is used, while providing a good balance between accuracy and scalability.
+        WRENCH-Cache is able to simulate both writeback and writethrough
         cache which would normally be available to local and NFS-based filesystems.
-
-    \section{Related Work}
-    \label{relatedwork}
+        WRENCH-Cache can provide accurate simulations for large-scale parallel
+        applications using the page cache.
+         
+		
+    \section{Related Work}        
+    \label{relatedwork}    
         
         \subsection{Page cache}
             
-            Linux implements a disk cache called \textit{page cache}. 
-            It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}.
-            The goal of the page cache is to avoid disk I/O by keeping data in memory 
-            for later accesses, minimize I/O time since disk accesses are considerably 
-            slower than memory accesses.
-            When the kernel starts a read operation, it checks if required data is in page cache.
-            If yes, data is read from memory. This is called a \textit{cache hit}. 
-            Otherwise, data is read from disk and placed in page cache.
-            For writing, page cache is implemented with three different strategies. 
-            The first is \textit{direct~I/O} or \textit{no-write}, which means the page cache 
-            is not involved in write operations. 
-            The second is \textit{write-through}, in which data goes \textit{through} 
-            page cache to disk. In this case, data is written to both page cache and disk. 
-            In the third strategy, called \textit{writeback}, data are written directly 
-            to disk as \textit{dirty} pages and these pages will be periodically flushed 
-            to disk later by a \textit{writeback} process and then marked as not dirty. 
+        To improve performance of disk accesses, the page cache was introduced to the Linux kernel. %It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}.
+            The goal of the page cache is to try ensure that most I/O operations occur entirely
+            within memory space rather than synchronously to and from the storage device.
+            All disk-backed data located in the page cache are partitioned into many small pages.
+            When a read operation is initiated, the kernel checks whether the required pages are in memory.
+            If it is the case, data is read entirely from memory (i.e. \textit{cache hit}). Otherwise,
+            the necessary pages must be loaded to memory from the disk (i.e. \textit{cache miss})
+            Conversely, for writing, one of three strategies can be applied: direct~I/O (or, ``no-write''),
+            writethrough and writeback.
+            If direct~I/O is enabled for a given file system, all I/O operations bypass the
+            page cache for writes, writing data directly to disk. In contrast, write-through enables the page cache
+            for file system writes, but the data is written synchronously from memory to disk. Writeback extends write-through
+            by enabling asynchronous writes to disk, meaning that a write call will return once
+            the data has been written to memory.
             The writeback strategy is considered to outperform write-through as well as 
-            direct I/O as it delays disk writes and perform a bulk write later.
+            direct I/O as it delays disk writes to perform a bulk write at a later time.
             \cite{linuxdev3rd2010}. 
             
-            In writeback, one of the keys is the cache eviction mechanism, which is
-            triggered when available memory is insufficient to remove pages 
-            from page cache. 
-            The term \textit{available memory} here includes both free memory and 
-            the memory used but can be reclaimed by the kernel with flushing 
-            and eviction. 
-            Because dirty pages are data written to page cache but yet to be 
-            written to disk, dirty pages must be kept in page cache and only clean pages 
-            are available for eviction.
-            If the clean pages are inadequate, dirty pages are flushed to disk, 
-            marked as clean and available for eviction. 
-            There is another type of flushing mechanism, which is 
-            \textit{periodical flushing}, called periodically in predefined intervals. 
+
+            Cache eviction and flushing strategies are integral to proper page cache functioning.
+            Whenever space in memory becomes limited, either as a result of application memory
+            or page cache use, page cache data may be evicted. Only data that 
+            has been persisted to storage (clean pages) can be flagged for eviction and removed from
+            memory. Written data that has not yet been persisted to disk (dirty data) must first
+            be copied (flushed) to storage prior to eviction. When sufficient memory is
+            being occupied, the flushing process is synchronous. However, even when 
+            there is sufficient available memory, written data will be flushed to disk
+            at a predefined interval through a process known as \textit{periodical flushing}.
             Periodical flushing only flushes expired dirty pages, which remain dirty in 
             page cache longer than an expiration time configured in the kernel. 
             Different cache eviction algorithms have also been developed and proposed
             \cite{owda2014comparison}.
-            In Linux kernel, a \textit{two lists strategy (LRU/2)} is implemented based on 
-            the least-recently-used (LRU) scheme, with an \textit{active list} and 
-            an \textit{inactive list}. 
+            The Linux kernel uses a two-list strategy to flag pages for eviction.
+            The two-list strategy is based on a least recently used (LRU) policy
+            and uses an active and inactive list in its implementation.
             If accessed pages are not in the page cache, they are added to the inactive list. 
-            If pages are accessed when residing in the inactive list, they will be moved from 
-            inactive list to active list. 
+            Should pages located on the inactive list be accessed, they will be moved from 
+            the inactive to the active list. 
             The lists are also kept balanced by moving pages from the active list
             to the inactive list when the active list grows too large.
             Thus, the active list only contains pages which are accessed more than once 
             and not evictable, while the inactive list includes pages accessed once only, 
-            or pages accessed more than once but moved from the active list. 
-            The lists work in LRU manner, pages are added to the tail and removed 
-            from the top. 
+            or pages that have be accessed more than once but moved from the active list. 
+            Both lists operate using LRU eviction policies meaning the data that has
+            not be accessed recently will be moved first.
              
         \subsection{Simulators}
             
-            Many simulation frameworks and applications have been developed 
-            in recent years to support studies in grids, cloud, HPC, peer-to-peer 
-            networks, volunteer computers.                     
-            These simulators are built with models of resources such as CPU, network, 
-            storage with different approaches and levels of details in different simulators. 
-            The detail level of the model causes a conflict between accuracy and scalability, 
-            and these simulators usually trade of one for the other 
-            \cite{casanova2014simgrid}. 
-            For example, some simulators are built with packet-level network models 
-            such as \textit{CloudSim} and \textit{iCanCloud}, or storage model that 
-            simulates the operation of storage hardware in \textit{DiskSim} 
-            \cite{casanova2014simgrid}. 
+            Many simulation frameworks exist to describe the behaviours of applications
+            running on the various infrastructures available to users, such as personal computers,
+            clouds and clusters.
+            These simulators are built with resource models such CPU, network and 
+            storage, using various different approaches to describe the hardware.
+            For example, there is \textit{CloudSim} and \textit{iCanCloud} for packet-level network models 
+            and \textit{DiskSim} the simulates storage hardware functioning.
+
+            Simulators must choose between scalability and accuracy when describing the
+            hardware.\cite{casanova2014simgrid}. 
             Fine-grained models allow simulators to achieve high accuracy, 
-            but at the same time lead to scalability issues due to long simulation time 
+            but lead to scalability issues due to long simulation time 
             when simulated platforms and applications grow. 
             SimGrid is an open source simulation platform that has been developed 
             not only to balance the trade-off between accuracy and scalability, 
-            but also to achieve versatility, which allows the use of the framework 
-            to simulate applications in multiple domains \cite{casanova2014simgrid}.
+            but also to achieve versatility, allowing the use of the framework 
+            to simulate applications in multiple domains. WRENCH, a workflow management
+            system simulator based on the SimGrid framework, provides a high-level API
+            for simulating workflows, thus facilitating the integration of new models.
+            \valerie{say more about wrench}
             
             Despite the fact that many sophisticated models for resources have been 
             integrated in simulators, and the page cache shows apparent impacts on I/O
@@ -207,35 +210,25 @@
             and capacity. 
             SIMCAN is a simulation framework that models page cache by storing data 
             accessed on disk in a block cache \cite{nunez2012simcan}. 
-            Page cache is also modeled in iCanCloud simulator with a component in charge 
-            of managing memory accesses and cached data \cite{nunez2012icancloud}, 
-            but one of the issues is scalability due to its sophisticated model.
-            Ultimately, non of these simulators provide any cache write strategy, 
-            cache eviction mechanism with dirty/clean data and the page cache LRU lists. 
-            Cache replacement policies is applied in \cite{xu2018saving} to simulate 
-            in-memory caching, but for the study in energy consumption of multi-tier 
-            heterogenous network.
+            Page cache is also modeled in the iCanCloud simulator through a component which
+            manages memory accesses and cached data \cite{nunez2012icancloud}. However,
+            the scalability of the iCanCloud simulator is limited by its sophisticated model.
+            Ultimately, none of these simulators provide any writeback cache simulator nor
+            cache eviction policys through LRU lists.
+            Although cache replacement policies are applied in \cite{xu2018saving} to simulate 
+            in-memory caching, their simulator is specific to energy consumption of multi-tier 
+            heterogenous networks.
             
-            In this study, we chose SimGrid to implement our model of I/O with page cache 
-            due to the balancing between accuracy and scalibility, the versatility allowing it 
-            to be adopted in different domains. 
-            In addition, it is an actively maintained open-scource framework with 
-            modular design, which enables the framework to be extended with new models. 
-            The main issue users have to face when using SimGrid is everything has to be 
-            implemented from scratch due to its low-level API. 
-            To ease this challenge, WRENCH, another open-source library, is built on top 
-            of SimGrid to abstract the low-level logic and expose a higher abstraction 
-            level API \cite{casanova2018wrench}. 
-            We integrate our model in WRENCH and use the SimGrid API to interact with 
-            simulated storage resource.
-            This approach allows us to leverage existing features in WRENCH and SimGrid.
-            Firstly, we can take advantage of the process control, synchronization of 
-            resource consumption by concurrent processes provided by the simulation core 
-            in SimGrid. 
-            Secondly, we can reuse the existing SimGrid storage model with capacity 
+
+            In this study, we use WRENCH 
+            to implement our page cache model. We chose WRENCH due to accurate yet scalable implementation, resulting
+            from its SimGrid backend, as well as its high-level API.
+            We have integrated our model in WRENCH and use the SimGrid API to interact with 
+            simulated storage resources.
+            This approach allows us to leverage existing features in WRENCH and SimGrid such as process control and synchronization of 
+            resource consumption.
+            We also leverage the existing SimGrid storage model with capacity 
             and bandwidth properties, which are similar to the characteristics of memory.
-            And finally, WRENCH provides a high level abstraction, which help us drop 
-            the burden of implementation. 
             
     \section{Method}
     \label{method}
