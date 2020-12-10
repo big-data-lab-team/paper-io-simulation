@@ -97,9 +97,9 @@
         reducing filesystem data transfer times. With the page cache, previously
         read data can be re-read directly from memory and written data can be written to
         memory before being asynchronously flushed to disk, resulting in improved I/O performance
-        on slower storage devices. The magnitude of the performance benefits that can be obtained from using the page
-        cache are determined by many factors including the total amount of memory,
-        the amount of data being written (i.e., dirty data), and the percentage of available memory available for
+        on slower storage devices. The performance improvements
+        depend on many factors including the total amount of memory,
+        the amount of data being written (i.e., dirty data), and the amount of memory available for
         written data. All these factors are important when determining the impact of I/O on
         application performance, particularly in data-intensive applications.
 
@@ -135,12 +135,12 @@
         bottlenecks that can arise over the course of execution, such as page cache
         starvation~\cite{zhuang2017}.
         While existing simulation frameworks of parallel and distributed computing
-        systems  capture many relevant features of hardware/software stacks of interest, 
+        systems  capture many relevant features of hardware/software stacks, 
         they lack the ability to simulate page caches adequately. Those frameworks
         that implement some page cache simulation
         fail to capture key features such
         as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
-        Some simulators, such as that in~\cite{xu2018saving}, do capture such features,
+        Some simulators, such as that in~\cite{xu2018saving}, do capture such features
         but are domain-specific. 
 
         %However, there is a trade-off between accuracy and scalability, which has been
@@ -160,7 +160,7 @@
     both single-threaded and multithreaded applications, and of both
     writeback and writethrough caches for local or network-based
     filesystems;
-        \item An implementation of this model as part of the WRENCH framework; 
+        \item An implementation of this model in WRENCH; 
         \item An evaluation and validation of the accuracy of our model, and of its implementation,
               for a range of applications, platforms, and page cache configurations. 
     \end{compactitem}
