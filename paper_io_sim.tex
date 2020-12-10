@@ -824,8 +824,27 @@
             hits \tristan{Dzung, pls check that.}.
 
         \subsection{Real application}
+
         \subsection{Overhead comparison}
-        \tristan{Dzung, add your overhead measures here.}
+        As is the case for WRENCH, simulation time with WRENCH-cache scales
+        linearly with the number of concurrent applications
+        (Figure~\ref{fig:multi_time}, p \textless $10^{-24}$). However, the page
+        cache model substantially increases the simulation time by
+        application as can be seen by comparing regression slopes in
+        Figure~\ref{fig:multi_time}. Interestingly, WRENCH-cache is faster with 
+        NFS I/Os than with local I/Os, most likely due to the use of writethrough
+        cache in NFS, which by-passes flushing operations.
+        \begin{figure}
+            \begin{subfigure}{\columnwidth}
+                \centering
+                \includegraphics[width=\linewidth]{result/multi/figures/simulation_time.pdf}
+            \end{subfigure}
+            \caption{Simulation time comparison. WRENCH-cache scales
+            linearly with the number of concurrent applications, albeit
+            with a higher overhead than WRENCH.}
+            \label{fig:multi_time}
+            \end{figure}
+
 
     \section{Conclusion}
     \label{discussion}

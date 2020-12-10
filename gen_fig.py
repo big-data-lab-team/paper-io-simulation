@@ -25,5 +25,5 @@ import result.multi.process_result as multi_result
 multi_result.result_local(rep_no=5)
 # Generate figures of experiment with NFS
 multi_result.result_nfs(rep_no=5)
-# Generate figures of simulation time
+# runtime plots
 multi_result.run_time()
