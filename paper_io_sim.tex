@@ -29,6 +29,7 @@
 \newcommand{\Desc}[2]{\State \makebox[2em][l]{#1}#2}
 
 \newcommand{\tristan}[1]{\color{orange}\textbf{From Tristan:}#1\color{black}}
+\newcommand{\henri}[1]{\color{green}\textbf{From Henri:}#1\color{black}}
 \newcommand{\english}[1]{\uwave{#1}}
 
 \newcommand{\valerie}[1]{\color{blue}\textbf{From Valerie:}#1\color{black}}
@@ -561,12 +562,13 @@
             The source code this prototype is available at
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}. We used Python 3.7.
 
-            We also implemented our model in WRENCH, separately from existing WRENCH components.
-            We exposed page cache simulation through a user API, activated using a command-line argument.
-            We used SimGrid 3.25 which is available at \url{https://framagit.org/simgrid/simgrid}.
-            To implement the simulator, we used the WRENCH 1.6 version at this commit \url{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}.
+            We also implemented our model as part of WRENCH, enhancing its internal implementation
+            and APIs with a page cache abstraction, and allowing users to activate the feature via a
+            command-line argument. For the experiments in this paper we use WRENCH 1.6 at this commit \url{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}, which uses
+            SimGrid 3.25 (available at \url{https://framagit.org/simgrid/simgrid}). However, our implementation is now part of WRENCH's master branch and will be available to users with the next WRENCH release. 
 
 \tristan{anything else interesting to mention about the implementation?}
+\henri{I mentioned that the implementaion is now part of the WRENCH master }
 
         \subsection{Experiments}
 
@@ -604,7 +606,7 @@
 
         To parametrize our simulators, we benchmarked the bandwidths of
         memory, local disk, remote disk (NFS), and network
-        (Table~\ref{table:benchmark}). Since WRENCH currently only supports
+        (Table~\ref{table:benchmark}). Since SimGrid, and thus WRENCH, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
         bandwidth values in our experiments.
             \begin{table}[htbp]
