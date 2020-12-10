@@ -168,4 +168,5 @@ def run_time():
     plt.ylabel("time (seconds)")
     plt.legend()
 
-    plt.show()
+    plt.savefig("figures/simulation_time.pdf", format="pdf")
+    plt.savefig("figures/simulation_time.svg", format="svg")

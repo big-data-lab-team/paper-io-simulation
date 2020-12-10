@@ -7,10 +7,7 @@ Generate pdf files used in the paper from svg files.
 
 ### Generate the figures
 If the svg files are not available to generate pdf files, you should re-generate the svg files 
-from experiment results. 
-
-The figures are generated from the log files exported in real execution and simulators.
-Use the Jupyter notebook `generate_figures.ipynb` to generate svg (and also pdf) files.
+from experiment results by running the python script `gen_fig.py`.
 
 Figures are generated and saved in:
 - Single-threaded experiment: [result/single/figures/](result/single/figures/)
