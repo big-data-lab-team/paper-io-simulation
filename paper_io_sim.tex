@@ -169,128 +169,125 @@
               for a range of applications, platforms, and page cache configurations. 
     \end{compactitem}
 
-
-
+    
     \section{Related Work}
     \label{relatedwork}
 
         \subsection{Page cache}
 
         To improve performance of disk accesses, the page cache was introduced to the Linux kernel. %It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}.
-            The goal of the page cache is to try ensure that most I/O operations occur entirely
-            within memory space rather than synchronously to and from the storage device.
-            All disk-backed data located in the page cache are partitioned into many small pages.
-            When a read operation is initiated, the kernel checks whether the required pages are in memory.
-            If it is the case, data is read entirely from memory (i.e. \textit{cache hit}). Otherwise,
-            the necessary pages must be loaded to memory from the disk (i.e. \textit{cache miss})
-            Conversely, for writing, one of three strategies can be applied: direct~I/O (or, ``no-write''),
-            writethrough and writeback.
-            If direct~I/O is enabled for a given file system, all I/O operations bypass the
-            page cache for writes, writing data directly to disk. In contrast, writethrough enables the page cache
-            for file system writes, but the data is written synchronously from memory to disk. Writeback extends writethrough
-            by enabling asynchronous writes to disk, meaning that a write call will return once
-            the data has been written to memory.
-            The writeback strategy is considered to outperform writethrough as well as
-            direct I/O as it delays disk writes to perform a bulk write at a later time
-            \cite{linuxdev3rd2010}.
-
-
-            Cache eviction and flushing strategies are integral to proper page cache functioning.
-            Whenever space in memory becomes limited, either as a result of application memory
-            or page cache use, page cache data may be evicted. Only data that
-            has been persisted to storage (clean pages) can be flagged for eviction and removed from
-            memory. Written data that has not yet been persisted to disk (dirty data) must first
-            be copied (flushed) to storage prior to eviction. When sufficient memory is
-            being occupied, the flushing process is synchronous. However, even when
-            there is sufficient available memory, written data will be flushed to disk
-            at a predefined interval through a process known as \textit{periodical flushing}.
-            Periodical flushing only flushes expired dirty pages, which remain dirty in
-            page cache longer than an expiration time configured in the kernel.
-            Different cache eviction algorithms have also been developed and proposed
-            \cite{owda2014comparison}.
-            The Linux kernel uses a two-list strategy to flag pages for eviction.
-            The two-list strategy is based on a least recently used (LRU) policy
-            and uses an active and inactive list in its implementation.
-            If accessed pages are not in the page cache, they are added to the inactive list.
-            Should pages located on the inactive list be accessed, they will be moved from
-            the inactive to the active list.
-            The lists are also kept balanced by moving pages from the active list
-            to the inactive list when the active list grows too large.
-            Thus, the active list only contains pages which are accessed more than once
-            and not evictable, while the inactive list includes pages accessed once only,
-            or pages that have be accessed more than once but moved from the active list.
-            Both lists operate using LRU eviction policies meaning the data that has
-            not be accessed recently will be moved first.
+        The goal of the page cache is to try ensure that most I/O operations occur entirely
+        within memory space rather than synchronously to and from the storage device.
+        All disk-backed data located in the page cache are partitioned into many small pages.
+        When a read operation is initiated, the kernel checks whether the required pages are in memory.
+        If it is the case, data is read entirely from memory (i.e. \textit{cache hit}). Otherwise,
+        the necessary pages must be loaded to memory from the disk (i.e. \textit{cache miss})
+        Conversely, for writing, one of three strategies can be applied: direct~I/O (or, ``no-write''),
+        writethrough and writeback.
+        If direct~I/O is enabled for a given file system, all I/O operations bypass the
+        page cache for writes, writing data directly to disk. In contrast, writethrough enables the page cache
+        for file system writes, but the data is written synchronously from memory to disk. Writeback extends writethrough
+        by enabling asynchronous writes to disk, meaning that a write call will return once
+        the data has been written to memory.
+        The writeback strategy is considered to outperform writethrough as well as
+        direct I/O as it delays disk writes to perform a bulk write at a later time
+        \cite{linuxdev3rd2010}.
+        Cache eviction and flushing strategies are integral to proper page cache functioning.
+        Whenever space in memory becomes limited, either as a result of application memory
+        or page cache use, page cache data may be evicted. Only data that
+        has been persisted to storage (clean pages) can be flagged for eviction and removed from
+        memory. Written data that has not yet been persisted to disk (dirty data) must first
+        be copied (flushed) to storage prior to eviction. When sufficient memory is
+        being occupied, the flushing process is synchronous. However, even when
+        there is sufficient available memory, written data will be flushed to disk
+        at a predefined interval through a process known as \textit{periodical flushing}.
+        Periodical flushing only flushes expired dirty pages, which remain dirty in
+        page cache longer than an expiration time configured in the kernel.
+        Different cache eviction algorithms have also been developed and proposed
+        \cite{owda2014comparison}.
+        The Linux kernel uses a two-list strategy to flag pages for eviction.
+        The two-list strategy is based on a least recently used (LRU) policy
+        and uses an active and inactive list in its implementation.
+        If accessed pages are not in the page cache, they are added to the inactive list.
+        Should pages located on the inactive list be accessed, they will be moved from
+        the inactive to the active list.
+        The lists are also kept balanced by moving pages from the active list
+        to the inactive list when the active list grows too large.
+        Thus, the active list only contains pages which are accessed more than once
+        and not evictable, while the inactive list includes pages accessed once only,
+        or pages that have be accessed more than once but moved from the active list.
+        Both lists operate using LRU eviction policies meaning the data that has
+        not be accessed recently will be moved first.
 
         \subsection{Simulators}
 
-	    Many simulation frameworks have been developed to enable the
-	    simulation of parallel and distributed
-	    applications~\cite{optorsim, gridsim, groudsim, cloudsim,
-	    nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf,
-	    cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid,
-	    ROSS, casanova2020fgcs}. These frameworks implement simulation
-	    models and abstractions to aid the development of simulators
-	    for studying the functional and performance behaviors of
-	    application workloads executed on various hardware/software
-	    infrastructures. 
+        Many simulation frameworks have been developed to enable the
+        simulation of parallel and distributed
+        applications~\cite{optorsim, gridsim, groudsim, cloudsim,
+        nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf,
+        cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid,
+        ROSS, casanova2020fgcs}. These frameworks implement simulation
+        models and abstractions to aid the development of simulators
+        for studying the functional and performance behaviors of
+        application workloads executed on various hardware/software
+        infrastructures. 
 
-	    The two main concerns for simulation are \emph{accuracy}
-	    (the ability to faithfully reproduce real-world executions) and
-	    \emph{scalability}  (the ability to simulate large/long real-world
-	    executions quickly and with low RAM footprint), and the above
-	    frameworks achieve different compromises between the two.  At
-	    one extreme are discrete-event models that capture
-	    ``microscopic'' behaviors of hardware/software systems (e.g.,
-	    packet-level network simulation, block-level disk simulation,
-	    cycle-accurate CPU simulation), which favor accuracy over
-	    speed.  At the other extreme are analytical models that capture
-	    ``macroscopic'' behaviors via mathematical models.  While these
-	    models lead to fast simulation, they must be developed
-	    carefully if high levels of accuracy are to be
-	    achieved~\cite{velhoTOMACS2013}. 
+        The two main concerns for simulation are \emph{accuracy}
+        (the ability to faithfully reproduce real-world executions) and
+        \emph{scalability}  (the ability to simulate large/long real-world
+        executions quickly and with low RAM footprint), and the above
+        frameworks achieve different compromises between the two.  At
+        one extreme are discrete-event models that capture
+        ``microscopic'' behaviors of hardware/software systems (e.g.,
+        packet-level network simulation, block-level disk simulation,
+        cycle-accurate CPU simulation), which favor accuracy over
+        speed.  At the other extreme are analytical models that capture
+        ``macroscopic'' behaviors via mathematical models.  While these
+        models lead to fast simulation, they must be developed
+        carefully if high levels of accuracy are to be
+        achieved~\cite{velhoTOMACS2013}. 
 
-	    In this  work, we use the \simgrid and \wrench simulation
-	    frameworks.  The years of research and development invested in
-	    the popular \simgrid simulation framework~\cite{casanova2014simgrid}, have
-	    culminated in a set of state-of-the-art macroscopic simulation
-	    models that yield high accuracy, as demonstrated by
-	    (in)validation studies and comparisons to competing
-	    frameworks~\cite{smpi_validity, velhoTOMACS2013, simutool_09,
-	    nstools_07, lebre2015, pouilloux:hal-01197274,
-	    smpi_tpds2017,  7885814, 8048921, 7384330}.  But one
-	    significant drawback of \simgrid is that its simulation
-	    abstractions are low-level, meaning that implementing a
-	    simulator of complex systems can be
-	    labor-intensive~\cite{kecskemeti_2014}. To remedy this problem,
-	    the \wrench simulation framework~\cite{casanova2020fgcs}
-	    builds on top of \simgrid to provide higher-level simulation
-	    abstractions, so that simulators of complex applications and
-	    systems can be implemented with a few hundred lines.
+        In this  work, we use the \simgrid and \wrench simulation
+        frameworks.  The years of research and development invested in
+        the popular \simgrid simulation framework~\cite{casanova2014simgrid}, have
+        culminated in a set of state-of-the-art macroscopic simulation
+        models that yield high accuracy, as demonstrated by
+        (in)validation studies and comparisons to competing
+        frameworks~\cite{smpi_validity, velhoTOMACS2013, simutool_09,
+        nstools_07, lebre2015, pouilloux:hal-01197274,
+        smpi_tpds2017,  7885814, 8048921, 7384330}.  But one
+        significant drawback of \simgrid is that its simulation
+        abstractions are low-level, meaning that implementing a
+        simulator of complex systems can be
+        labor-intensive~\cite{kecskemeti_2014}. To remedy this problem,
+        the \wrench simulation framework~\cite{casanova2020fgcs}
+        builds on top of \simgrid to provide higher-level simulation
+        abstractions, so that simulators of complex applications and
+        systems can be implemented with a few hundred lines.
 
-	    Although the Linux page cache has a large impact on I/O
-	    performance, and thus on the execution of data-intensive
-	    applications, its simulation is rarely considered in the above
-	    frameworks.  Most frameworks merely simulate I/O operations
-	    based on storage bandwidths and capacities.  The SIMCAN
-	    framework does models page caching by storing data accessed on
-	    disk in a block cache~\cite{nunez2012simcan}.  Page cache is
-	    also modeled in iCanCloud through a component that manages
-	    memory accesses and cached data~\cite{nunez2012icancloud}.
-	    However, the scalability of the iCanCloud simulator is limited
-	    due to it using  microscopic simulation models.  Besides, none
-	    of these simulators provide any writeback cache simulator nor
-	    cache eviction policies through LRU lists.  Although cache
-	    replacement policies are applied in~\cite{xu2018saving} to
-	    simulate in-memory caching, their simulator is specific to
-	    energy consumption of multi-tier heterogeneous networks.
+        Although the Linux page cache has a large impact on I/O
+        performance, and thus on the execution of data-intensive
+        applications, its simulation is rarely considered in the above
+        frameworks.  Most frameworks merely simulate I/O operations
+        based on storage bandwidths and capacities.  The SIMCAN
+        framework does models page caching by storing data accessed on
+        disk in a block cache~\cite{nunez2012simcan}.  Page cache is
+        also modeled in iCanCloud through a component that manages
+        memory accesses and cached data~\cite{nunez2012icancloud}.
+        However, the scalability of the iCanCloud simulator is limited
+        due to it using  microscopic simulation models.  Besides, none
+        of these simulators provide any writeback cache simulator nor
+        cache eviction policies through LRU lists.  Although cache
+        replacement policies are applied in~\cite{xu2018saving} to
+        simulate in-memory caching, their simulator is specific to
+        energy consumption of multi-tier heterogeneous networks.
 
-            In this study, we develop a page cache simulation model which we implement
-            as part of the \wrench framework. We targeted \wrench because it is a
-            recent, actively developed framework that provides convenient simulation
-            abstractions, because it is easy to incorporate new simulation models
-            into it, and because it builds on \simgrid, whose scalable and accurate
-            simulation models we can thus reuse for our purpose. 
+        In this study, we develop a page cache simulation model which we implement
+        as part of the \wrench framework. We targeted \wrench because it is a
+        recent, actively developed framework that provides convenient simulation
+        abstractions, because it is easy to incorporate new simulation models
+        into it, and because it builds on \simgrid, whose scalable and accurate
+        simulation models we can thus reuse for our purpose. 
 
     \section{Methods}
     \label{method}
