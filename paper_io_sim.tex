@@ -11,6 +11,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{ulem}
+\usepackage{xspace}
 \usepackage{tabularx}
 
 % Fix link colors
@@ -31,6 +32,9 @@
 \newcommand{\tristan}[1]{\color{orange}\textbf{From Tristan:}#1\color{black}}
 \newcommand{\henri}[1]{\color{green}\textbf{From Henri:}#1\color{black}}
 \newcommand{\english}[1]{\uwave{#1}}
+
+\newcommand{\simgrid}{SimGrid\xspace}
+\newcommand{\wrench}{WRENCH\xspace}
 
 \newcommand{\valerie}[1]{\color{blue}\textbf{From Valerie:}#1\color{black}}
 
@@ -78,8 +82,8 @@
         % Some cosmetic rewrites below
     In this paper, we propose a I/O simulation model that characterizes
     the key features of the page cache. We have implemented this model
-    as  part of the WRENCH workflow simulation framework, which itself
-    builds on the popular SimGrid distributed systems simulation
+    as  part of the \wrench workflow simulation framework, which itself
+    builds on the popular \simgrid distributed systems simulation
     framework.  Our model and its implementation enable the simulation
     of both single-threaded and multithreaded applications, and of both
     writeback and writethrough caches for local or network-based
@@ -115,8 +119,8 @@
     technologies so as to propose new solutions. Unfortunately, application performance
         studies via experiments on real-world compute platforms
         faces several difficulties (high operational costs, labor-intensive experimental setups,
-        shared platforms with dynamic loads that hinder reproductibilty of results) and shortcomings
-        (experiments are limited to the available platform/softare configurations, which precludes
+        shared platforms with dynamic loads that hinder reproducibility of results) and shortcomings
+        (experiments are limited to the available platform/software configurations, which precludes
         the exploration of hypothetical scenarios). 
     Simulations address these concerns by providing simulation models
     and abstractions for the performance of computer hardware, such as
@@ -125,7 +129,7 @@
     application performance on arbitrary platform configurations. It thus comes
         as no surprise that, considering here only the field of parallel and distributed
         computing, a large number of simulation frameworks have been developed and used
-        to support research and development endeavors~\cite{ optorsim, gridsim, groudsim, cloudsim, nunez2012simcan,nunez2012icancloud, dissect_cf, cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}. 
+        to support research and development endeavors~\cite{ optorsim, gridsim, groudsim, cloudsim, nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf, cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}. 
 
 
         Page caching is a well-known and ubiquitous technique for mitigating the I/O bottleneck
@@ -149,10 +153,10 @@
         %accuracy for the scalability and performance when their platforms grow to
         %hundreds or thousands nodes.
 
-    In this work, we present WRENCH-cache, a simulation model of I/O
-    with page cache incorporated into the WRENCH simulation framework~\cite{casanova2020fgcs},
-    which is  based on the popular SimGrid distributed simulation framework~\cite{casanova2014simgrid}.
-    The added value of WRENCH-cache is to make it possible to simulate 
+    In this work, we present \wrench-cache, a simulation model of I/O
+    with page cache incorporated into the \wrench simulation framework~\cite{casanova2020fgcs},
+    which is  based on the popular \simgrid distributed simulation framework~\cite{casanova2014simgrid}.
+    The added value of \wrench-cache is to make it possible to simulate 
         application execution accurately in the presence of page caching. Our specific 
         contributions are as follows:
     \begin{compactitem}
@@ -160,7 +164,7 @@
     both single-threaded and multithreaded applications, and of both
     writeback and writethrough caches for local or network-based
     filesystems;
-        \item An implementation of this model in WRENCH; 
+        \item An implementation of this model in \wrench; 
         \item An evaluation of the accuracy and scalability of our model, and of its implementation,
               for a range of applications, platforms, and page cache configurations. 
     \end{compactitem}
@@ -220,54 +224,73 @@
 
         \subsection{Simulators}
 
-            Many simulation frameworks exist to describe the behaviour of applications
-            running on the various infrastructures available to users, such as personal computers,
-            clouds and clusters.
-            These simulators are built with resource models such CPU, network and
-            storage, using various different approaches to describe the hardware.
-            For example, there is \textit{CloudSim} and \textit{iCanCloud} for packet-level network models
-            and \textit{DiskSim} the simulates storage hardware functioning \tristan{add references}.
+	    Many simulation frameworks have been developed to enable the
+	    simulation of parallel and distributed
+	    applications~\cite{optorsim, gridsim, groudsim, cloudsim,
+	    nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf,
+	    cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid,
+	    ROSS, casanova2020fgcs}. These frameworks implement simulation
+	    models and abstractions to aid the development of simulators
+	    for studying the functional and performance behaviors of
+	    application workloads executed on various hardware/software
+	    infrastructures. 
 
-            Simulators must choose between scalability and accuracy when describing the
-            hardware~\cite{casanova2014simgrid}.
-            Fine-grained models allow simulators to achieve high accuracy,
-            but lead to scalability issues due to long simulation time
-            when simulated platforms and applications grow.
-            SimGrid is an open source simulation platform that has been developed
-            not only to balance the trade-off between accuracy and scalability,
-            but also to achieve versatility, allowing the use of the framework
-            to simulate applications in multiple domains. WRENCH, a workflow management
-            system simulator based on the SimGrid framework, provides a high-level API
-            for simulating workflows, thus facilitating the integration of new models.
-            \valerie{say more about wrench}
+	    The two main concerns for simulation are \emph{accuracy}
+	    (the ability to faithfully reproduce real-world executions) and
+	    \emph{scalability}  (the ability to simulate large/long real-world
+	    executions quickly and with low RAM footprint), and the above
+	    frameworks achieve different compromises between the two.  At
+	    one extreme are discrete-event models that capture
+	    ``microscopic'' behaviors of hardware/software systems (e.g.,
+	    packet-level network simulation, block-level disk simulation,
+	    cycle-accurate CPU simulation), which favor accuracy over
+	    speed.  At the other extreme are analytical models that capture
+	    ``macroscopic'' behaviors via mathematical models.  While these
+	    models lead to fast simulation, they must be developed
+	    carefully if high levels of accuracy are to be
+	    achieved~\cite{velhoTOMACS2013}. 
 
-            Despite the fact that many sophisticated models for resources have been
-            integrated in simulators, and the page cache shows apparent impacts on I/O
-            performance, the simulation model of page cache is still missing in most
-            of simulators.
-            For example, SimGrid only simulates I/O operations with storage bandwidths
-            and capacity.
-            SIMCAN is a simulation framework that models page cache by storing data
-            accessed on disk in a block cache \cite{nunez2012simcan}.
-            Page cache is also modeled in the iCanCloud simulator through a component which
-            manages memory accesses and cached data \cite{nunez2012icancloud}. However,
-            the scalability of the iCanCloud simulator is limited by its sophisticated model.
-            Ultimately, none of these simulators provide any writeback cache simulator nor
-            cache eviction policys through LRU lists.
-            Although cache replacement policies are applied in \cite{xu2018saving} to simulate
-            in-memory caching, their simulator is specific to energy consumption of multi-tier
-            heterogenous networks.
+	    In this  work, we use the \simgrid and \wrench simulation
+	    frameworks.  The years of research and development invested in
+	    the popular \simgrid simulation framework~\cite{casanova2014simgrid}, have
+	    culminated in a set of state-of-the-art macroscopic simulation
+	    models that yield high accuracy, as demonstrated by
+	    (in)validation studies and comparisons to competing
+	    frameworks~\cite{smpi_validity, velhoTOMACS2013, simutool_09,
+	    nstools_07, lebre2015, pouilloux:hal-01197274,
+	    smpi_tpds2017,  7885814, 8048921, 7384330}.  But one
+	    significant drawback of \simgrid is that its simulation
+	    abstractions are low-level, meaning that implementing a
+	    simulator of complex systems can be
+	    labor-intensive~\cite{kecskemeti_2014}. To remedy this problem,
+	    the \wrench simulation framework~\cite{casanova2020fgcs}
+	    builds on top of \simgrid to provide higher-level simulation
+	    abstractions, so that simulators of complex applications and
+	    systems can be implemented with a few hundred lines.
 
+	    Although the Linux page cache has a large impact on I/O
+	    performance, and thus on the execution of data-intensive
+	    applications, its simulation is rarely considered in the above
+	    frameworks.  Most frameworks merely simulate I/O operations
+	    based on storage bandwidths and capacities.  The SIMCAN
+	    framework does models page caching by storing data accessed on
+	    disk in a block cache~\cite{nunez2012simcan}.  Page cache is
+	    also modeled in iCanCloud through a component that manages
+	    memory accesses and cached data~\cite{nunez2012icancloud}.
+	    However, the scalability of the iCanCloud simulator is limited
+	    due to it using  microscopic simulation models.  Besides, none
+	    of these simulators provide any writeback cache simulator nor
+	    cache eviction policies through LRU lists.  Although cache
+	    replacement policies are applied in~\cite{xu2018saving} to
+	    simulate in-memory caching, their simulator is specific to
+	    energy consumption of multi-tier heterogeneous networks.
 
-            In this study, we use WRENCH
-            to implement our page cache model. We chose WRENCH due to accurate yet scalable implementation, resulting
-            from its SimGrid backend, as well as its high-level API.
-            We have integrated our model in WRENCH and use the SimGrid API to interact with
-            simulated storage resources.
-            This approach allows us to leverage existing features in WRENCH and SimGrid such as process control and synchronization of
-            resource consumption.
-            We also leverage the existing SimGrid storage model with capacity
-            and bandwidth properties, which are similar to the characteristics of memory.
+            In this study, we develop a page cache simulation model which we implement
+            as part of the \wrench framework. We targeted \wrench because it is a
+            recent, actively developed framework that provides convenient simulation
+            abstractions, because it is easy to incorporate new simulation models
+            into it, and because it builds on \simgrid, whose scalable and accurate
+            simulation models we can thus reuse for our purpose. 
 
     \section{Method}
     \label{method}
@@ -333,7 +356,7 @@
     used data blocks from the active list to the inactive list~\cite{gorman2004understanding, linuxdev3rd2010}.
 
     At any given time, a file can be partially cached, completely cached,
-    or uncached at all. A cached data block can only reside in one of two
+    or not cached at all. A cached data block can only reside in one of two
     page cache LRU lists. The first time they are accessed, blocks are
     added to the inactive list. On subsequent accesses, blocks of the
     inactive list are moved to the top of the active list. Cached blocks
@@ -539,7 +562,7 @@
             simulator independent of existing simulation frameworks and libraries.
             This allowed us to evaluate the accuracy and correctness of our
             model in a simple scenario before integrating it to the more complex
-            WRENCH framework.
+            \wrench framework.
             In this prototype we used the following basic storage model for
             both memory and disk:
             \begin{align*}
@@ -563,18 +586,18 @@
             The source code this prototype is available at
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}. We used Python 3.7.
 
-            We also implemented our model as part of WRENCH, enhancing its internal implementation
+            We also implemented our model as part of \wrench, enhancing its internal implementation
             and APIs with a page cache abstraction, and allowing users to activate the feature via a
-            command-line argument. For the experiments in this paper we use WRENCH 1.6 at this commit \url{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}, which uses
-            SimGrid 3.25 (available at \url{https://framagit.org/simgrid/simgrid}). However, our implementation is now part of WRENCH's master branch and will be available to users with the next WRENCH release. 
+            command-line argument. For the experiments in this paper we use \wrench 1.6 at this commit \url{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}, which uses
+            \simgrid 3.25 (available at \url{https://framagit.org/simgrid/simgrid}). However, our implementation is now part of \wrench's master branch and will be available to users with the next \wrench release. 
 
 \tristan{anything else interesting to mention about the implementation?}
-\henri{I mentioned that the implementaion is now part of the WRENCH master }
+\henri{I mentioned that the implementaion is now part of the \wrench master }
 
         \subsection{Experiments}
 
         Our experiments compare real executions with our Python prototype,
-        with the original WRENCH, and with our WRENCH-cache extension. We
+        with the original \wrench, and with our \wrench-cache extension. We
         evaluate our page cache simulation in single-threaded and
         multi-threaded applications, accessing data on local and remote
         file systems.
@@ -607,7 +630,7 @@
 
         To parametrize our simulators, we benchmarked the bandwidths of
         memory, local disk, remote disk (NFS), and network
-        (Table~\ref{table:benchmark}). Since SimGrid, and thus WRENCH, currently only supports
+        (Table~\ref{table:benchmark}). Since \simgrid, and thus \wrench, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
         bandwidth values in our experiments.
             \begin{table}[htbp]
@@ -617,7 +640,7 @@
             |>{\centering\arraybackslash}X
             |>{\centering\arraybackslash}X|}
             \hline
-                Bandwidths  & Cluster (real) & Python simulator & WRENCH simulator\\
+                Bandwidths  & Cluster (real) & Python simulator & \wrench simulator\\
             \hline
                 Memory read  & 6860    & 4812     & 4812\\
                 Memory write & 2764    & 4812 & 4812\\
@@ -639,10 +662,10 @@
             application task durations on a cluster node and used these
             durations in our simulation. For the Python simulator,
             execution times were directly used in the simulation. For
-            WRENCH and WRENCH-cache, we determined the corresponding number
+            \wrench and \wrench-cache, we determined the corresponding number
             of flops on a 1~Gflops CPU and used these values in the
             simulation (see Table~\ref{table:cputime}). The final simulated
-            platform and application used in our experiment are avaiable at
+            platform and application used in our experiment are available at
             \url{https://github.com/wrench-project/wrench/tree/ec6b43561b95977002258c0fe37a4ecad8f1d33f/examples/basic-examples/io-pagecache}.
 
             \begin{table}[htbp]
@@ -662,7 +685,7 @@
             \label{table:cputime}
             \end{table}
 
-            % Finally, because WRENCH simulates applications base on network-communication,
+            % Finally, because \wrench simulates applications base on network-communication,
             % we use an infinite bandwidth to eliminate network latency for local I/Os.
 
             Our first experiment (\textit{Exp single-threaded}) simply runs one instance of the
@@ -693,8 +716,8 @@
             Finally, we simulate a real application from the neuroimaging
             domain. \textcolor{red}{[Description of the real pipeline with
             nighres (including the workflow engine if it's Dask)]}.
-            We simulate this pipeline with simulators using original WRENCH
-            and WRENCH-cache. Because our work focuses on I/O time, we
+            We simulate this pipeline with simulators using original \wrench
+            and \wrench-cache. Because our work focuses on I/O time, we
             assume that CPU time is correctly modeled and use the CPU time
             measured in the real pipelines to setup our simulated
             application.
@@ -707,18 +730,18 @@
         The page cache simulation model drastically reduces I/O simulation
         errors in the three successive application tasks (Figure~\ref{fig:single_error}). The first read is not impacted
         as it only involves uncached data. Errors are reduced from an average
-        of 345\% in the original WRENCH to 46\% in the Python prototype and
-        39\% in WRENCH-cache. Unsurprisingly, the original WRENCH simulator
+        of 345\% in the original \wrench to 46\% in the Python prototype and
+        39\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
         significantly overestimates read and write times, due to its lack
         of page cache simulation model. Results with files of 50~GB and 75~GBs
         show similar behaviors and are not reported due to space limitations.
 
-        WRENCH simulation errors are substantially lower with 100~GB
+        \wrench simulation errors are substantially lower with 100~GB
         files than with 20~GB files, due to the fact that part of the
         100~GB file needs to be read and written to disk, the only storage
-        device in WRENCH, as it does not fit in cache. Conversely,
-        simulation errors of the Python prototype and WRENCH-cache are higher with
-        100~GB files than with 20~GB files, due to idiosyncracies in the kernel
+        device in \wrench, as it does not fit in cache. Conversely,
+        simulation errors of the Python prototype and \wrench-cache are higher with
+        100~GB files than with 20~GB files, due to idiosyncrasies in the kernel
         flushing and eviction strategies.
 
         Simulated memory profiles are highly consistent with the real ones
@@ -732,7 +755,7 @@
         memory is highly consistent with real values, except toward the end
         of Read 3 where it slightly increases in simulation but not in
         reality \tristan{why?}. As expected, dirty data remains under the
-        dirty ratio. The Python prototype and WRENCH-cache exhibit nearly
+        dirty ratio. The Python prototype and \wrench-cache exhibit nearly
         identical memory profiles, which reinforces the confidence in our
         implementation.
 
@@ -794,14 +817,14 @@
             \label{fig:multi_local}
             \end{figure*}
 
-            The page cache model notably reduce WRENCH's simulation error
+            The page cache model notably reduce \wrench's simulation error
             for concurrent applications and local I/Os
-            (Figure~\ref{fig:multi_local}). For reads, WRENCH-cache still
+            (Figure~\ref{fig:multi_local}). For reads, \wrench-cache still
             slightly overestimates reality, due to the discrepancy between
             simulated and real read bandwidths mentioned before
             (\tristan{check it's indeed mentioned. Dzung: is it correct?}). For writes,
-            WRENCH-cache slightly underestimates reality for the same reason. The plateau
-            ending around 7 concurrent pipelines in the WRENCH-cache curve
+            \wrench-cache slightly underestimates reality for the same reason. The plateau
+            ending around 7 concurrent pipelines in the \wrench-cache curve
             marks the limit beyond which the page cache is saturated with dirty data
             and needs flushing \tristan{why is there no plateay irl?}.
 
@@ -819,7 +842,7 @@
             Page cache simulation importantly reduces the simulation error
             on remote storage as well (Figure~\ref{fig:multi_nfs}). This
             manifests only for reads, as only write-through cache was
-            enabled in the NFS server. Both WRENCH and WRENCH-cache
+            enabled in the NFS server. Both \wrench and \wrench-cache
             underestimate write times due to the discrepancy between
             simulated and real bandwidths mentioned previously. For reads,
             this discrepancy only impacts the results beyond 22
@@ -829,12 +852,12 @@
         \subsection{Real application}
 
         \subsection{Overhead comparison}
-        As is the case for WRENCH, simulation time with WRENCH-cache scales
+        As is the case for \wrench, simulation time with \wrench-cache scales
         linearly with the number of concurrent applications
         (Figure~\ref{fig:multi_time}, p \textless $10^{-24}$). However, the page
         cache model substantially increases the simulation time by
         application as can be seen by comparing regression slopes in
-        Figure~\ref{fig:multi_time}. Interestingly, WRENCH-cache is faster with 
+        Figure~\ref{fig:multi_time}. Interestingly, \wrench-cache is faster with 
         NFS I/Os than with local I/Os, most likely due to the use of writethrough
         cache in NFS, which by-passes flushing operations.
         \begin{figure}
@@ -842,9 +865,9 @@
                 \centering
                 \includegraphics[width=\linewidth]{result/multi/figures/simulation_time.pdf}
             \end{subfigure}
-            \caption{Simulation time comparison. WRENCH-cache scales
+            \caption{Simulation time comparison. \wrench-cache scales
             linearly with the number of concurrent applications, albeit
-            with a higher overhead than WRENCH.}
+            with a higher overhead than \wrench.}
             \label{fig:multi_time}
             \end{figure}
 
@@ -857,7 +880,7 @@
         applications, schedulers and infrastructures. However, page cache
         is missing in many simulation tools for distributed systems. In
         this study, we proposed a simulation model of I/Os with page cache,
-        we implemented it in the SimGrid-based WRENCH library, and we
+        we implemented it in the \simgrid-based \wrench library, and we
         evaluated its benefits in different conditions. Results show that
         our model very substantially improves simulation accuracy,
         decreasing absolute relative errors between simulated and real
@@ -865,13 +888,13 @@
         single-threaded experiment). Furthermore, this level of accuracy
         can be achieved without a fine-grained level of details
         \tristan{not sure what you mean}. Our page cache model is available
-        in WRENCH from commit \tristan{abcd}, ready to be used for the
+        in \wrench from commit \tristan{abcd}, ready to be used for the
         simulation of Big Data applications.
 
         Simulation results could be made even more accurate by a deeper
         investigation of cache eviction mechanisms \tristan{be more
         specific}. The availability of asymmetrical bandwidths in the
-        forthcoming SimGrid release will also directly improve our
+        forthcoming \simgrid release will also directly improve our
         simulation accuracy. Relevant future work includes simulating
         application memory consumption, random I/O, file readahead and
         persistent disk storage.
