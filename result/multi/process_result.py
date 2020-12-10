@@ -120,7 +120,7 @@ def result_local(rep_no=1):
     plt.savefig("figures/multi_local.pdf", format="pdf")
     plt.savefig("figures/multi_local.svg", format="svg")
 
-    plt.show()
+    # plt.show()
 
 
 def result_nfs(rep_no=1):
@@ -143,4 +143,30 @@ def result_nfs(rep_no=1):
     plt.savefig("figures/multi_nfs.pdf", format="pdf")
     plt.savefig("figures/multi_nfs.svg", format="svg")
 
-    plt.show()
+    # plt.show()
+
+
+def run_time():
+    local_org_df = pd.read_csv("local/wrench/run_time_original.csv")
+    local_cache_df = pd.read_csv("local/wrench/run_time_pagecache.csv")
+    nfs_org_df = pd.read_csv("nfs/wrench/run_time_original.csv")
+    nfs_cache_df = pd.read_csv("nfs/wrench/run_time_pagecache.csv")
+
+    fig, (ax1, ax2) = plt.subplots(figsize=(10,4), ncols=2, nrows=1)
+
+    ax1.set_ylim(top=2)
+    ax1.plot(local_org_df["no_pipeline"], local_org_df["run_time"], label = "WRENCH")
+    ax1.plot(local_cache_df["no_pipeline"], local_cache_df["run_time"],label = "WRENCH-cache")
+    ax1.set_title("Local file system")
+
+    ax2.set_ylim(top=2)
+    ax2.plot(nfs_org_df["no_pipeline"], nfs_org_df["run_time"], label = "WRENCH")
+    ax2.plot(nfs_cache_df["no_pipeline"], nfs_cache_df["run_time"],label = "WRENCH-cache")
+    ax2.set_title("NFS")
+
+    plt.xlabel("number of pipelines")
+    plt.ylabel("time (seconds)")
+    plt.legend()
+
+    plt.savefig("figures/simulation_time.pdf", format="pdf")
+    plt.savefig("figures/simulation_time.svg", format="svg")
