@@ -97,9 +97,9 @@
         reducing filesystem data transfer times. With the page cache, previously
         read data can be re-read directly from memory and written data can be written to
         memory before being asynchronously flushed to disk, resulting in improved I/O performance
-        on slower storage devices. The magnitude of the performance benefits that can be obtained from using the page
-        cache are determined by many factors including the total amount of memory,
-        the amount of data being written (i.e., dirty data), and the percentage of available memory available for
+        on slower storage devices. The performance improvements
+        depend on many factors including the total amount of memory,
+        the amount of data being written (i.e., dirty data), and the amount of memory available for
         written data. All these factors are important when determining the impact of I/O on
         application performance, particularly in data-intensive applications.
 
@@ -125,7 +125,8 @@
     application performance on arbitrary platform configurations. It thus comes
         as no surprise that, considering here only the field of parallel and distributed
         computing, a large number of simulation frameworks have been developed and used
-        to support research and development endeavors~\cite{LAUNDRYLISTOFREFS_THAT_HENRI_WILL_PUT_IN}.
+        to support research and development endeavors~\cite{ optorsim, gridsim, groudsim, cloudsim, nunez2012simcan,nunez2012icancloud, dissect_cf, cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}. 
+
 
         Page caching is a well-known and ubiquitous technique for mitigating the I/O bottleneck
         faced by data-intensive applications. As such, it is necessary to simulate page caching
@@ -134,12 +135,12 @@
         bottlenecks that can arise over the course of execution, such as page cache
         starvation~\cite{zhuang2017}.
         While existing simulation frameworks of parallel and distributed computing
-        systems  capture many relevant features of hardware/software stacks of interest, 
+        systems  capture many relevant features of hardware/software stacks, 
         they lack the ability to simulate page caches adequately. Those frameworks
         that implement some page cache simulation
         fail to capture key features such
         as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
-        Some simulators, such as that in~\cite{xu2018saving}, do capture such features,
+        Some simulators, such as that in~\cite{xu2018saving}, do capture such features
         but are domain-specific. 
 
         %However, there is a trade-off between accuracy and scalability, which has been
@@ -149,8 +150,8 @@
         %hundreds or thousands nodes.
 
     In this work, we present WRENCH-cache, a simulation model of I/O
-    with page cache incorporated into the WRENCH simulation framework~\cite{casanova2018wrench},
-    which is  based on the popular SimGrid distributed simulation framework~\cite{XXX}.
+    with page cache incorporated into the WRENCH simulation framework~\cite{casanova2020fgcs},
+    which is  based on the popular SimGrid distributed simulation framework~\cite{casanova2014simgrid}.
     The added value of WRENCH-cache is to make it possible to simulate 
         application execution accurately in the presence of page caching. Our specific 
         contributions are as follows:
@@ -159,8 +160,8 @@
     both single-threaded and multithreaded applications, and of both
     writeback and writethrough caches for local or network-based
     filesystems;
-        \item An implementation of this model as part of the WRENCH framework; 
-        \item An evaluation and validation of the accuracy of our model, and of its implementation,
+        \item An implementation of this model in WRENCH; 
+        \item An evaluation of the accuracy and scalability of our model, and of its implementation,
               for a range of applications, platforms, and page cache configurations. 
     \end{compactitem}
 
