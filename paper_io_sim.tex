@@ -13,6 +13,8 @@
 \usepackage{ulem}
 \usepackage{xspace}
 \usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
 
 % Fix link colors
 \hypersetup{
@@ -70,18 +72,17 @@
     need for efficient data storage management techniques.  While
     infrastructures with sufficient compute power are available to
     process large datasets, the I/O bottleneck remains.  A
-    well-known and ubiquitous approach for reducing the overhead of
+    well-known approach for reducing the overhead of
     I/O operations is to use the Linux page cache.  It is thus crucial
     to study experimentally the impact of the Linux page cache on the
-    performance Big Data applications. Given the difficulties with and shortcomings of
+    performance of Big Data applications. Given the difficulties with and shortcomings of
     real-world experiments, a popular approach for application
     performance studies is to use simulation.  While many simulation
     frameworks have been developed for this purpose, they do not 
-        simulate page caching fully, or even at all.  As a result, using
+    simulate page caching fully, or even at all.  As a result, using
     these frameworks for studying the performance of data-intensive
-    applications leads inaccurate simulation results. 
+    applications leads to inaccurate simulation results. 
 
-        % Some cosmetic rewrites below
     In this paper, we propose a I/O simulation model that characterizes
     the key features of the page cache. We have implemented this model
     as  part of the \wrench workflow simulation framework, which itself
@@ -112,7 +113,7 @@
         % Swapped the order the two paragraphs and merged them into one
         The number of data-intensive applications has been steadily rising as a result of
         open-data and data sharing initiatives. Due to the sheer size of the data being
-        processed, these applications must be executed on large scale infrastructure
+        processed, these applications must be executed on large-scale infrastructures
     such as High Performance Computing (HPC) clusters or the cloud.  It
     is thus crucial to quantify the performance of these applications
     on these platforms. The goals include determining which type of hardware/software
@@ -120,13 +121,13 @@
     understanding the shortcomings of current algorithms, designs and
     technologies so as to propose new solutions. Unfortunately, application performance
         studies via experiments on real-world compute platforms
-        faces several difficulties (high operational costs, labor-intensive experimental setups,
+        face several difficulties (high operational costs, labor-intensive experimental setups,
         shared platforms with dynamic loads that hinder reproducibility of results) and shortcomings
         (experiments are limited to the available platform/software configurations, which precludes
         the exploration of hypothetical scenarios). 
-    Simulations address these concerns by providing simulation models
+    Simulations address these concerns by providing models
     and abstractions for the performance of computer hardware, such as
-    CPU, network and storage. Consequently, simulations provide a
+    CPU, network and storage. As a result, simulations provide a
     cost-effective, fast, easy and reproducible way to evaluate
     application performance on arbitrary platform configurations. It thus comes
         as no surprise that, considering here only the field of parallel and distributed
@@ -134,7 +135,7 @@
         to support research and development endeavors~\cite{ optorsim, gridsim, groudsim, cloudsim, nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf, cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}. 
 
 
-        Page caching is a well-known and ubiquitous technique for mitigating the I/O bottleneck
+        Page caching is an ubiquitous technique for mitigating the I/O bottleneck
         faced by data-intensive applications. As such, it is necessary to simulate page caching
         when performing performance studies in simulation.
         Furthermore, simulating the page cache makes it possible to study relevant application-I/O
@@ -142,7 +143,7 @@
         starvation~\cite{zhuang2017}.
         While existing simulation frameworks of parallel and distributed computing
         systems  capture many relevant features of hardware/software stacks, 
-        they lack the ability to simulate page caches adequately. Those frameworks
+        they lack the ability to simulate page cache adequately. Those frameworks
         that implement some page cache simulation
         fail to capture key features such
         as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
@@ -178,12 +179,12 @@
         \subsection{Page cache}
 
         To improve performance of disk accesses, the page cache was introduced to the Linux kernel. %It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}.
-        The goal of the page cache is to try ensure that most I/O operations occur entirely
-        within memory space rather than synchronously to and from the storage device.
+        The goal of the page cache is to ensure that most I/O operations occur entirely
+        within memory space rather than synchronously to and from storage devices.
         All disk-backed data located in the page cache are partitioned into many small pages.
         When a read operation is initiated, the kernel checks whether the required pages are in memory.
         If it is the case, data is read entirely from memory (i.e. \textit{cache hit}). Otherwise,
-        the necessary pages must be loaded to memory from the disk (i.e. \textit{cache miss})
+        the necessary pages must be loaded to memory from the disk (i.e. \textit{cache miss}).
         Conversely, for writing, one of three strategies can be applied: direct~I/O (or, ``no-write''),
         writethrough and writeback.
         If direct~I/O is enabled for a given file system, all I/O operations bypass the
@@ -237,7 +238,7 @@
         The two main concerns for simulation are \emph{accuracy}
         (the ability to faithfully reproduce real-world executions) and
         \emph{scalability}  (the ability to simulate large/long real-world
-        executions quickly and with low RAM footprint), and the above
+        executions quickly and with low RAM footprint). The above
         frameworks achieve different compromises between the two.  At
         one extreme are discrete-event models that capture
         ``microscopic'' behaviors of hardware/software systems (e.g.,
@@ -641,28 +642,28 @@
         (Table~\ref{table:benchmark}). Since \simgrid, and thus \wrench, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
         bandwidth values in our experiments.
-            \begin{table}[htbp]
+            \begin{table}
             \centering
-            \begin{tabularx}{\columnwidth}{|l
-            |>{\centering\arraybackslash}X
-            |>{\centering\arraybackslash}X
-            |>{\centering\arraybackslash}X|}
-            \hline
-                Bandwidths  & Cluster (real) & Python simulator & \wrench simulator\\
-            \hline
-                Memory read  & 6860    & 4812     & 4812\\
-                Memory write & 2764    & 4812 & 4812\\
-                Local disk read & 510 & 465 & 465\\
-                Local disk write & 420 & 465     & 465\\
-                Remote disk read & 515 & - & 445\\
-                Remote disk write & 375 & - & 445\\
-                Network & 3000 & - & 3000\\
-            \hline
+            \begin{tabularx}{\columnwidth}{ll
+            >{\centering\arraybackslash}X
+            >{\centering\arraybackslash}X
+            >{\centering\arraybackslash}X}
+            \toprule
+                \multicolumn{2}{c}{Bandwidths}  & Cluster (real) & Python prototype & \wrench simulator\\
+            \midrule
+            \multirow{2}{*}{Memory}      & read  & 6860 & 4812 & 4812\\
+                                         & write & 2764 & 4812 & 4812\\
+            \multirow{2}{*}{Local disk}  & read  & 510  & 465  & 465\\
+                                         & write & 420  & 465  & 465\\
+            \multirow{2}{*}{Remote disk} & read  & 515  & -    & 445\\
+                                         & write & 375  & -    & 445\\
+            \multicolumn{2}{l}{Network}  & 3000  & -    & 3000\\
+            \bottomrule
             \end{tabularx}
             \caption{Bandwidth benchmarks (MBps) and simulator configurations.
             The bandwidths used in the simulations are the average of the read and write bandwidths
             measured in the cluster.
-            Remote disk and network accesses are not simulated in the Python simulator. \tristan{table could be prettified}}
+            Remote disk and network accesses are not simulated in the Python simulator.}
             \label{table:benchmark}
             \end{table}
 
@@ -676,20 +677,20 @@
             platform and application used in our experiments are avaiable at
             \url{https://github.com/wrench-project/wrench/tree/ec6b43561b95977002258c0fe37a4ecad8f1d33f/examples/basic-examples/io-pagecache}.
 
-            \begin{table}[htbp]
+            \begin{table}[b]
             \centering
-            \begin{tabularx}{0.8\columnwidth}{|l|>{\centering\arraybackslash}X|}
-            \hline
+            \begin{tabularx}{0.8\columnwidth}{c>{\centering\arraybackslash}X}
+            \toprule
                 Input size (GB)  & CPU time (second)\\
-            \hline
+            \midrule
                 3      & 4.4 \\
                 20  & 28 \\
                 50  & 75 \\
                 75  & 110 \\
                 100  & 155 \\
-            \hline
+            \bottomrule
             \end{tabularx}
-            \caption{Task CPU time corresponding to input file size. \tristan{are the input files in GB or in GiB? If GiB, then change the abbreviation everywhere.}
+            \caption{Task CPU times used in the simulation. \tristan{are the input files in GB or in GiB? If GiB, then change the abbreviation everywhere.}
             \tristan{add nighres CPU times when available}}
             \label{table:cputime}
             \end{table}
