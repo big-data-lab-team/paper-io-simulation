@@ -222,7 +222,7 @@
         Both lists operate using LRU eviction policies meaning the data that has
         not be accessed recently will be moved first.
 
-        \subsection{Simulators}
+        \subsection{Simulation}
 
         Many simulation frameworks have been developed to enable the
         simulation of parallel and distributed
@@ -321,18 +321,18 @@
 
     The Memory Manager simulates two parallel threads: the main one
     implements flushing, eviction, and cached I/Os synchronously, whereas
-    the second one, operating in the background, periodically searches for
-    expired dirty data in page cache LRU lists and flushes them to disk. We
+    the second one, which operates in the background, periodically searches for
+    expired dirty data in page cache LRU lists and flushes data to disk. We
     use existing storage simulation models~\cite{lebre2015} to simulate disk and
     memory, characterized by their storage capacity, read and write
-    bandwidths, and latency. Reusing existing storage models allows us to
-    simulate bandwidth sharing between concurrent memory accesses and concurrent disk accesses.
+    bandwidths, and latency. These models account for
+    bandwidth sharing between concurrent memory accesses and concurrent disk accesses.
 
     \subsubsection{Page cache LRU lists}
 
     In the Linux kernel, page cache LRU lists contain file pages. However,
     due to the large number of file pages, simulating lists of pages
-    induces substantial overheads.
+    induces substantial overhead.
     Therefore, we introduce the concept of a data block as a unit to represent data
     cached in memory. A data block is a subset of file pages stored in
     page cache that were accessed in the same I/O operation.
@@ -378,7 +378,7 @@
     and append it to the active list.
     If the blocks are dirty, we move them independently to the active list, to preserve their entry time.
     Because the chunk and block sizes may be different, there are situations
-    where a block is not entirely read.
+    in a block is not entirely read.
     In this case, the block is split in two smaller blocks and one of them is re-accessed.
     % From Tristan: not sure where to put this nor if it's necessary:
     % , in which chunks are read/written
@@ -406,8 +406,8 @@
     least recently used dirty block to disk, having set its dirty
     flag to 0. In case the amount of data to flush requires that a
     block be partially flushed, the block is split in two blocks,
-    one that is flushed and one that remains dirty. Flushing time
-    to disk is simulated by the storage model.
+    one that is flushed and one that remains dirty. The time needed
+    to flush data to disk is simulated by the storage model.
 
     The cache eviction simulation also runs in
     the main thread. It frees up the page cache by traversing and deleting
@@ -417,7 +417,7 @@
     or until there is no clean block left in the list.
     If the last evicted block does not have to be entirely evicted, the block is split in two blocks,
     and only one of them is evicted.
-    The cache eviction simulation does not contribute to the simulated time
+    The overhead of the cache eviction algorithm is not part of the simulated time
     since cache eviction time is negligible in real systems \tristan{a reference would be welcome}.
 
     \begin{algorithm}\caption{Periodical flushing simulation in I/O Controller}\label{alg:pdflush}
@@ -550,7 +550,7 @@
     the remaining data is written to cache in a loop
     where we repeatedly flush and evict to free space in the cache (line 12-18).
 
-    The write simulation described above models page cache in writeback
+    The above models page cache in writeback
     mode. Our model also includes a write function in writethrough mode,
     which simply simulates a disk write with the amount of data passed in,
     then evicts cache if needed and adds the written data to the cache.
@@ -577,7 +577,7 @@
                 \item $b_w$ is the write bandwidth of the device
             \end{itemize}
 
-            Since bandwidth sharing is not simulated, the prototype does not support
+            This prototype does not simulate  bandwidth sharing and thus does not support
             concurrency: it is limited to single-threaded applications running on systems
             with a single-core CPU. We used this prototype for a first validation of our simulation
             model against a real sequential application running on a real system.
@@ -593,7 +593,7 @@
             which uses \simgrid 3.25, available at
             \url{https://framagit.org/simgrid/simgrid}. Our implementation
             is now part of \wrench's master branch and will be available to
-            users with the next \wrench release. W\wrench provides a full \simgrid-based simulation 
+            users with the upcoming \wrench 1.8 release. \wrench provides a full \simgrid-based simulation 
             environment that supports, among other features, concurrent accesses to storage devices, 
             applications distributed on multiple hosts, network transfers, 
             and multi-threading. 
