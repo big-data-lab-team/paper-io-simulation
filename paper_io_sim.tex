@@ -322,7 +322,7 @@
     The Memory Manager simulates two parallel threads: the main one
     implements flushing, eviction, and cached I/Os synchronously, whereas
     the second one, which operates in the background, periodically searches for
-    expired dirty data in page cache LRU lists and flushes data to disk. We
+    expired dirty data in page cache LRU lists and flushes this data to disk. We
     use existing storage simulation models~\cite{lebre2015} to simulate disk and
     memory, characterized by their storage capacity, read and write
     bandwidths, and latency. These models account for
@@ -378,7 +378,7 @@
     and append it to the active list.
     If the blocks are dirty, we move them independently to the active list, to preserve their entry time.
     Because the chunk and block sizes may be different, there are situations
-    in a block is not entirely read.
+    where a block is not entirely read.
     In this case, the block is split in two smaller blocks and one of them is re-accessed.
     % From Tristan: not sure where to put this nor if it's necessary:
     % , in which chunks are read/written
