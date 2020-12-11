@@ -303,8 +303,8 @@
     and to read or write cached data. The Memory Manager
     implements these operations, simulates periodical flushing
     and eviction, and reads or writes to disk when necessary.
-    In case the writethrough strategy is used, the I/O Controller directly
-    writes to disk \tristan{Then how is the written data added to cache?}.
+    In case the writethrough strategy is used, the I/O Controller directly writes to disk, 
+    cache is flushed if needed and written data is added to page cache.
 
     \begin{figure}
            \centering
@@ -432,12 +432,14 @@
                \EndInput
                \While{host is on}
                 \State blocks = expired\_blocks(exp, in) + expired\_blocks(exp, ac)
-                \State flushing\_time = sm.write(blocks)
-                \State for blk in blocks: blk.dirty = 0 \tristan{with this logic a flushed block can remain dirty for a long time. Is it what you implemented?
-                it would be wise to set the dirty flag to 0 right after the block is written}
+                \State flushing\_time = 0
+                \For{blk in blocks} 
+                  \State blk.dirty = 0 
+                  \State flushing\_time = flushing\_time + sm.write(blocks)
+                \EndFor
                 \If{flushing\_time $<$ t}
                     \State sleep(t - flushing\_time)
-                \EndIf  % Else: do nothing, continue the loop
+                \EndIf  
             \EndWhile
         \end{algorithmic}
     \end{algorithm}
@@ -622,10 +624,10 @@
         stripping in high-resolution brain images, an operation common to
         many neuroimage analysis pipelines. The workflow is implemented as a Python
         script that calls Java image-processing routines. We used Python
-        3.6, Java 8, and Nighres \tristan{add version}. We patched the
+        3.6, Java 8, and Nighres 1.3.0. We patched the
         skull stripping workflow to monitor task CPU times and inject them
-        in the simulation, to focus our analysis on I/O times \tristan{add
-        link to patched code}. 
+        in the simulation, to focus our analysis on I/O times, the patched code is 
+        available at \url{https://github.com/dohoangdzung/nighres}. 
 
         The applications were executed on a dedicated cluster at
         Concordia University, with one login node, 9 compute nodes, and 4
@@ -690,7 +692,9 @@
                 100  & 155 \\
             \bottomrule
             \end{tabularx}
-            \caption{Task CPU times used in the simulation. \tristan{are the input files in GB or in GiB? If GiB, then change the abbreviation everywhere.}
+            \caption{Task CPU times used in the simulation.
+%            \tristan{are the input files in GB or in GiB? If GiB, then change the abbreviation everywhere.}
+%  Dzung: it's in GB
             \tristan{add nighres CPU times when available}}
             \label{table:cputime}
             \end{table}
@@ -723,7 +727,7 @@
             reads can benefit from cache hits.
 
             Our fourth and final experiment (\textit{Exp Nighres})
-            simulates the Nighres skull stripping workflow
+            simulates the Nighres CRUISE cortical reconstruction workflow
             \tristan{describe data, and if the execution was single node or
             distributed.}
 
@@ -759,7 +763,10 @@
         when application tasks release anonymous memory. Simulated cached
         memory is highly consistent with real values, except toward the end
         of Read 3 where it slightly increases in simulation but not in
-        reality \tristan{why?}. As expected, dirty data remains under the
+        reality. Our explanation could be that we allocate anonymous memory 
+        chunk-by-chunk to application, while anonymous memory is allocated 
+        when as soon as task starts.
+        As expected, dirty data remains under the
         dirty ratio. The Python prototype and \wrench-cache exhibit nearly
         identical memory profiles, which reinforces the confidence in our
         implementation.
@@ -769,10 +776,14 @@
         simulated cache content exactly matches reality, since all files fit in page cache. With 100~GB files, a slight
         discrepancy is observed after Write 2, which explains the
         simulation error previously mentioned in Read 3. In the real execution indeed,
-        File 3 is entirely cached after Write 2, whereas in the simulated execution, part
-        of it is on disk. This is due to the fact that the simulated flushing and eviction
-        was triggered after File 3 was already written, while in reality these operations
-        happened before File 3 was written \tristan{Dzung, pls check that. Also, why doesn't it happen irl?}.
+        File 3 is entirely cached after Write 2, whereas in the simulated execution, 
+        only a part of it is cached. 
+        This is due to the fact that the in simulation, data is flushed and evicted 
+        from the inactive list first, then from the active list. Thus, File 2, which is 
+        accessed again by Read 2 and is cached in the active list, is not flushed and evicted, 
+        while File 3 is flushed and evicted since it is accessed once only and cached 
+        in the inactive list. This may not correctly simulate what really happens 
+        in reality. 
 
         % We conclude from this experiment that our model can accurately
         % simulate cached I/Os in a sequential context. The next experiment
