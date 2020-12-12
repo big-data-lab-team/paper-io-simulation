@@ -727,7 +727,13 @@
             reads can benefit from cache hits.
 
             Our fourth and final experiment (\textit{Exp Nighres})
-            simulates the Nighres CRUISE cortical reconstruction workflow
+            simulates the Nighres CRUISE cortical reconstruction workflow, which consists 
+            of four tasks. The first two tasks are skull stripping and MGDM segmentation, 
+            which are in this Nighres example: 
+            \url{https://nighres.readthedocs.io/en/latest/auto_examples/example_01_tissue_classification.html}. 
+            The last two steps are region extraction and CRUISE cortical reconstruction 
+            in this example: 
+            \url{https://nighres.readthedocs.io/en/latest/auto_examples/example_02_cortical_depth_estimation.html}.
             \tristan{describe data, and if the execution was single node or
             distributed.}
 

@@ -32,12 +32,12 @@ def parse_task(logfile, sum_file):
 
         summary = {}
         for task in log:
-            _input = []
-            _output = []
+            _input = {}
+            _output = {}
             for fileread in log[task]["read"]:
-                _input.append(fileread["filename"])
+                _input[fileread["filename"]] = fileread["filesize"]
             for filewrite in log[task]["write"]:
-                _output.append(filewrite["filename"])
+                _output[filewrite["filename"]] = filewrite["filesize"]
 
             summary[task] = {
                 "input": _input,
@@ -48,5 +48,5 @@ def parse_task(logfile, sum_file):
         json.dump(summary, outfile)
 
 
-parse_time("real/log/timelog.json", "real/log/summary_time.json")
-parse_task("real/log/timelog.json", "real/log/summary_file.json")
+parse_time("real/log/timelog_sub001_sess1_.json", "real/log/__summary_time_sub001_sess1.json")
+parse_task("real/log/timelog_sub001_sess1_.json", "real/log/__summary_file_sub001_sess1.json")
