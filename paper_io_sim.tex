@@ -912,32 +912,40 @@
     Our page cache model is publicly available
     in the \wrench GitHub repository.
 
-    Page cache simulation would be instrumental in a number of studies.
-    For instance, it is now common for HPC clusters to run 
-    application jobs in Linux control groups (cgroups), where resource consumption 
-    including memory is controlled. 
+    Page cache simulation would be instrumental in a number of studies. For
+    instance, it is now common for HPC clusters to run application jobs in
+    Linux control groups (cgroups), where resource consumption, including
+    memory and therefore page cache usage, is limited. Using our simulator,
+    it would be possible to model the interaction between memory allocation
+    and I/O performance, with the goal to improve scheduling algorithms.
+    Our simulator could also be utilized to evaluate solutions that
+    reduce the impact of network file transfers on distributed
+    applications, such as burst
+    buffers~\cite{ferreiradasilva-fgcs-bb-2019}, hierarchical file
+    systems~\cite{islam2015triple}, active storage, or specific
+    hardware architectures~\cite{hayot2020performance}. 
 
-    With the page cache, I/O times are strongly dependent on the amount of
-    available memory, which is itself impacted by the use of anonymous
-    memory by applications. A more accurate simulation of application
-    memory consumption would therefore be a relevant future direction to
-    further improve I/O simulation.
-    
-    I/Os remain much more complex than is currently available in simulation
-    models.  
+    However, I/Os remain much more complex than is currently available in
+    simulation models, which could drastically limit their accuracy. A more
+    accurate description of the use of anonymous memory by applications
+    would be an important extension directly related to our page
+    cache model. With the page cache indeed, I/O times are indeed strongly
+    dependent on the amount of available memory, which is itself impacted
+    by the use of anonymous memory by applications. File access patterns, 
+    including random I/O, might also be worth describing, as they directly impact the content of the page cache.
 
 
-        Simulation results could be made even more accurate by a deeper
-        investigation of page cache flushing and eviction order. 
-        The availability of asymmetrical bandwidths in the
-        forthcoming \simgrid release will also directly improve our
-        simulation accuracy.
+        % Simulation results could be made even more accurate by a deeper
+        % investigation of page cache flushing and eviction order. 
+        % The availability of asymmetrical bandwidths in the
+        % forthcoming \simgrid release will also directly improve our
+        % simulation accuracy.
         
-        Relevant future work includes simulating
-        application memory consumption, random I/O, file readahead and
-        persistent disk storage.
+        % Relevant future work includes simulating
+        % application memory consumption, random I/O, file readahead and
+        % persistent disk storage.
 
-        \tristan{discussion could be fleshed out. cgroups}
+        % \tristan{discussion could be fleshed out. cgroups}
 
         \section{Acknowledgments}
 The computing platform used in the experiments was obtained with funding
