@@ -589,8 +589,10 @@
             We also implemented our model as part of \wrench, enhancing its
             internal implementation and APIs with a page cache abstraction,
             and allowing users to activate the feature via a command-line
-            argument. For the experiments in this paper we use \wrench 1.6
-            at commit
+            argument. We used SimGrid's locking mechanism to handle
+            concurrent accesses to page cache LRU lists by the two Memory
+            Manager threads. For the experiments in this paper we use
+            \wrench 1.6 at commit
             \href{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}{6718537433},
             which uses \simgrid 3.25, available at
             \url{https://framagit.org/simgrid/simgrid}. Our implementation
@@ -613,11 +615,13 @@
         The synthetic application, implemented in C, consists of three single-core,
         sequential tasks where each task reads the file produced by the
         previous task, increments every byte of this file to emulate real
-        processing, and writes the resulting data to disk. In real
-        executions, we clear the page cache before starting the application,
-        to ensure comparable conditions among the runs.
-        The anonymous memory used by application
-        is released after each task, which we also simulate in the Python prototype and in WRENCH-cache.
+        processing, and writes the resulting data to disk. Files are
+        numbered by ascending creation times: File 1 is file read by Task 1, and File \texttt{i+1} is the file
+        written by task \texttt{i}. In real executions, we clear the page
+        cache before starting the application, to ensure comparable
+        conditions among the runs. The anonymous memory used by application
+        is released after each task, which we also simulate in the Python
+        prototype and in WRENCH-cache.
         
         The real application is a workflow of the Nighres
         toolbox~\cite{huntenburg2018nighres} that implements skull
@@ -742,13 +746,13 @@
         \subsection{Single-threaded experiment}
 
         The page cache simulation model drastically reduces I/O simulation
-        errors in the three successive application tasks (Figure~\ref{fig:single_error}). The first read is not impacted
+        errors in each application task (Figure~\ref{fig:single_error}). The first read is not impacted
         as it only involves uncached data. Errors are reduced from an average
         of 345\% in the original \wrench to 46\% in the Python prototype and
         39\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
-        significantly overestimates read and write times, due to its lack
-        of page cache simulation model. Results with files of 50~GB and 75~GBs
-        show similar behaviors and are not reported due to space limitations.
+        significantly overestimates read and write times, due to the lack
+        of page cache simulation. Results with files of 50~GB and 75~GB
+        show similar behaviors and are not reported for brevity.
 
         \wrench simulation errors are substantially lower with 100~GB
         files than with 20~GB files, due to the fact that part of the
@@ -759,21 +763,21 @@
         flushing and eviction strategies.
 
         Simulated memory profiles are highly consistent with the real ones
-        (Figure~\ref{fig:single_memprof}). With 20~GB files, memory
-        profiles almost exactly match the real ones, although dirty data
-        seems to be flushing faster in real life than in simulation
-        \tristan{any idea why?}, a behavior also observed with 100~GB files. With
-        100~GB files, used memory reaches total memory during the first write,
-        triggering dirty data flushing. Used memory drops to cached memory
-        when application tasks release anonymous memory. Simulated cached
-        memory is highly consistent with real values, except toward the end
-        of Read 3 where it slightly increases in simulation but not in
-        reality. Our explanation could be that in reality, because File 3 is
-        entirely in cache, the cache amount does not increase when File 3 is read.
-        While in simulation, a part of File 3 is read from disk, leading to an increase
-        in cache amount followed by a decrease when eviction is called.
-        Apart from that, dirty data remains under the dirty ratio as expected. 
-        The Python prototype and \wrench-cache exhibit nearly
+        (Figure~\ref{fig:single_memprof}). Used memory consists of both
+        cached and anonymous memory that cannot be evicted at the current
+        time. With 20~GB files, memory profiles almost exactly match the
+        real ones, although dirty data seems to be flushing faster in real
+        life than in simulation \tristan{any idea why?}, a behavior also
+        observed with 100~GB files. With 100~GB files, used memory reaches
+        total memory during the first write, triggering dirty data
+        flushing. Used memory drops to cached memory when application tasks
+        release anonymous memory. Simulated cached memory is highly
+        consistent with real values, except toward the end of Read 3 where
+        it slightly increases in simulation but not in reality. This
+        occurred due to the fact that after Write 2, File 3 was only partly
+        cached in simulation whereas it was entirely cached in the real
+        system. In all cases, dirty data remains under the dirty ratio as
+        expected. The Python prototype and \wrench-cache exhibit nearly
         identical memory profiles, which reinforces the confidence in our
         implementation.
 
@@ -785,12 +789,10 @@
         File 3 is entirely cached after Write 2, whereas in the simulated execution, 
         only a part of it is cached. 
         This is due to the fact that the in simulation, data is flushed and evicted 
-        from the inactive list first, then from the active list. Thus, File 2, which is 
+        from the inactive list first, then from the active list \tristan{whereas in the real execution ...?}. Thus, File 2, which is 
         accessed again by Read 2 and is cached in the active list, is not flushed and evicted, 
         while File 3 is flushed and evicted since it is accessed once only and cached 
         in the inactive list. 
-        This flushing and eviction order in simulation may not correctly reflect the 
-        order in reality and lead to the difference.
 
         % We conclude from this experiment that our model can accurately
         % simulate cached I/Os in a sequential context. The next experiment
@@ -812,7 +814,11 @@
                 %    Lines represent memory usage along pipeline execution time.}
                    \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
                    \vspace*{-0.7cm}
-                   \caption{Memory profiles \tristan{Remove trailing whitespace for 20GB graphs (xmax should be about 160s, not 200s)}}
+                   \caption{Memory profiles \tristan{Remove trailing
+                   whitespace for 20GB graphs (xmax should be about 160s,
+                   not 200s)} \tristan{Find a way to add Read 1, Write 1,
+                   Read 2, etc on the graphs, perhaps at the top of the
+                   real execution graphs}}
                    \vspace*{0.5cm}
                    \label{fig:single_memprof}
             \end{subfigure}
@@ -828,7 +834,7 @@
 
 
 
-        \subsection{Concurrent applications}
+        \subsection{Concurrent application (local storage)}
 
             \begin{figure*}
             \begin{subfigure}{\linewidth}
@@ -840,16 +846,16 @@
             \end{figure*}
 
             The page cache model notably reduces \wrench's simulation error
-            for concurrent applications and local I/Os
+            for concurrent applications executed with local I/Os
             (Figure~\ref{fig:multi_local}). For reads, \wrench-cache still
             slightly overestimates reality, due to the discrepancy between
             simulated and real read bandwidths mentioned before. For writes,
             \wrench-cache slightly underestimates reality for the same reason. The plateau
-            ending around 7 concurrent pipelines in the \wrench-cache writes
+            ending around 7 concurrent applications in the \wrench-cache writes
             marks the limit beyond which the page cache is saturated with dirty data
             and needs flushing \tristan{why is there no plateau in real life?}.
 
-        \subsection{Remote storage}
+        \subsection{Remote storage (NFS)}
 
             \begin{figure*}
             \begin{subfigure}{\linewidth}
@@ -878,11 +884,11 @@
         As is the case for \wrench, simulation time with \wrench-cache scales
         linearly with the number of concurrent applications
         (Figure~\ref{fig:multi_time}, p \textless $10^{-24}$). However, the page
-        cache model substantially increases the simulation time by
-        application as can be seen by comparing regression slopes in
+        cache model substantially increases simulation time by
+        application, as can be seen by comparing regression slopes in
         Figure~\ref{fig:multi_time}. Interestingly, \wrench-cache is faster with 
         NFS I/Os than with local I/Os, most likely due to the use of writethrough
-        cache in NFS, which by-passes flushing operations.
+        cache in NFS, which bypasses flushing operations.
         \begin{figure}
             \begin{subfigure}{\columnwidth}
                 \centering
@@ -897,31 +903,37 @@
 
     \section{Conclusion}
     \label{discussion}
-        Page cache undoubtedly has important impacts on performance, in
-        particular for data-intensive applications. Numerical simulation is
-        an effective approach to predict and compare the performance of
-        applications, schedulers and infrastructures. However, page cache
-        is missing in many simulation tools for distributed systems. In
-        this study, we proposed a simulation model of I/Os with page cache,
-        we implemented it in the \simgrid-based \wrench library, and we
-        evaluated its benefits in different conditions. Results show that
-        our model very substantially improves simulation accuracy,
-        decreasing absolute relative errors between simulated and real
-        performance by a factor close to 10 (see results of the
-        single-threaded experiment). 
-        %Furthermore, this level of accuracy
-        %can be achieved without a fine-grained level of details
-        %\tristan{not sure what you mean}. 
-        % Dzung: I meant the results are accurate without a very detailed model. But the overhead results dot not seem to show that.
-        Our page cache model is available
-        in \wrench from commit \href{https://github.com/wrench-project/wrench/tree/d4e188d2f0cf69a19ae0a6b5e41530eb77d12cd8}{d4e188d2f0}, ready to be used 
-        for the simulation of Big Data applications.
+    We designed a model of the Linux page cache and implemented it in
+    the \simgrid-based \wrench library to simulate distributed
+    applications. Evaluation results show that our model very
+    substantially improves simulation accuracy, decreasing absolute
+    relative simulation errors up to 9$\times$ (see results of
+    the single-threaded experiment).
+    Our page cache model is publicly available
+    in the \wrench GitHub repository.
+
+    Page cache simulation would be instrumental in a number of studies.
+    For instance, it is now common for HPC clusters to run 
+    application jobs in Linux control groups (cgroups), where resource consumption 
+    including memory is controlled. 
+
+    With the page cache, I/O times are strongly dependent on the amount of
+    available memory, which is itself impacted by the use of anonymous
+    memory by applications. A more accurate simulation of application
+    memory consumption would therefore be a relevant future direction to
+    further improve I/O simulation.
+    
+    I/Os remain much more complex than is currently available in simulation
+    models.  
+
 
         Simulation results could be made even more accurate by a deeper
         investigation of page cache flushing and eviction order. 
         The availability of asymmetrical bandwidths in the
         forthcoming \simgrid release will also directly improve our
-        simulation accuracy. Relevant future work includes simulating
+        simulation accuracy.
+        
+        Relevant future work includes simulating
         application memory consumption, random I/O, file readahead and
         persistent disk storage.
 
