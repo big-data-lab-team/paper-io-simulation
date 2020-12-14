@@ -9,9 +9,11 @@ Generate pdf files used in the paper from svg files.
 If the svg files are not available to generate pdf files, you should re-generate the svg files 
 from experiment results by running the python script `gen_fig.py`.
 
-Figures are generated and saved in:
+Experimental figures are generated and saved in:
 - Single-threaded experiment: [result/single/figures/](result/single/figures/)
 - Multi-threaded experiment: [result/multi/figures/](result/multi/figures/)
+
+The other general figures can be found [here](https://drive.google.com/drive/folders/1ahnUdi9r9niyKgiBlmcODHrO5RUIroo8?usp=sharing) 
 
 ### Get the log files
 If the log files are missing, or if you would like to run the experiments with your own configurations,
