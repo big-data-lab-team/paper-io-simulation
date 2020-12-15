@@ -72,7 +72,7 @@
     the I/O bottleneck remains. The Linux page cache is an efficient
     approach to reduce I/O overheads, but few
     experimental studies of its interactions with Big Data applications exist,
-    partly due to limitations associated with
+    partly due to limitations of
     real-world experiments. Simulation is a popular approach to address
     these issues, however, existing simulation frameworks do not simulate
     page caching fully, or even at all.  As a result, simulation-based
@@ -80,7 +80,7 @@
     results.
 
     In this paper, we propose an I/O simulation model that includes
-    the key features of the page cache. We have implemented this model
+    the key features of the Linux page cache. We have implemented this model
     as part of the \wrench workflow simulation framework, which itself
     builds on the popular \simgrid distributed systems simulation
     framework. Our model and its implementation enable the simulation
@@ -98,7 +98,7 @@
 
         The Linux page cache plays an important role in
         reducing filesystem data transfer times. With the page cache, previously
-        read data can be re-read directly from memory and written data can be written to
+        read data can be re-read directly from memory, and written data can be written to
         memory before being asynchronously flushed to disk, resulting in improved I/O performance
         on slower storage devices. The performance improvements
         depend on many factors including the total amount of memory,
@@ -114,9 +114,9 @@
     is thus crucial to quantify the performance of these applications
     on these platforms. The goals include determining which type of hardware/software
     stacks are best suited to different application classes, as well as
-    understanding the shortcomings of current algorithms, designs and
-    technologies so as to propose new solutions. Unfortunately, application performance
-        studies via experiments on real-world compute platforms
+    understanding the limitations of current algorithms, designs and
+    technologies. Unfortunately, performance
+        studies relying on real-world experiments on compute platforms
         face several difficulties (high operational costs, labor-intensive experimental setups,
         shared platforms with dynamic loads that hinder reproducibility of results) and shortcomings
         (experiments are limited to the available platform/software configurations, which precludes
@@ -126,24 +126,18 @@
     CPU, network and storage. As a result, simulations provide a
     cost-effective, fast, easy and reproducible way to evaluate
     application performance on arbitrary platform configurations. It thus comes
-        as no surprise that, considering here only the field of parallel and distributed
-        computing, a large number of simulation frameworks have been developed and used
-        to support research and development endeavors~\cite{ optorsim, gridsim, groudsim, cloudsim, nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf, cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}. 
+        as no surprise that a large number of simulation frameworks have been developed and used 
+        for research and development~\cite{ optorsim, gridsim, groudsim, cloudsim, nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf, cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}. 
 
 
-        Page caching is an ubiquitous technique for mitigating the I/O bottleneck
-        faced by data-intensive applications. As such, it is necessary to simulate page caching
-        when performing performance studies in simulation.
-        Furthermore, simulating the page cache makes it possible to study relevant application-I/O
-        bottlenecks that can arise over the course of execution, such as page cache
-        starvation~\cite{zhuang2017}.
+        Page caching is an ubiquitous technique for mitigating the I/O bottleneck.
+        As such, it is necessary to model it
+        when simulating data-intensive applications.
         While existing simulation frameworks of parallel and distributed computing
         systems  capture many relevant features of hardware/software stacks, 
-        they lack the ability to simulate page cache adequately. Those frameworks
-        that implement some page cache simulation
-        fail to capture key features such
+        they lack the ability to simulate page cache with enough details to capture key features such
         as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
-        Some simulators, such as that in~\cite{xu2018saving}, do capture such features
+        Some simulators, such as the one in~\cite{xu2018saving}, do capture such features,
         but are domain-specific. 
 
         %However, there is a trade-off between accuracy and scalability, which has been
@@ -152,12 +146,10 @@
         %accuracy for the scalability and performance when their platforms grow to
         %hundreds or thousands nodes.
 
-    In this work, we present \wrench-cache, a simulation model of I/O
-    with page cache incorporated into the \wrench simulation framework~\cite{casanova2020fgcs},
-    which is  based on the popular \simgrid distributed simulation framework~\cite{casanova2014simgrid}.
-    The added value of \wrench-cache is to make it possible to simulate 
-        application execution accurately in the presence of page caching. Our specific 
-        contributions are as follows:
+    In this work, we present \wrench-cache, a page cache simulation model
+    implemented in \wrench~\cite{casanova2020fgcs}, a workflow simulation
+    framework based on the popular \simgrid distributed simulation
+    toolkit~\cite{casanova2014simgrid}. Our contributions are:
     \begin{compactitem}
         \item A page cache simulation model that supports 
     both single-threaded and multithreaded applications, and of both
@@ -165,7 +157,7 @@
     filesystems;
         \item An implementation of this model in \wrench; 
         \item An evaluation of the accuracy and scalability of our model, and of its implementation,
-              for a range of applications, platforms, and page cache configurations. 
+              for multiple applications, execution scenarios, and page cache configurations. 
     \end{compactitem}
 
 
@@ -911,16 +903,16 @@
 
     Page cache simulation would be instrumental in a number of studies. For
     instance, it is now common for HPC clusters to run applications in
-    Linux control groups (cgroups), where resource consumption is limited, including
-    memory and therefore page cache usage. Using our simulator,
+    Linux control groups (cgroups), where resource consumption is limited,
+    including memory and therefore page cache usage. Using our simulator,
     it would be possible to study the interaction between memory allocation
-    and I/O performance, for instance to improve scheduling algorithms.
-    Our simulator could also be utilized to evaluate solutions that
-    reduce the impact of network file transfers on distributed
-    applications, such as burst
+    and I/O performance, for instance to improve scheduling algorithms or
+    avoid page cache starvation~\cite{zhuang2017}. Our simulator could also
+    be utilized to evaluate solutions that reduce the impact of network
+    file transfers on distributed applications, such as burst
     buffers~\cite{ferreiradasilva-fgcs-bb-2019}, hierarchical file
-    systems~\cite{islam2015triple}, active storage~\cite{5496981}, or specific
-    hardware architectures~\cite{hayot2020performance}. 
+    systems~\cite{islam2015triple}, active storage~\cite{5496981}, or
+    specific hardware architectures~\cite{hayot2020performance}. 
 
     However, I/Os remain much more complex than is currently available in
     simulation models, which could drastically limit the accuracy of simulations.
