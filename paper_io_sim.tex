@@ -66,33 +66,29 @@
 
     \begin{abstract}
 
-    % Henri Rewrote quite  a bit in the next paragraph here to spell out a bit
-    % more why we need simulation
     The emergence of Big Data in recent years has resulted in a growing
-    need for efficient data storage management techniques.  While
-    infrastructures with sufficient compute power are available to
-    process large datasets, the I/O bottleneck remains.  A
-    well-known approach for reducing the overhead of
-    I/O operations is to use the Linux page cache.  It is thus crucial
-    to study experimentally the impact of the Linux page cache on the
-    performance of Big Data applications. Given the difficulties with and shortcomings of
-    real-world experiments, a popular approach for application
-    performance studies is to use simulation.  While many simulation
-    frameworks have been developed for this purpose, they do not 
-    simulate page caching fully, or even at all.  As a result, using
-    these frameworks for studying the performance of data-intensive
-    applications leads to inaccurate simulation results. 
+    need for efficient data processing solutions. While infrastructures
+    with sufficient compute power are available,
+    the I/O bottleneck remains. The Linux page cache is an efficient
+    approach to reduce I/O overheads, but few
+    experimental studies of its interactions with Big Data applications exist,
+    partly due to limitations associated with
+    real-world experiments. Simulation is a popular approach to address
+    these issues, however, existing simulation frameworks do not simulate
+    page caching fully, or even at all.  As a result, simulation-based
+    performance studies of data-intensive applications leads to inaccurate
+    results.
 
-    In this paper, we propose a I/O simulation model that characterizes
+    In this paper, we propose an I/O simulation model that includes
     the key features of the page cache. We have implemented this model
-    as  part of the \wrench workflow simulation framework, which itself
+    as part of the \wrench workflow simulation framework, which itself
     builds on the popular \simgrid distributed systems simulation
-    framework.  Our model and its implementation enable the simulation
+    framework. Our model and its implementation enable the simulation
     of both single-threaded and multithreaded applications, and of both
     writeback and writethrough caches for local or network-based
     filesystems. We evaluate the accuracy of our model in different
     conditions, including sequential and concurrent applications, as
-    well as local and remote I/Os.  We find that our page cache model
+    well as local and remote I/Os. We find that our page cache model
     reduces the simulation error by up to an order of magnitude when
     compared to state-of-the-art, cacheless simulations.
 
@@ -100,7 +96,7 @@
 
     \section{Introduction}
 
-        The Linux Page Cache plays an important role in
+        The Linux page cache plays an important role in
         reducing filesystem data transfer times. With the page cache, previously
         read data can be re-read directly from memory and written data can be written to
         memory before being asynchronously flushed to disk, resulting in improved I/O performance
