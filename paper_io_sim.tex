@@ -733,6 +733,41 @@
     \section{Results}
     \label{results}
 
+    \begin{figure*}
+        \centering
+        \begin{subfigure}{\linewidth}
+            \centering
+               \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
+               \vspace*{-0.7cm}
+               \caption{Absolute relative simulation errors}
+               \vspace*{0.5cm}
+               \label{fig:single_error}
+            \end{subfigure}
+        \begin{subfigure}{\linewidth}
+            \centering
+            %    Gray shades represent task phases (read, compute and write).
+            %    Lines represent memory usage along pipeline execution time.}
+               \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
+               \vspace*{-0.7cm}
+               \caption{Memory profiles \tristan{Remove trailing
+               whitespace for 20GB graphs (xmax should be about 160s,
+               not 200s)} \tristan{Find a way to add Read 1, Write 1,
+               Read 2, etc on the graphs, perhaps at the top of the
+               real execution graphs}}
+               \vspace*{0.5cm}
+               \label{fig:single_memprof}
+        \end{subfigure}
+        \begin{subfigure}{\linewidth}
+            \centering
+               \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files.pdf}
+               \caption{Cache contents \emph{after} application I/O operations}
+            %    \textcolor{red}{Update real results of 20GB}}
+               \label{fig:single_cache}
+        \end{subfigure}
+        \caption{Single-threaded results}
+        \end{figure*}
+
+
         \subsection{Single-threaded experiment}
 
         The page cache simulation model drastically reduces I/O simulation
@@ -750,7 +785,7 @@
         device in \wrench, as it does not fit in cache. Conversely,
         simulation errors of the Python prototype and \wrench-cache are higher with
         100~GB files than with 20~GB files, due to idiosyncrasies in the kernel
-        flushing and eviction strategies.
+        flushing and eviction strategies that could not be easily modeled.
 
         Simulated memory profiles are highly consistent with the real ones
         (Figure~\ref{fig:single_memprof}). Used memory consists of both
@@ -760,16 +795,27 @@
         life than in simulation \tristan{any idea why?}, a behavior also
         observed with 100~GB files. With 100~GB files, used memory reaches
         total memory during the first write, triggering dirty data
-        flushing. Used memory drops to cached memory when application tasks
+        flushing, and drops back to cached memory when application tasks
         release anonymous memory. Simulated cached memory is highly
         consistent with real values, except toward the end of Read 3 where
         it slightly increases in simulation but not in reality. This
-        occurred due to the fact that after Write 2, File 3 was only partly
+        occurred due to the fact that after Write 2, File 3 was only partially
         cached in simulation whereas it was entirely cached in the real
         system. In all cases, dirty data remains under the dirty ratio as
         expected. The Python prototype and \wrench-cache exhibit nearly
         identical memory profiles, which reinforces the confidence in our
-        implementation.
+        implementations.
+
+
+        \begin{figure*}
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
+            \end{subfigure}
+            \caption{Concurrent results with 3~GB files (averages on 5 repetitions)}
+            \label{fig:multi_local}
+        \end{figure*}
+
 
         The content of the simulated memory cache is also highly consistent
         with reality (Figure~\ref{fig:single_cache}). With 20~GB files, the
@@ -778,62 +824,21 @@
         simulation error previously mentioned in Read 3. In the real execution indeed,
         File 3 is entirely cached after Write 2, whereas in the simulated execution, 
         only a part of it is cached. 
-        This is due to the fact that the in simulation, data is flushed and evicted 
-        from the inactive list first, then from the active list \tristan{whereas in the real execution ...?}. Thus, File 2, which is 
-        accessed again by Read 2 and is cached in the active list, is not flushed and evicted, 
-        while File 3 is flushed and evicted since it is accessed once only and cached 
-        in the inactive list. 
-
-        % We conclude from this experiment that our model can accurately
-        % simulate cached I/Os in a sequential context. The next experiment
-        % evaluates our simulation with concurrent I/Os.
-
-            \begin{figure*}
-            \centering
+        This is due to the fact that the Linux kernel tend to not evict 
+        pages that belong to files being currently written (File 3 in this case), which we 
+        could not easily reproduce in our model.
+        \begin{figure*}
             \begin{subfigure}{\linewidth}
                 \centering
-                   \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
-                   \vspace*{-0.7cm}
-                   \caption{Absolute relative simulation errors}
-                   \vspace*{0.5cm}
-                   \label{fig:single_error}
-                \end{subfigure}
-            \begin{subfigure}{\linewidth}
-                \centering
-                %    Gray shades represent task phases (read, compute and write).
-                %    Lines represent memory usage along pipeline execution time.}
-                   \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
-                   \vspace*{-0.7cm}
-                   \caption{Memory profiles \tristan{Remove trailing
-                   whitespace for 20GB graphs (xmax should be about 160s,
-                   not 200s)} \tristan{Find a way to add Read 1, Write 1,
-                   Read 2, etc on the graphs, perhaps at the top of the
-                   real execution graphs}}
-                   \vspace*{0.5cm}
-                   \label{fig:single_memprof}
+                \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
             \end{subfigure}
-            \begin{subfigure}{\linewidth}
-                \centering
-                   \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files.pdf}
-                   \caption{Cache contents \emph{after} application I/O operations}
-                %    \textcolor{red}{Update real results of 20GB}}
-                   \label{fig:single_cache}
-            \end{subfigure}
-            \caption{Single-threaded results}
+            \caption{NFS results with 3~GB files (averages on 5 repetitions)}
+            \label{fig:multi_nfs}
             \end{figure*}
 
+        \subsection{Concurrent applications}
 
 
-        \subsection{Concurrent application (local storage)}
-
-            \begin{figure*}
-            \begin{subfigure}{\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
-            \end{subfigure}
-            \caption{Concurrent results with 3~GB files (averages on 5 repetitions)}
-            \label{fig:multi_local}
-            \end{figure*}
 
             The page cache model notably reduces \wrench's simulation error
             for concurrent applications executed with local I/Os
@@ -847,19 +852,12 @@
 
         \subsection{Remote storage (NFS)}
 
-            \begin{figure*}
-            \begin{subfigure}{\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
-            \end{subfigure}
-            \caption{NFS results with 3~GB files (averages on 5 repetitions)}
-            \label{fig:multi_nfs}
-            \end{figure*}
+
 
             Page cache simulation importantly reduces the simulation error
             on remote storage as well (Figure~\ref{fig:multi_nfs}). This
-            manifests only for reads, as only writethrough cache was
-            enabled in the NFS server. Both \wrench and \wrench-cache
+            manifests only for reads, as the NFS server used writethrough rather than writeback cache.
+            Both \wrench and \wrench-cache
             underestimate write times due to the discrepancy between
             simulated and real bandwidths mentioned previously. For reads,
             this discrepancy only impacts the results beyond 22
@@ -910,19 +908,17 @@
     it would be possible to study the interaction between memory allocation
     and I/O performance, for instance to improve scheduling algorithms or
     avoid page cache starvation~\cite{zhuang2017}. Our simulator could also
-    be utilized to evaluate solutions that reduce the impact of network
+    be leveraged to evaluate solutions that reduce the impact of network
     file transfers on distributed applications, such as burst
     buffers~\cite{ferreiradasilva-fgcs-bb-2019}, hierarchical file
     systems~\cite{islam2015triple}, active storage~\cite{5496981}, or
     specific hardware architectures~\cite{hayot2020performance}. 
 
-    However, I/Os remain much more complex than is currently available in
-    simulation models, which could drastically limit the accuracy of simulations.
+    I/Os remain much more complex than is currently available in
+    simulation models, which could substantially limit the accuracy of simulations.
     Relevant extensions to this work could include more
-    accurate descriptions of anonymous memory usage by applications. 
-    With the page cache, I/O times are indeed strongly
-    dependent on the amount of available memory, which is itself impacted
-    by the use of anonymous memory. File access patterns, 
+    accurate descriptions of anonymous memory usage in applications, 
+    which strongly affects I/O times through writeback cache. File access patterns, 
     including random I/O, might also be worth including in application models,
     as they directly affect page cache content.
     % readahead and persistent storage could also be adeed
