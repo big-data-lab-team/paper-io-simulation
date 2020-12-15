@@ -339,7 +339,7 @@
 
     We model page cache LRU lists as
     two lists of data blocks, an active list and an inactive list, both ordered by
-    last access time (earliest first, see Figure~\ref{fig:lrulist}).
+    last access time (earliest first, Figure~\ref{fig:lrulist}).
     As in the kernel, our simulator limits the size of the active list to
     twice the size of the inactive list, by moving least recently
     used data blocks from the active list to the inactive list~\cite{gorman2004understanding, linuxdev3rd2010}.
@@ -571,8 +571,8 @@
             concurrency: it is limited to single-threaded applications running on systems
             with a single-core CPU. We used this prototype for a first validation of our simulation
             model against a real sequential application running on a real system.
-            The source code this prototype is available at
-            \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}. We used Python 3.7.
+            The Python 3.7 source code this prototype is available at
+            \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}.
 
             We also implemented our model as part of \wrench, enhancing its
             internal implementation and APIs with a page cache abstraction,
@@ -596,15 +596,15 @@
         with the original \wrench, and with our \wrench-cache extension. We
         evaluate our page cache simulation in single-threaded and
         multi-threaded applications, accessing data on local and remote
-        file systems. We use two applications: a synthetic one created to
-        evaluate the simulation model, and a real one representative of
+        file systems. We use two applications: a synthetic one, designed to
+        evaluate the simulation model, and a real one, representative of
         neuroimaging data processing.
 
         The synthetic application, implemented in C, consists of three single-core,
         sequential tasks where each task reads the file produced by the
         previous task, increments every byte of this file to emulate real
         processing, and writes the resulting data to disk. Files are
-        numbered by ascending creation times: File 1 is file read by Task 1, and File \texttt{i+1} is the file
+        numbered by ascending creation times: File 1 is the file read by Task 1, and file \texttt{i+1} is the file
         written by task \texttt{i}. In real executions, we clear the page
         cache before starting the application, to ensure comparable
         conditions among the runs. The anonymous memory used by application
@@ -612,14 +612,16 @@
         prototype and in WRENCH-cache.
         
         The real application is a workflow of the Nighres
-        toolbox~\cite{huntenburg2018nighres} that implements skull
-        stripping in high-resolution brain images, an operation common to
-        many neuroimage analysis pipelines. The workflow is implemented as a Python
+        toolbox~\cite{huntenburg2018nighres} that implements
+        cortical reconstruction from brain images in four steps: skull stripping, tissue classification, 
+        region extraction, and cortical reconstruction. More information 
+        on this applicatoin is available in the Nighres documentation at \url{https://nighres.readthedocs.io/en/latest/auto_examples/example_02_cortical_depth_estimation.html}.
+        The workflow is implemented as a Python
         script that calls Java image-processing routines. We used Python
         3.6, Java 8, and Nighres 1.3.0. We patched the
-        skull stripping workflow to monitor task CPU times and inject them
-        in the simulation, to focus our analysis on I/O times, the patched code is 
-        available at \url{https://github.com/dohoangdzung/nighres}. 
+        application to remove lazy data loading, which made CPU time difficult to separate from I/O time, 
+        and to monitor task CPU times, to inject them in the simulators. The patched code is 
+        available at \url{https://github.com/dohoangdzung/nighres}.
 
         The applications were executed on a dedicated cluster at
         Concordia University, with one login node, 9 compute nodes, and 4
@@ -627,11 +629,11 @@
         compute node has 2 $\times$ 16-core Intel(R) Xeon(R) Gold 6130 CPU
         @ 2.10GHz, 250~GiB of RAM, 6 $\times$ SSDs of 450~GiB each with the XFS
         file system, 378~GiB of tmpfs, and 126~GiB of devtmpfs file system.
-        Nodes run CentOS~8.1 with NFS version 4. We use the \texttt{atop}
+        Nodes run CentOS~8.1 with NFS version 4. We used the \texttt{atop}
         and \texttt{collectl} tools to monitor and collect memory status
         and disk throughput.
 
-        To parametrize our simulators, we benchmarked the
+        To parametrize the simulators, we benchmarked the
         memory, local disk, remote disk (NFS), and network bandwidths
         (Table~\ref{table:benchmark}). Since \simgrid, and thus \wrench, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
@@ -664,7 +666,7 @@
             As our focus is on I/O rather than compute, we measured
             application task CPU times on a cluster node
             (Table~\ref{table:cputime}), and used these durations in our
-            simulations. For the Python simulator, we used CPU times
+            simulations. For the Python prototype, we injected CPU times
             directly in the simulation. For \wrench and \wrench-cache, we
             determined the corresponding number of flops on a 1~Gflops CPU
             and used these values in the simulation. The final simulated
@@ -694,21 +696,21 @@
             % Finally, because \wrench simulates applications base on network-communication,
             % we use an infinite bandwidth to eliminate network latency for local I/Os.
 
-            Our first experiment (\textit{Exp single-threaded}) runs a
+            Our first experiment runs a
             single instance of the synthetic application on a single
             cluster node, with different input file sizes (20~GB, 50~GB,
             75~GB, 100~GB), and with all I/Os directed to the same local
             disk. The goal is to validate the simulation model in absence
             of any concurrent disk access.
 
-            Our second experiment (\textit{Exp concurrent}) runs concurrent instances of the
+            Our second experiment runs concurrent instances of the
             application on a single node, all application instances
             operating on different files of size 3~GB stored in the same
             local disk. We vary the number of
             concurrent application instances from 1 to 32 since cluster
             nodes have 32 CPU cores.
 
-            Our third experiment (\textit{Exp NFS}) occurs in the same
+            Our third experiment occurs in the same
             configuration as the previous one, albeit reading and writing
             on a 50-GiB NFS-mounted partition of a 450-GiB remote disk of
             another compute node. As is commonly configured in HPC
@@ -718,15 +720,15 @@
             Therefore, all the writes happen at disk bandwidth, but
             reads can benefit from cache hits.
 
-            Our fourth and final experiment (\textit{Exp Nighres})
-            simulates the Nighres CRUISE cortical reconstruction workflow, which consists 
-            of four steps. The first two steps are skull stripping and MGDM segmentation, 
-            which are in this Nighres \href{{https://nighres.readthedocs.io/en/latest/auto_examples/example_01_tissue_classification.html}}{tissue classification example}. 
-            The last two tasks are region extraction and CRUISE cortical reconstruction 
-            in the   
-            \href{https://nighres.readthedocs.io/en/latest/auto_examples/example_02_cortical_depth_estimation.html}{cortical depth estimation example}.
-            \tristan{describe data, and if the execution was single node or
-            distributed.}
+            Our fourth and final experiment runs the Nighres workflow on
+            data from participant 0027430 in the dataset of the Max Planck Institute for
+            Human Cognitive and Brain Sciences
+            available at
+            \url{http://dx.doi.org/10.15387/fcp_indi.corr.mpg1}. The data
+            amounts to 2.3~GB and was downloaded from
+            \url{http://datasets.datalad.org/?dir=/corr/RawDataBIDS/MPG_1/sub-0027430}.
+            The workflow was run on a single node of the cluster, using a
+            single local disk.
 
     \section{Results}
     \label{results}
@@ -894,14 +896,14 @@
     We designed a model of the Linux page cache and implemented it in the
     \simgrid-based \wrench library to simulate distributed applications.
     Evaluation results show that our model improves simulation accuracy
-    substantially, decreasing absolute relative simulation errors up to
+    substantially, reducing absolute relative simulation errors up to
     9$\times$ (see results of the single-threaded experiment). The
     availability of asymmetrical disk bandwidths in the forthcoming
-    \simgrid release will further improve the accuracy of our simulations.
+    \simgrid release will further improve these results.
     Our page cache model is publicly available in the \wrench GitHub
     repository.
 
-    Page cache simulation would be instrumental in a number of studies. For
+    Page cache simulation can be instrumental in a number of studies. For
     instance, it is now common for HPC clusters to run applications in
     Linux control groups (cgroups), where resource consumption is limited,
     including memory and therefore page cache usage. Using our simulator,
@@ -922,14 +924,15 @@
     dependent on the amount of available memory, which is itself impacted
     by the use of anonymous memory. File access patterns, 
     including random I/O, might also be worth including in application models,
-    as they directly impact page cache content.
+    as they directly affect page cache content.
     % readahead and persistent storage could also be adeed
     % Simulation results could be made even more accurate by a deeper
     % investigation of page cache flushing and eviction order. 
 
         \section{Acknowledgments}
 The computing platform used in the experiments was obtained with funding
-from the Canada Foundation for Innovation.
+from the Canada Foundation for Innovation. This work was partially supported
+by NSF contracts \#1923539 and \#1923621.
 
 \bibliographystyle{IEEEtran}
 \bibliography{citation}
