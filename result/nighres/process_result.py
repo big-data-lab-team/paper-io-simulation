@@ -101,12 +101,11 @@ def plot_error():
     wrench_cache_log_file = "wrench/pagecache/dump_nighres_pagecache_sim_time.json"
     wrench_cache_time_file = "wrench/pagecache/summary_wrench_nighres_pagecache.json"
 
+    parse_time_real(real_log_file, real_time_file)
+    parse_task_real(real_log_file, "real/summary_file_sub001_sess1.json")
 
-    # parse_time_real(real_log_file, real_time_file)
-    # parse_task_real(real_log_file, "real/summary_file_sub001_sess1.json")
-    #
-    # parse_time_wrench(wrench_log_file, wrench_time_file)
-    # parse_time_wrench(wrench_cache_log_file, wrench_cache_time_file)
+    parse_time_wrench(wrench_log_file, wrench_time_file)
+    parse_time_wrench(wrench_cache_log_file, wrench_cache_time_file)
 
     tasks = ["mp2rage_skullstripping", "mgdm_segmentation", "extract_brain_region", "cruise_cortex_extraction"]
 
