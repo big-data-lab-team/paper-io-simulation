@@ -48,5 +48,5 @@ def parse_task(logfile, sum_file):
         json.dump(summary, outfile)
 
 
-parse_time("real/log/timelog_sub001_sess1_.json", "real/log/__summary_time_sub001_sess1.json")
-parse_task("real/log/timelog_sub001_sess1_.json", "real/log/__summary_file_sub001_sess1.json")
+parse_time("real/log/timelog_sub001_sess1.json", "real/log/summary_time_sub001_sess1.json")
+parse_task("real/log/timelog_sub001_sess1.json", "real/log/summary_file_sub001_sess1.json")

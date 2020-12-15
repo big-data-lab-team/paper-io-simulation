@@ -33,8 +33,8 @@ def parse_pipeline(filename):
     return [task_1, task_2, task_3]
 
 
-def gantt_plot(no_pipelines=20):
-    pipelines = [parse_pipeline("indv_logs/time_pipeline_%d_%d.csv" % (no_pipelines, i + 1)) for i in
+def gantt_plot(no_pipelines=32):
+    pipelines = [parse_pipeline("real/only_5/time_pipeline_%d_%d.csv" % (no_pipelines, i + 1)) for i in
                  range(no_pipelines)]
 
     fig, ax = plt.subplots()
@@ -58,7 +58,9 @@ def gantt_plot(no_pipelines=20):
     plt.xlabel("Time (s)")
     plt.ylabel("Tasks")
     plt.title("no. pipelines = %d" % no_pipelines)
+    plt.legend()
+    plt.tight_layout()
     plt.show()
 
 
-gantt_plot(32)
+# gantt_plot(5)
