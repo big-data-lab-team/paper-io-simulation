@@ -11,8 +11,8 @@ import result.single.plot_error as plot_error
 import result.single.plot_cache as plot_cache
 
 # Generate memory profiling comparision between 20GB and 100GB inputs.
-# xmax is set to 200 and 1300
-plot_memprof.compare_plot([20, 100], [200, 1300])
+# xmax is set to 165 and 1300
+plot_memprof.compare_plot([20, 100], [165, 1300])
 # Generate simulation errors with 20GB and 100GB inputs
 plot_error.plot_error()
 # Generate amount of cached data with 20GB and 100GB inputs
