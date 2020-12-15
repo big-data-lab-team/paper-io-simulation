@@ -903,49 +903,41 @@
 
     \section{Conclusion}
     \label{discussion}
-    We designed a model of the Linux page cache and implemented it in
-    the \simgrid-based \wrench library to simulate distributed
-    applications. Evaluation results show that our model very
-    substantially improves simulation accuracy, decreasing absolute
-    relative simulation errors up to 9$\times$ (see results of
-    the single-threaded experiment).
-    Our page cache model is publicly available
-    in the \wrench GitHub repository.
+    We designed a model of the Linux page cache and implemented it in the
+    \simgrid-based \wrench library to simulate distributed applications.
+    Evaluation results show that our model improves simulation accuracy
+    substantially, decreasing absolute relative simulation errors up to
+    9$\times$ (see results of the single-threaded experiment). The
+    availability of asymmetrical disk bandwidths in the forthcoming
+    \simgrid release will further improve the accuracy of our simulations.
+    Our page cache model is publicly available in the \wrench GitHub
+    repository.
 
     Page cache simulation would be instrumental in a number of studies. For
-    instance, it is now common for HPC clusters to run application jobs in
-    Linux control groups (cgroups), where resource consumption, including
-    memory and therefore page cache usage, is limited. Using our simulator,
-    it would be possible to model the interaction between memory allocation
-    and I/O performance, with the goal to improve scheduling algorithms.
+    instance, it is now common for HPC clusters to run applications in
+    Linux control groups (cgroups), where resource consumption is limited, including
+    memory and therefore page cache usage. Using our simulator,
+    it would be possible to study the interaction between memory allocation
+    and I/O performance, for instance to improve scheduling algorithms.
     Our simulator could also be utilized to evaluate solutions that
     reduce the impact of network file transfers on distributed
     applications, such as burst
     buffers~\cite{ferreiradasilva-fgcs-bb-2019}, hierarchical file
-    systems~\cite{islam2015triple}, active storage, or specific
+    systems~\cite{islam2015triple}, active storage~\cite{5496981}, or specific
     hardware architectures~\cite{hayot2020performance}. 
 
     However, I/Os remain much more complex than is currently available in
-    simulation models, which could drastically limit their accuracy. A more
-    accurate description of the use of anonymous memory by applications
-    would be an important extension directly related to our page
-    cache model. With the page cache indeed, I/O times are indeed strongly
+    simulation models, which could drastically limit the accuracy of simulations.
+    Relevant extensions to this work could include more
+    accurate descriptions of anonymous memory usage by applications. 
+    With the page cache, I/O times are indeed strongly
     dependent on the amount of available memory, which is itself impacted
-    by the use of anonymous memory by applications. File access patterns, 
-    including random I/O, might also be worth describing, as they directly impact the content of the page cache.
-
-
-        % Simulation results could be made even more accurate by a deeper
-        % investigation of page cache flushing and eviction order. 
-        % The availability of asymmetrical bandwidths in the
-        % forthcoming \simgrid release will also directly improve our
-        % simulation accuracy.
-        
-        % Relevant future work includes simulating
-        % application memory consumption, random I/O, file readahead and
-        % persistent disk storage.
-
-        % \tristan{discussion could be fleshed out. cgroups}
+    by the use of anonymous memory. File access patterns, 
+    including random I/O, might also be worth including in application models,
+    as they directly impact page cache content.
+    % readahead and persistent storage could also be adeed
+    % Simulation results could be made even more accurate by a deeper
+    % investigation of page cache flushing and eviction order. 
 
         \section{Acknowledgments}
 The computing platform used in the experiments was obtained with funding
