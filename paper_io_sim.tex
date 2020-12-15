@@ -634,7 +634,7 @@
         and \texttt{collectl} tools to monitor and collect memory status
         and disk throughput.
 
-        To parametrize the simulators, we benchmarked the
+        To parameterize the simulators, we benchmarked the
         memory, local disk, remote disk (NFS), and network bandwidths
         (Table~\ref{table:benchmark}). Since \simgrid, and thus \wrench, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
@@ -889,9 +889,10 @@
     \section{Conclusion}
     \label{discussion}
     We designed a model of the Linux page cache and implemented it in the
-    \simgrid-based \wrench library to simulate distributed applications.
+    \simgrid-based \wrench simulation framework to simulate the execution
+    of distributed applications.
     Evaluation results show that our model improves simulation accuracy
-    substantially, reducing absolute relative simulation errors up to
+    substantially, reducing absolute relative simulation errors by up to
     9$\times$ (see results of the single-threaded experiment). The
     availability of asymmetrical disk bandwidths in the forthcoming
     \simgrid release will further improve these results.
@@ -911,12 +912,13 @@
     systems~\cite{islam2015triple}, active storage~\cite{5496981}, or
     specific hardware architectures~\cite{hayot2020performance}. 
 
-    I/Os remain much more complex than is currently available in
-    simulation models, which could substantially limit the accuracy of simulations.
-    Relevant extensions to this work could include more
+    Not all I/O behaviors are captured by currently available simulation models,
+    including the one developed in this work, 
+    which could substantially limit the accuracy of simulations.
+    Relevant extensions to this work include more
     accurate descriptions of anonymous memory usage in applications, 
     which strongly affects I/O times through writeback cache. File access patterns, 
-    including random I/O, might also be worth including in application models,
+    including random I/O, might also be worth including in the simulation models,
     as they directly affect page cache content.
     % readahead and persistent storage could also be adeed
     % Simulation results could be made even more accurate by a deeper
