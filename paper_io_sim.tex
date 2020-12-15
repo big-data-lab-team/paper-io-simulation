@@ -166,7 +166,7 @@
 
         \subsection{Page cache}
 
-        To improve performance of disk accesses, the page cache was introduced to the Linux kernel. %It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}.
+        %To improve performance of disk accesses, the page cache was introduced to the Linux kernel. %It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}.
         The goal of the page cache is to ensure that most I/O operations occur entirely
         within memory space rather than synchronously to and from storage devices.
         All disk-backed data located in the page cache are partitioned into many small pages.
@@ -183,6 +183,7 @@
         The writeback strategy is considered to outperform writethrough as well as
         direct I/O as it delays disk writes to perform a bulk write at a later time
         \cite{linuxdev3rd2010}.
+
         Cache eviction and flushing strategies are integral to proper page cache functioning.
         Whenever space in memory becomes limited, either as a result of application memory
         or page cache use, page cache data may be evicted. Only data that
