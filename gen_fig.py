@@ -27,3 +27,8 @@ multi_result.result_local(rep_no=5)
 multi_result.result_nfs(rep_no=5)
 # runtime plots
 multi_result.run_time()
+
+# ======== Nighres experiment results ==========
+os.chdir("../nighres")
+import result.nighres.process_result as nighres_result
+nighres_result.plot_error()
