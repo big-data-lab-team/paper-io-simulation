@@ -39,7 +39,7 @@ def real_subplot(subplot_ax, real_time_file, real_mem_file, xmin, xmax, ymin, ym
                                label="Read" if i == 0 else "")
         else:
             subplot_ax.axvspan(xmin=timestamps[i - 1][2] - start, xmax=timestamps[i][1] - start, color="k", alpha=0.25,
-                               label="Computation" if i == 1 else "")
+                               label="Compute" if i == 1 else "")
             subplot_ax.axvspan(xmin=timestamps[i][1] - start, xmax=timestamps[i][2] - start, color="k", alpha=0.4,
                                label="write" if i == 1 else "")
 
@@ -99,7 +99,7 @@ def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, l
         if idx == 0:
             subplot_ax.axvspan(xmin=0, xmax=read_ends[idx] - start, color="k", alpha=0.1, label="Read")
             subplot_ax.axvspan(xmin=read_ends[idx] - start, xmax=write_starts[idx] - start, color="k",
-                               alpha=0.25, label="Computation")
+                               alpha=0.25, label="Compute")
             subplot_ax.axvspan(xmin=write_starts[idx] - start, xmax=write_ends[idx] - start, color="k", alpha=0.4,
                                label="Write")
         else:
@@ -154,8 +154,8 @@ def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
 
     lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.05, 3.75), ncol=8)
 
-    fig.text(0.27, 0.06, 'time (s)', ha='center', fontsize=12)
-    fig.text(0.77, 0.06, 'time (s)', ha='center', fontsize=12)
+    fig.text(0.32, 0.06, 'time (s)', ha='center', fontsize=12)
+    fig.text(0.73, 0.06, 'time (s)', ha='center', fontsize=12)
     fig.text(0.08, 0.45, 'memory (GB)', va='center', rotation='vertical', fontsize=12)
     fig.text(0.91, 0.69, 'Real execution', fontsize=14, color='white', bbox={'pad': 5, 'color': '#90C987'}, rotation=-90)
     fig.text(0.91, 0.405, 'Python prototype', fontsize=14, color='white', bbox={'pad': 5, 'color': '#7BAFDE'}, rotation=-90)
