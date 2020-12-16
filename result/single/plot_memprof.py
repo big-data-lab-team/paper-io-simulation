@@ -123,7 +123,7 @@ def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, l
     #                     bbox={'alpha': 0.2, 'pad': 5})
 
 
-def compare_plot(input_sizes=[20, 100], makespan=[200, 1300]):
+def compare_plot(input_sizes=[20, 100], makespan=[165, 1300]):
     fig, axes = plt.subplots(figsize=(15, 9), ncols=2, nrows=3)
     plt.subplots_adjust(wspace=0.1)
     plt.rcParams.update({'font.size': 9})
