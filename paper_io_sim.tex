@@ -597,53 +597,127 @@
 
         \subsection{Experiments}
 
-        Our experiments compare real executions with our Python prototype,
-        with the original \wrench, and with our \wrench-cache extension. We
-        evaluate our page cache simulation in single-threaded and
-        multi-threaded applications, accessing data on local and remote
-        file systems. We use two applications: a synthetic one, designed to
-        evaluate the simulation model, and a real one, representative of
-        neuroimaging data processing.
+        Our experiments compared real executions with our Python prototype,
+        with the original \wrench simulator, and with our \wrench-cache
+        extension. Executions included single-threaded and multi-threaded
+        applications, accessing data on local and remote file systems. We
+        used two applications: a synthetic one, created to evaluate the
+        simulation model, and a real one, representative of neuroimaging
+        data processing.
 
-        The synthetic application, implemented in C, consists of three single-core,
-        sequential tasks where each task reads the file produced by the
-        previous task, increments every byte of this file to emulate real
-        processing, and writes the resulting data to disk. Files are
-        numbered by ascending creation times: File 1 is the file read by Task 1, and file \texttt{i+1} is the file
-        written by task \texttt{i}. In real executions, we clear the page
-        cache before starting the application, to ensure comparable
-        conditions among the runs. The anonymous memory used by application
-        is released after each task, which we also simulate in the Python
-        prototype and in WRENCH-cache.
-        
-        The real application is a workflow of the Nighres
-        toolbox~\cite{huntenburg2018nighres} that implements
-        cortical reconstruction from brain images in four steps: skull stripping, tissue classification, 
-        region extraction, and cortical reconstruction. More information 
-        on this applicatoin is available in the Nighres documentation at \url{https://nighres.readthedocs.io/en/latest/auto_examples/example_02_cortical_depth_estimation.html}.
-        The workflow is implemented as a Python
-        script that calls Java image-processing routines. We used Python
-        3.6, Java 8, and Nighres 1.3.0. We patched the
-        application to remove lazy data loading, which made CPU time difficult to separate from I/O time, 
-        and to monitor task CPU times, to inject them in the simulators. The patched code is 
-        available at \url{https://github.com/dohoangdzung/nighres}.
-
-        The applications were executed on a dedicated cluster at
+        Experiments were conducted on a dedicated cluster at
         Concordia University, with one login node, 9 compute nodes, and 4
         storage nodes connected with a network bandwidth of 25 Gbps. Each
-        compute node has 2 $\times$ 16-core Intel(R) Xeon(R) Gold 6130 CPU
+        compute node had 2 $\times$ 16-core Intel(R) Xeon(R) Gold 6130 CPU
         @ 2.10GHz, 250~GiB of RAM, 6 $\times$ SSDs of 450~GiB each with the XFS
         file system, 378~GiB of tmpfs, and 126~GiB of devtmpfs file system.
-        Nodes run CentOS~8.1 with NFS version 4. We used the \texttt{atop}
+        Nodes ran CentOS~8.1 with NFS version 4. We used the \texttt{atop}
         and \texttt{collectl} tools to monitor and collect memory status
-        and disk throughput.
+        and disk throughput. We cleared the page
+        cache before starting the application, to ensure comparable
+        conditions among runs. 
+
+        \begin{table}[b]
+            \centering
+            \begin{tabularx}{0.8\columnwidth}{c>{\centering\arraybackslash}X}
+            \toprule
+                Input size (GB)  & CPU time (s)\\
+            \midrule
+                3      & 4.4 \\
+                20  & 28 \\
+                50  & 75 \\
+                75  & 110 \\
+                100  & 155 \\
+            \bottomrule
+            \end{tabularx}
+            \caption{Synthetic application parameters}
+            \label{table:cputime}
+            \end{table}
+        The synthetic application, implemented in C, consisted of three single-core,
+        sequential tasks where each task read the file produced by the
+        previous task, incremented every byte of this file to emulate real
+        processing, and wrote the resulting data to disk. Files were
+        numbered by ascending creation times: File 1 was the file read by Task 1, and file \texttt{i+1} was the file
+        written by task \texttt{i}. The anonymous memory used by the application
+        was released after each task, which we also simulated in the Python
+        prototype and in WRENCH-cache. As our focus is on I/O rather than compute, we measured
+        application task CPU times on a cluster node
+        (Table~\ref{table:cputime}), and used these durations in our
+        simulations. For the Python prototype, we injected CPU times
+        directly in the simulation. For \wrench and \wrench-cache, we
+        determined the corresponding number of flops on a 1~Gflops CPU
+        and used these values in the simulation. The final simulated
+        platform and application are available at
+        commit \href{https://github.com/wrench-project/wrench/tree/ec6b43561b95977002258c0fe37a4ecad8f1d33f/examples/basic-examples/io-pagecache}{ec6b43561b}.
+
+        We used the synthetic application in three experiments. In the
+        first one (\textit{Exp 1}), we executed \emph{a single instance} of
+        the application on a single cluster node, with different input file
+        sizes (20~GB, 50~GB, 75~GB, 100~GB), and with all I/Os directed to
+        the same local disk.
+        In the second experiment (\textit{Exp 2}), we executed
+        \emph{concurrent} instances of the application on a single node,
+        all application instances operating on different files of size 3~GB
+        stored in the same local disk. We varied the number of concurrent
+        application instances from 1 to 32 since cluster nodes had 32 CPU
+        cores.
+        In the third experiment (\textit{Exp 3}), we used the same
+        configuration as the previous one, albeit reading and writing
+        on a 50-GiB NFS-mounted partition of a 450-GiB remote disk of
+        another compute node. As is commonly configured in HPC
+        environments to avoid data loss, there was no client write cache
+        and the server cache was configured as writethrough instead of
+        writeback. NFS client and server read caches were enabled. 
+        Therefore, all the writes happened at disk bandwidth, but
+        reads can benefit from cache hits.
+
+        The real application was a workflow of the Nighres
+        toolbox~\cite{huntenburg2018nighres}, implementing cortical
+        reconstruction from brain images in four steps: skull stripping,
+        tissue classification, region extraction, and cortical
+        reconstruction. Each step read
+        files produced by the previous step, and wrote files that were or were not read by the subsequent step. 
+        More information on this
+        application is available in the Nighres documentation at
+        \url{https://nighres.readthedocs.io/en/latest/auto_examples/example_02_cortical_depth_estimation.html}.
+        The workflow is implemented as a Python script that calls Java
+        image-processing routines. We used Python 3.6, Java 8, and Nighres
+        1.3.0. We patched the application to remove lazy data loading,
+        which made CPU time difficult to separate from I/O time, and to
+        monitor task CPU times, to inject them in the simulators. The
+        patched code is available at
+        \url{https://github.com/dohoangdzung/nighres}.
+        \begin{table}
+            \centering
+            \begin{tabular}{lccc}
+            \toprule
+                \multicolumn{1}{c}{Workflow step}& Input size       & Output size      & CPU time\\
+                                       & (MB)             & (MB)             & (s)\\
+            \midrule
+               Skull stripping         &  111             & 30               & 137 \\
+               Tissue classification   &  22              & 175              & 624 \\
+               Region extraction       &  175             & 121              & 81 \\
+               Cortical reconstruction &  47              & 250              & 270\\
+            \bottomrule
+            \end{tabular} 
+            \caption{Nighres application parameters}
+            \label{table:nighres_stats}
+            \end{table}
+
+        We used the real application in the fourth and final experiment
+        (\textit{Exp 4}). The workflow was run on a single node of the
+        cluster, using a single local disk. We processed data from
+        participant 0027430 in the dataset of the Max Planck Institute for
+        Human Cognitive and Brain Sciences available at
+        \url{http://dx.doi.org/10.15387/fcp_indi.corr.mpg1}, leading to the
+        workflow parameters in Table~\ref{table:nighres_stats}.
 
         To parameterize the simulators, we benchmarked the
         memory, local disk, remote disk (NFS), and network bandwidths
         (Table~\ref{table:benchmark}). Since \simgrid, and thus \wrench, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
         bandwidth values in our experiments.
-            \begin{table}
+            \begin{table}[b]
             \centering
             \begin{tabularx}{\columnwidth}{ll
             >{\centering\arraybackslash}X
@@ -668,72 +742,9 @@
             \label{table:benchmark}
             \end{table}
 
-            As our focus is on I/O rather than compute, we measured
-            application task CPU times on a cluster node
-            (Table~\ref{table:cputime}), and used these durations in our
-            simulations. For the Python prototype, we injected CPU times
-            directly in the simulation. For \wrench and \wrench-cache, we
-            determined the corresponding number of flops on a 1~Gflops CPU
-            and used these values in the simulation. The final simulated
-            platform and application used in our experiments are available at
-            commit \href{https://github.com/wrench-project/wrench/tree/ec6b43561b95977002258c0fe37a4ecad8f1d33f/examples/basic-examples/io-pagecache}{ec6b43561b}.
-
-            \begin{table}[b]
-            \centering
-            \begin{tabularx}{0.8\columnwidth}{c>{\centering\arraybackslash}X}
-            \toprule
-                Input size (GB)  & CPU time (second)\\
-            \midrule
-                3      & 4.4 \\
-                20  & 28 \\
-                50  & 75 \\
-                75  & 110 \\
-                100  & 155 \\
-            \bottomrule
-            \end{tabularx}
-            \caption{Task CPU times used in the simulation.
-%            \tristan{are the input files in GB or in GiB? If GiB, then change the abbreviation everywhere.}
-%  Dzung: it's in GB
-            \tristan{add nighres CPU times when available}}
-            \label{table:cputime}
-            \end{table}
-
             % Finally, because \wrench simulates applications base on network-communication,
             % we use an infinite bandwidth to eliminate network latency for local I/Os.
 
-            Our first experiment runs a
-            single instance of the synthetic application on a single
-            cluster node, with different input file sizes (20~GB, 50~GB,
-            75~GB, 100~GB), and with all I/Os directed to the same local
-            disk. The goal is to validate the simulation model in absence
-            of any concurrent disk access.
-
-            Our second experiment runs concurrent instances of the
-            application on a single node, all application instances
-            operating on different files of size 3~GB stored in the same
-            local disk. We vary the number of
-            concurrent application instances from 1 to 32 since cluster
-            nodes have 32 CPU cores.
-
-            Our third experiment occurs in the same
-            configuration as the previous one, albeit reading and writing
-            on a 50-GiB NFS-mounted partition of a 450-GiB remote disk of
-            another compute node. As is commonly configured in HPC
-            environments to avoid data loss, there is no client write cache
-            and the server cache is configured as writethrough instead of
-            writeback. NFS client and server read caches are enabled. 
-            Therefore, all the writes happen at disk bandwidth, but
-            reads can benefit from cache hits.
-
-            Our fourth and final experiment runs the Nighres workflow on
-            data from participant 0027430 in the dataset of the Max Planck Institute for
-            Human Cognitive and Brain Sciences
-            available at
-            \url{http://dx.doi.org/10.15387/fcp_indi.corr.mpg1}. The data
-            amounts to 2.3~GB and was downloaded from
-            \url{http://datasets.datalad.org/?dir=/corr/RawDataBIDS/MPG_1/sub-0027430}.
-            The workflow was run on a single node of the cluster, using a
-            single local disk.
 
     \section{Results}
     \label{results}
@@ -765,11 +776,11 @@
             %    \textcolor{red}{Update real results of 20GB}}
                \label{fig:single_cache}
         \end{subfigure}
-        \caption{Single-threaded results}
+        \caption{Single-threaded results (\textit{Exp 1})}
         \end{figure*}
 
 
-        \subsection{Single-threaded experiment}
+        \subsection{Single-threaded execution (Exp 1)}
 
         The page cache simulation model drastically reduces I/O simulation
         errors in each application task (Figure~\ref{fig:single_error}). The first read is not impacted
@@ -779,6 +790,15 @@
         significantly overestimates read and write times, due to the lack
         of page cache simulation. Results with files of 50~GB and 75~GB
         show similar behaviors and are not reported for brevity.
+
+        \begin{figure*}
+            \begin{subfigure}{\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
+            \end{subfigure}
+            \caption{Concurrent results with 3~GB files (\textit{Exp 2}). Averages on 5 repetitions.}
+            \label{fig:multi_local}
+        \end{figure*}
 
         \wrench simulation errors are substantially lower with 100~GB
         files than with 20~GB files, due to the fact that part of the
@@ -808,14 +828,7 @@
         implementations.
 
 
-        \begin{figure*}
-            \begin{subfigure}{\linewidth}
-                \centering
-                \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
-            \end{subfigure}
-            \caption{Concurrent results with 3~GB files (averages on 5 repetitions)}
-            \label{fig:multi_local}
-        \end{figure*}
+
 
 
         The content of the simulated memory cache is also highly consistent
@@ -833,13 +846,11 @@
                 \centering
                 \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
             \end{subfigure}
-            \caption{NFS results with 3~GB files (averages on 5 repetitions)}
+            \caption{NFS results with 3~GB files (\textit{Exp 3}). Averages on 5 repetitions.}
             \label{fig:multi_nfs}
             \end{figure*}
 
-        \subsection{Concurrent applications}
-
-
+        \subsection{Concurrent applications (Exp 2)}
 
             The page cache model notably reduces \wrench's simulation error
             for concurrent applications executed with local I/Os
@@ -851,7 +862,7 @@
             marks the limit beyond which the page cache is saturated with dirty data
             and needs flushing \tristan{why is there no plateau in real life?}.
 
-        \subsection{Remote storage (NFS)}
+        \subsection{Remote storage (Exp 3)}
 
 
 
@@ -867,9 +878,27 @@
             % \tristan{Dzung, pls check that.}.
             % Yes, disk reads appear from 23 apps indeed.
 
-        \subsection{Real application}
+        \subsection{Real application (Exp 4)}
+        As for the synthetic application, simulation errors are again
+        substantially reduced by the WRENCH-cache simulator compared to
+        WRENCH (Figure~\ref{fig:nighres}). On average, errors are reduced
+        from 212~\% in WRENCH to 68~\% in WRENCH-cache. The error
+        reduction is mostly due to more accurate read times, since write
+        times remain generally identical between both implementations, presumably due to 
+        the dominance of file compression time in write time.
+        Similar to
+        the synthetic application, the first read happens entirely from disk and is therefore 
+        very accurately simulated by both WRENCH and WRENCH-cache.
+        \begin{figure}
+            \begin{subfigure}{\columnwidth}
+                \centering
+                \includegraphics[width=\linewidth]{result/nighres/figures/nighres_errors.pdf}
+            \end{subfigure}
+            \caption{Real application results (\textit{Exp 4})}
+            \label{fig:nighres}
+            \end{figure}
 
-        \subsection{Overhead comparison}
+        \subsection{Simulation time}
         As is the case for \wrench, simulation time with \wrench-cache scales
         linearly with the number of concurrent applications
         (Figure~\ref{fig:multi_time}, p \textless $10^{-24}$). However, the page
