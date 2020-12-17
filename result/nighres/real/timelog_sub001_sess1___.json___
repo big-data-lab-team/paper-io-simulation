@@ -1,0 +1,335 @@
+{
+  "mp2rage_skullstripping": {
+    "read": [
+      {
+        "filename": "/disk5/dzung/nighres_data/data_sets/7T_TRT/sub001_sess1_INV2.nii.gz",
+        "filesize": 24069110,
+        "start": 1608062710.656798,
+        "end": 1608062710.7110286,
+        "duration": 0.054230690002441406
+      },
+      {
+        "filename": "/disk5/dzung/nighres_data/data_sets/7T_TRT/sub001_sess1_T1w.nii.gz",
+        "filesize": 45150266,
+        "start": 1608062713.0041413,
+        "end": 1608062713.0980103,
+        "duration": 0.09386897087097168
+      },
+      {
+        "filename": "/disk5/dzung/nighres_data/data_sets/7T_TRT/sub001_sess1_T1map.nii.gz",
+        "filesize": 41993557,
+        "start": 1608062715.5096893,
+        "end": 1608062715.5962448,
+        "duration": 0.08655548095703125
+      }
+    ],
+    "write": [
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_strip-inv2.nii.gz",
+        "filesize": 7737646,
+        "start": 1608062834.7884216,
+        "end": 1608062835.3398297,
+        "duration": 0.551408052444458
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_strip-mask.nii.gz",
+        "filesize": 706731,
+        "start": 1608062835.3438988,
+        "end": 1608062835.667614,
+        "duration": 0.3237152099609375
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_strip-t1w.nii.gz",
+        "filesize": 11193417,
+        "start": 1608062841.947185,
+        "end": 1608062842.6620412,
+        "duration": 0.7148561477661133
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_strip-t1map.nii.gz",
+        "filesize": 10575876,
+        "start": 1608062848.881334,
+        "end": 1608062849.5530305,
+        "duration": 0.6716964244842529
+      }
+    ],
+    "makespan": [
+      {
+        "filename": null,
+        "filesize": 0,
+        "start": 1608062710.4176373,
+        "end": 1608062849.5558121,
+        "duration": 139.13817477226257
+      }
+    ]
+  },
+  "mgdm_segmentation": {
+    "read": [
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_strip-t1w.nii.gz",
+        "filesize": 11193417,
+        "start": 1608062849.5625997,
+        "end": 1608062849.5665636,
+        "duration": 0.003963947296142578
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_strip-t1map.nii.gz",
+        "filesize": 10575876,
+        "start": 1608062851.6682918,
+        "end": 1608062851.6725836,
+        "duration": 0.0042917728424072266
+      }
+    ],
+    "write": [
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-seg.nii.gz",
+        "filesize": 1926257,
+        "start": 1608063473.4278529,
+        "end": 1608063473.7918818,
+        "duration": 0.3640289306640625
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-dist.nii.gz",
+        "filesize": 23734571,
+        "start": 1608063473.7962785,
+        "end": 1608063474.9686735,
+        "duration": 1.1723949909210205
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-lbls.nii.gz",
+        "filesize": 22347936,
+        "start": 1608063474.97093,
+        "end": 1608063477.8986125,
+        "duration": 2.927682399749756
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-mems.nii.gz",
+        "filesize": 126623059,
+        "start": 1608063477.9012926,
+        "end": 1608063484.7938902,
+        "duration": 6.892597675323486
+      }
+    ],
+    "makespan": [
+      {
+        "filename": null,
+        "filesize": 0,
+        "start": 1608062849.5603323,
+        "end": 1608063484.796535,
+        "duration": 635.2362027168274
+      }
+    ]
+  },
+  "extract_brain_region": {
+    "read": [
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-seg.nii.gz",
+        "filesize": 1926257,
+        "start": 1608063484.8050544,
+        "end": 1608063484.8063927,
+        "duration": 0.0013382434844970703
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-mems.nii.gz",
+        "filesize": 126623059,
+        "start": 1608063484.992256,
+        "end": 1608063485.0306132,
+        "duration": 0.03835725784301758
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-dist.nii.gz",
+        "filesize": 23734571,
+        "start": 1608063485.610121,
+        "end": 1608063485.616681,
+        "duration": 0.006560087203979492
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-mems.nii.gz",
+        "filesize": 126623059,
+        "start": 1608063487.7641869,
+        "end": 1608063487.8054883,
+        "duration": 0.04130148887634277
+      },
+      {
+        "filename": "/disk5/dzung/output/tissue_classification/vhs_mgdm-lbls.nii.gz",
+        "filesize": 22347936,
+        "start": 1608063500.543503,
+        "end": 1608063500.5506468,
+        "duration": 0.007143735885620117
+      }
+    ],
+    "write": [
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xmask-lcrwm.nii.gz",
+        "filesize": 638809,
+        "start": 1608063565.3762343,
+        "end": 1608063565.6984248,
+        "duration": 0.322190523147583
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xproba-lcrwm.nii.gz",
+        "filesize": 11831013,
+        "start": 1608063565.7031355,
+        "end": 1608063566.4273217,
+        "duration": 0.7241861820220947
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xlvl-lcrwm.nii.gz",
+        "filesize": 23942276,
+        "start": 1608063566.4310622,
+        "end": 1608063567.6093526,
+        "duration": 1.1782903671264648
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xmask-lcrgm.nii.gz",
+        "filesize": 841958,
+        "start": 1608063567.611525,
+        "end": 1608063567.9381816,
+        "duration": 0.3266565799713135
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xproba-lcrgm.nii.gz",
+        "filesize": 12170018,
+        "start": 1608063567.9406488,
+        "end": 1608063568.6777678,
+        "duration": 0.7371189594268799
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xlvl-lcrgm.nii.gz",
+        "filesize": 24060457,
+        "start": 1608063568.68063,
+        "end": 1608063569.860207,
+        "duration": 1.179577112197876
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xmask-lcrbg.nii.gz",
+        "filesize": 746661,
+        "start": 1608063569.863302,
+        "end": 1608063570.1894977,
+        "duration": 0.32619571685791016
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xproba-lcrbg.nii.gz",
+        "filesize": 22400679,
+        "start": 1608063570.1916823,
+        "end": 1608063571.329901,
+        "duration": 1.138218641281128
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xlvl-lcrbg.nii.gz",
+        "filesize": 24128804,
+        "start": 1608063571.3329692,
+        "end": 1608063572.4962919,
+        "duration": 1.1633226871490479
+      }
+    ],
+    "makespan": [
+      {
+        "filename": null,
+        "filesize": 0,
+        "start": 1608063484.8023984,
+        "end": 1608063572.4989552,
+        "duration": 87.69655680656433
+      }
+    ]
+  },
+  "cruise_cortex_extraction": {
+    "read": [
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xmask-lcrwm.nii.gz",
+        "filesize": 638809,
+        "start": 1608063572.5064836,
+        "end": 1608063572.5074222,
+        "duration": 0.0009386539459228516
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xproba-lcrwm.nii.gz",
+        "filesize": 11831013,
+        "start": 1608063573.2849543,
+        "end": 1608063573.2894714,
+        "duration": 0.004517078399658203
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xproba-lcrgm.nii.gz",
+        "filesize": 12170018,
+        "start": 1608063575.397288,
+        "end": 1608063575.401129,
+        "duration": 0.003840923309326172
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_xproba-lcrbg.nii.gz",
+        "filesize": 22400679,
+        "start": 1608063577.461407,
+        "end": 1608063577.4677129,
+        "duration": 0.0063059329986572266
+      }
+    ],
+    "write": [
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-cortex.nii.gz",
+        "filesize": 989087,
+        "start": 1608063842.1537726,
+        "end": 1608063842.4889662,
+        "duration": 0.3351936340332031
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-gwb.nii.gz",
+        "filesize": 83151825,
+        "start": 1608063842.4938319,
+        "end": 1608063846.0825977,
+        "duration": 3.588765859603882
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-cgb.nii.gz",
+        "filesize": 83431234,
+        "start": 1608063846.0861335,
+        "end": 1608063849.69435,
+        "duration": 3.6082165241241455
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-avg.nii.gz",
+        "filesize": 8396101,
+        "start": 1608063849.697376,
+        "end": 1608063850.2505367,
+        "duration": 0.5531606674194336
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-thick.nii.gz",
+        "filesize": 3560258,
+        "start": 1608063850.2544203,
+        "end": 1608063850.6611958,
+        "duration": 0.40677547454833984
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-pwm.nii.gz",
+        "filesize": 24497232,
+        "start": 1608063850.6642084,
+        "end": 1608063851.7736838,
+        "duration": 1.1094753742218018
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-pgm.nii.gz",
+        "filesize": 23321907,
+        "start": 1608063851.7765002,
+        "end": 1608063852.971349,
+        "duration": 1.1948487758636475
+      },
+      {
+        "filename": "/disk5/dzung/output/cortical_depth_estimation/vhs_left_cerebrum_cruise-pcsf.nii.gz",
+        "filesize": 22605755,
+        "start": 1608063852.9747007,
+        "end": 1608063854.102196,
+        "duration": 1.127495288848877
+      }
+    ],
+    "makespan": [
+      {
+        "filename": null,
+        "filesize": 0,
+        "start": 1608063572.504801,
+        "end": 1608063854.1060493,
+        "duration": 281.60124826431274
+      }
+    ]
+  }
+}
