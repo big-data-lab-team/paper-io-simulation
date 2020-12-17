@@ -692,10 +692,10 @@
                 \multicolumn{1}{c}{Workflow step}& Input size       & Output size      & CPU time\\
                                        & (MB)             & (MB)             & (s)\\
             \midrule
-               Skull stripping         &  111             & 30               & 137 \\
-               Tissue classification   &  22              & 175              & 624 \\
-               Region extraction       &  175             & 121              & 81 \\
-               Cortical reconstruction &  47              & 250              & 270\\
+               Skull stripping         &  295             & 393               & 137 \\
+               Tissue classification   &  197              & 1376              & 614 \\
+               Region extraction       &  1376             & 885              & 76 \\
+               Cortical reconstruction &  393              & 786              & 272\\
             \bottomrule
             \end{tabular} 
             \caption{Nighres application parameters}
@@ -872,10 +872,10 @@
         As for the synthetic application, simulation errors were
         substantially reduced by the WRENCH-cache simulator compared to
         WRENCH (Figure~\ref{fig:nighres}). On average, errors were reduced
-        from 212~\% in WRENCH to 68~\% in WRENCH-cache. Error
-        reduction was mostly due to read times, since write
-        times remained generally identical between both implementations, presumably due to 
-        the dominance of file compression time in write time.
+        from 337~\% in WRENCH to 47~\% in WRENCH-cache. 
+%        Error reduction was mostly due to read times, since write
+%        times remained generally identical between both implementations, presumably due to 
+%        the dominance of file compression time in write time.
         Similar to
         the synthetic application, the first read happened entirely from disk and was therefore 
         very accurately simulated by both WRENCH and WRENCH-cache.
