@@ -155,8 +155,8 @@ def plot_error():
     # print("WRENCH-cache Write errors:")
     # print(abs(np.array(writes_wrench_cache) - np.array(writes_real)) / np.array(writes_real)% 100)
 
-    fig, ax = plt.subplots(figsize=(11, 5))
-    plt.rcParams.update({'font.size': 9})
+    plt.rcParams.update({'font.size': 12})
+    fig, ax = plt.subplots(figsize=(9, 4))
     wrench_error = abs(np.array(wrench_arr) - np.array(real_arr)) / np.array(real_arr) * 100
     wrench_cache_error = abs(np.array(wrench_cache_arr) - np.array(real_arr)) / np.array(real_arr) * 100
 
@@ -165,9 +165,10 @@ def plot_error():
     # labels = ["Write 1", "Write 2", "Write 3",  "Write 4"]
     grouped_bar_chart(ax, labels, "", "error (%)",  ("WRENCH", wrench_error, '#994F88'),
                       ("WRENCH-cache", wrench_cache_error, '#1965B0'))
-    lgd = plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1), ncol=3)
+    lgd = plt.legend(loc='upper center', bbox_to_anchor=(0.55, 1), ncol=2)
+
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.85, wspace=0.3)
 
     plt.savefig("figures/nighres_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.savefig("figures/nighres_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.85, wspace=0.3)
     # plt.show()

@@ -129,10 +129,10 @@ def result_local(rep_no=1, step=1):
 
     plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.18), ncol=4)
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.4)
-    # plt.savefig("figures/multi_local.pdf", format="pdf")
-    # plt.savefig("figures/multi_local.svg", format="svg")
+    plt.savefig("figures/multi_local.pdf", format="pdf")
+    plt.savefig("figures/multi_local.svg", format="svg")
 
-    plt.show()
+    # plt.show()
 
 
 def result_nfs(rep_no=1):
