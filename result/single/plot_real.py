@@ -31,32 +31,41 @@ def timestamp_readonly_plot(fig, time_stamps):
             fig.axvspan(xmin=read_end[idx] - start, xmax=read_start[idx + 1] - start, color="k", alpha=0.2)
 
 
-def mem_plot(fig, atoplog, time_stamp, input_size, readonly=False):
-    dirty_data = np.array(atoplog["total"])
+def mem_plot(fig, atop_log, time_stamp, input_size, readonly=False):
+    dirty_data = np.array(atop_log["total"])
     intervals = len(dirty_data)
     time = np.arange(0, intervals)
 
     fig.minorticks_on()
-    fig.set_title("memory profiling (input size = %s GB)" % input_size)
+    # fig.set_title("memory profiling (input size = %s GB)" % input_size)
+    start = time_stamp[0][1]
 
-    if time_stamp is not None:
-        if readonly:
-            timestamp_readonly_plot(fig, time_stamp)
+    for i in range(len(time_stamp)):
+        if time_stamp[i][0] == "read":
+            fig.axvspan(xmin=time_stamp[i][1] - start, xmax=time_stamp[i][2] - start, color="k", alpha=0.1,
+                        label="Read" if i == 0 else "")
         else:
-            timestamp_plot(fig, time_stamp)
+            fig.axvspan(xmin=time_stamp[i - 1][2] - start, xmax=time_stamp[i][1] - start, color="k", alpha=0.25,
+                        label="Compute" if i == 1 else "")
+            fig.axvspan(xmin=time_stamp[i][1] - start, xmax=time_stamp[i][2] - start, color="k", alpha=0.4,
+                        label="write" if i == 1 else "")
+
+    linewidth = 1.5
+    linestyle = "-"
+    line_alpha = 0.9
 
     # app_cache = list(np.array(app_mem) + np.array(cache_used))
 
-    fig.plot(time, atoplog["total"], color='k', linewidth=1, linestyle=":", label="total mem")
-    # ax1.plot(time, free_mem, color='g', linewidth=1.5, linestyle="-.", label="free memory")
-    fig.plot(time, atoplog["used_mem"], color='g', linewidth=1, label="used mem")
-    # ax1.plot(time, app_mem, color='c', linewidth=1.5, label="app memory")
-    fig.plot(time, atoplog["cache"], color='m', linewidth=1, label="cache used")
-    # ax1.plot(time, app_cache, color='c', linewidth=1.5, label="cache + app")
-    fig.plot(time, atoplog["dirty_data"], color='r', linewidth=1, label="dirty data")
-    fig.plot(time, atoplog["avai_mem"], color='b', linewidth=1, linestyle="-.", label="available mem")
-    fig.plot(time, atoplog["dirty_ratio"], color='k', linewidth=1, linestyle="-.", label="dirty_ratio")
-    fig.plot(time, atoplog["dirty_bg_ratio"], color='r', linewidth=1, linestyle="-.", label="dirty_bg_ratio")
+    fig.plot(time, atop_log["total"], color='black', linewidth=linewidth, label="Total memory",
+             alpha=line_alpha)
+    fig.plot(time, atop_log["dirty_ratio"], color='black', linewidth=linewidth, linestyle=":",
+             label="dirty_ratio", alpha=line_alpha)
+    fig.plot(time, atop_log["used_mem"], color='#72190E', linewidth=linewidth, linestyle=linestyle,
+             label="Used memory", alpha=line_alpha)
+    fig.plot(time, atop_log["cache"], color='#DC050C', linewidth=linewidth, linestyle=linestyle,
+             label="Cache", alpha=line_alpha)
+    fig.plot(time, atop_log["dirty_data"], color='#F4A736', linewidth=linewidth, linestyle=linestyle,
+             label="Dirty data", alpha=line_alpha)
 
     fig.legend(fontsize='small', loc='upper right')
 
@@ -115,8 +124,8 @@ def plot(atop_log_file, timestamps_file, collectl_log_file, input_size):
     else:
         ax1 = figure.add_subplot(1, 1, 1)
 
-    ax1.set_ylim(top=280, bottom=-10)
-    ax1.set_xlim(left=0, right=400)
+    ax1.set_ylim(top=120, bottom=-10)
+    ax1.set_xlim(left=0, right=50)
     mem_plot(ax1, atop_log, timestamps, input_size)
 
     if collectl_log_file is not None:
@@ -126,7 +135,7 @@ def plot(atop_log_file, timestamps_file, collectl_log_file, input_size):
 
 
 size = 20
-plot(atop_log_file="real/nfs/%dgb/atop.log" % size,
-     timestamps_file="real/nfs/%dgb/timestamps.csv" % size,
+plot(atop_log_file="real/export_multi_2nd_vhs_1/2/atop_1",
+     timestamps_file="real/export_multi_2nd_vhs_1/2/time_pipeline_1_1.csv",
      collectl_log_file=None,
      input_size=size)
