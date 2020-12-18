@@ -43,12 +43,19 @@ def aggregate_result(folder, no_pipeline):
     return no_pipeline, makespan, readtime, writetime
 
 
-def export_real_results(folder, filename):
+def export_real_results(folder, filename, step=1):
+    """
+    Export aggregated results for each repetition of read execution
+    :param folder:
+    :param filename: aggregated results file
+    :param step: increment step of number of pipelines
+    :return:
+    """
     file = "%s%s" % (folder, filename)
     with open(file, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["no_pipeline", "makespan", "readtime", "writetime"])
-        for i in range(32):
+        for i in range(0, 32, step):
             writer.writerow(list(aggregate_result(folder, i + 1)))
 
 
@@ -74,10 +81,11 @@ def parse_simgrid_result(filename, no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1):
+def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1, step=1):
     simg_org_df = pd.read_csv("%s/original/aggregated.csv" % wrench_dir)
     simg_ext_df = pd.read_csv("%s/pagecache/aggregated.csv" % wrench_dir)
     no_pipeline_df = simg_org_df["no_pipeline"]
+    no_pipeline_real = list(range(1, len(no_pipeline_df) + 1, step))
 
     real_df = pd.DataFrame()
     for i in range(rep_no):
@@ -90,10 +98,10 @@ def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1):
 
     ax.set_title(title)
 
-    ax.plot(no_pipeline_df, mean_df / no_pipeline_df, color=real_color, linewidth=2, label="Real execution mean")
+    ax.plot(no_pipeline_real, mean_df / no_pipeline_real, color=real_color, linewidth=2, label="Real execution mean")
     # ax.plot(no_pipeline_df, max_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
     # ax.plot(no_pipeline_df, min_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
-    ax.fill_between(no_pipeline_df, min_df / no_pipeline_df, max_df / no_pipeline_df, facecolor=real_color, alpha=0.5,
+    ax.fill_between(no_pipeline_real, min_df / no_pipeline_real, max_df / no_pipeline_real, facecolor=real_color, alpha=0.5,
                     label="Real execution min-max interval (5 repetitions)")
 
     ax.plot(no_pipeline_df, simg_org_df[propname] / no_pipeline_df, linewidth=2, color=wrench_color, label="WRENCH")
@@ -104,27 +112,27 @@ def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1):
         ax.set_ylabel("time (s)")
 
 
-def result_local(rep_no=1):
+def result_local(rep_no=1, step=1):
     for i in range(rep_no):
-        export_real_results("local/real/%d/" % (i + 1), "aggregated.csv")
+        export_real_results("local/real_clearoutput_step5/%d/" % (i + 1), "aggregated.csv", step)
 
     export_simgrid_result("local/wrench/original/", "aggregated.csv")
     export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
     plt.rcParams.update({'font.size': 8})
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
 
-    suplot_prop(ax1, "local/real/", "local/wrench/", "readtime", "Read time", True, rep_no=rep_no)
-    suplot_prop(ax2, "local/real/", "local/wrench/", "writetime", "Write time", False, rep_no=rep_no)
+    suplot_prop(ax1, "local/real_clearoutput_step5/", "local/wrench/", "readtime", "Read time", True, rep_no=rep_no, step=step)
+    suplot_prop(ax2, "local/real_clearoutput_step5/", "local/wrench/", "writetime", "Write time", False, rep_no=rep_no, step=step)
 
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
 
     plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.18), ncol=4)
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.4)
-    plt.savefig("figures/multi_local.pdf", format="pdf")
-    plt.savefig("figures/multi_local.svg", format="svg")
+    # plt.savefig("figures/multi_local.pdf", format="pdf")
+    # plt.savefig("figures/multi_local.svg", format="svg")
 
-    # plt.show()
+    plt.show()
 
 
 def result_nfs(rep_no=1):
@@ -206,3 +214,4 @@ def run_time():
 
     plt.savefig("figures/simulation_time.pdf", format="pdf")
     plt.savefig("figures/simulation_time.svg", format="svg")
+

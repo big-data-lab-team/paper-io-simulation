@@ -8,15 +8,23 @@ The output log files should be generated and placed in corresponding directories
 #### Local file system experiment
 
 - Real execution: log files should be placed in `local/real/<i>/`, where `<i>` is the number 
-of the repetition. 
+of the iteration. 
 The log file should be named as `time_pipeline_<no_pipeline>_<pipeline_idx>.csv`
 
 - Original WRENCH: log files should be placed in `local/wrench/orginal/<i>/`. 
 The log files (exported by WRENCH) should be named as `dump_<no_pipeline>.json`.
 
-- WRENCH with page cache: log files should be placed in `local/wrench/pagecache/<i>/`. 
+- WRENCH-cache: log files should be placed in `local/wrench/pagecache/<i>/`. 
 The log files (exported by WRENCH) should be named as `dump_<no_pipeline>.json`.
 
 #### NFS experiment
 
 Similar to above experiment but use the directory `nfs/` instead of `local/`.
+
+#### Nighres experiment
+
+- Real execution: log files in `nighres/real/`.
+
+- Original WRENCH: log files in `nighres/wrench/orignal`. 
+
+- WRENCH-cache: log files in `nighres/wrench/pagecache`.
