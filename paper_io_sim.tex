@@ -31,7 +31,7 @@
 \algnotext{EndOutput}
 \newcommand{\Desc}[2]{\State \makebox[2em][l]{#1}#2}
 
-\newcommand{\tristan}[1]{}%\color{orange}\textbf{From Tristan:}#1\color{black}}
+\newcommand{\tristan}[1]{\color{orange}\textbf{From Tristan:}#1\color{black}}
 \newcommand{\henri}[1]{\color{green}\textbf{From Henri:}#1\color{black}}
 \newcommand{\english}[1]{\uwave{#1}}
 
@@ -841,11 +841,11 @@
             for concurrent applications executed with local I/Os
             (Figure~\ref{fig:multi_local}). For reads, \wrench-cache still
             slightly overestimated reality, due to the discrepancy between
-            simulated and real read bandwidths mentioned before. For writes,
-            \wrench-cache slightly underestimated reality for the same reason. The plateau
-            ending around 7 concurrent applications in the \wrench-cache writes
-            marks the limit beyond which the page cache was saturated with dirty data
-            and needed flushing. \tristan{why is there no plateau in real life?}
+            simulated and real read bandwidths mentioned before. For
+            writes, \wrench-cache correctly retrieves the plateau ending at
+            \tristan{x} concurrent applications in real life, corresponding
+            to the limit beyond which the page cache was saturated with
+            dirty data and needed flushing.
 
             \begin{figure}[b]
                 \begin{subfigure}{0.95\linewidth}
