@@ -410,7 +410,7 @@
     If the last evicted block does not have to be entirely evicted, the block is split in two blocks,
     and only one of them is evicted.
     The overhead of the cache eviction algorithm is not part of the simulated time
-    since cache eviction time is negligible in real systems \tristan{a reference would be welcome}.
+    since cache eviction time is negligible in real systems. % \tristan{a reference would be welcome}.
 
     \begin{algorithm}[b]\caption{Periodical flush simulation in Memory Manager}\label{alg:pdflush}
         \small
@@ -801,7 +801,7 @@
         Simulated memory profiles were highly consistent with the real ones
         (Figure~\ref{fig:single_memprof}). With 20~GB files, memory profiles almost exactly matched the
         real ones, although dirty data seemed to be flushing faster in real
-        life than in simulation, \tristan{any idea why?} a behavior also
+        life than in simulation, a behavior also
         observed with 100~GB files. With 100~GB files, used memory reached
         total memory during the first write, triggering dirty data
         flushing, and droped back to cached memory when application tasks
