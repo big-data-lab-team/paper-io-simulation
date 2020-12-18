@@ -94,7 +94,7 @@ def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1):
     # ax.plot(no_pipeline_df, max_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
     # ax.plot(no_pipeline_df, min_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
     ax.fill_between(no_pipeline_df, min_df / no_pipeline_df, max_df / no_pipeline_df, facecolor=real_color, alpha=0.5,
-                    label="Real execution min-max interval")
+                    label="Real execution min-max interval (5 repetitions)")
 
     ax.plot(no_pipeline_df, simg_org_df[propname] / no_pipeline_df, linewidth=2, color=wrench_color, label="WRENCH")
     ax.plot(no_pipeline_df, simg_ext_df[propname] / no_pipeline_df, linewidth=2, color=wrench_cache_color, label="WRENCH-cache")

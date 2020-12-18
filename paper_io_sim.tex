@@ -228,7 +228,7 @@
         application workloads executed on various hardware/software
         infrastructures. 
 
-        The two main concerns of simulation are accuracy,
+        The two main concerns for simulation are accuracy,
         the ability to faithfully reproduce real-world executions, and
         scalability, the ability to simulate large/long real-world
         executions quickly and with low RAM footprint. The above
@@ -574,7 +574,7 @@
             concurrency: it is limited to single-threaded applications running on systems
             with a single-core CPU. We used this prototype for a first validation of our simulation
             model against a real sequential application running on a real system.
-            The Python 3.7 source code of this prototype is available at
+            The Python 3.7 source code is available at
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}.
 
             We also implemented our model as part of \wrench, enhancing its
@@ -667,7 +667,7 @@
         and the server cache was configured as writethrough instead of
         writeback. NFS client and server read caches were enabled. 
         Therefore, all the writes happened at disk bandwidth, but
-        reads can benefit from cache hits.
+        reads could benefit from cache hits.
 
         The real application was a workflow of the Nighres
         toolbox~\cite{huntenburg2018nighres}, implementing cortical
@@ -788,7 +788,7 @@
         39\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
         significantly overestimated read and write times, due to the lack
         of page cache simulation. Results with files of 50~GB and 75~GB
-        showed similar behaviors and were not reported for brevity.
+        showed similar behaviors and are not reported for brevity.
 
         \wrench simulation errors were substantially lower with 100~GB
         files than with 20~GB files, due to the fact that part of the
@@ -801,7 +801,7 @@
         Simulated memory profiles were highly consistent with the real ones
         (Figure~\ref{fig:single_memprof}). With 20~GB files, memory profiles almost exactly matched the
         real ones, although dirty data seemed to be flushing faster in real
-        life than in simulation \tristan{any idea why?}, a behavior also
+        life than in simulation, \tristan{any idea why?} a behavior also
         observed with 100~GB files. With 100~GB files, used memory reached
         total memory during the first write, triggering dirty data
         flushing, and droped back to cached memory when application tasks
@@ -818,7 +818,7 @@
         The content of the simulated memory cache was also highly
         consistent with reality (Figure~\ref{fig:single_cache}). With 20~GB
         files, the simulated cache content exactly matched reality, since
-        all files fit in page cache. With 100~GB files, a slight
+        all files fitted in page cache. With 100~GB files, a slight
         discrepancy was observed after Write 2, which explains the
         simulation error previously mentioned in Read 3. In the real
         execution indeed, File 3 was entirely cached after Write 2, whereas
@@ -832,7 +832,7 @@
                     \centering
                     \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
                 \end{subfigure}
-                \caption{Concurrent results with 3~GB files (\textit{Exp 2}). Averages on 5 repetitions.}
+                \caption{Concurrent results with 3~GB files (\textit{Exp 2})}
                 \label{fig:multi_local}
             \end{figure*}
         \subsection{Concurrent applications (Exp 2)}
@@ -881,7 +881,7 @@
                     \centering
                     \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
                 \end{subfigure}
-                \caption{NFS results with 3~GB files (\textit{Exp 3}). Averages on 5 repetitions.}
+                \caption{NFS results with 3~GB files (\textit{Exp 3})}
                 \label{fig:multi_nfs}
                 \end{figure*}
     
