@@ -5,10 +5,10 @@ import csv
 import json
 import seaborn as sns
 
-
 real_color = "#90C987"
 wrench_color = "#994F88"
 wrench_cache_color = "#1965B0"
+
 
 def parse_single_pipeline(filename):
     """
@@ -43,7 +43,7 @@ def aggregate_result(folder, no_pipeline):
     return no_pipeline, makespan, readtime, writetime
 
 
-def export_real_results(folder, filename, step=1):
+def export_real_results(folder, filename):
     """
     Export aggregated results for each repetition of read execution
     :param folder:
@@ -55,8 +55,9 @@ def export_real_results(folder, filename, step=1):
     with open(file, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["no_pipeline", "makespan", "readtime", "writetime"])
-        for i in range(0, 32, step):
-            writer.writerow(list(aggregate_result(folder, i + 1)))
+        no_pipelines = [1] + list(range(6, 17)) + [21, 26, 31]
+        for i in no_pipelines:
+            writer.writerow(list(aggregate_result(folder, i)))
 
 
 def export_simgrid_result(folder, filename):
@@ -81,18 +82,19 @@ def parse_simgrid_result(filename, no_pipeline):
     return no_pipeline, makespan, read, write
 
 
-def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1, step=1, xmax=32):
-
+def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1, xmax=32):
     # Real execution
     real_df = pd.DataFrame()
+    no_pipeline_real = pd.Series()
     for i in range(rep_no):
         df = pd.read_csv("%s/%d/aggregated.csv" % (real_dir, i + 1))
+        if no_pipeline_real.empty:
+            no_pipeline_real = df["no_pipeline"]
         real_df[i + 1] = df[propname]
 
     mean_df = real_df.mean(axis=1)
     max_df = real_df.max(axis=1)
     min_df = real_df.min(axis=1)
-    no_pipeline_real = list(range(1, xmax + 1, step))
 
     # Simulation
     simg_org_df = pd.read_csv("%s/original/aggregated.csv" % wrench_dir)
@@ -105,12 +107,14 @@ def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1, ste
     ax.plot(no_pipeline_real, mean_df / no_pipeline_real, color=real_color, linewidth=2, label="Real execution mean")
     # ax.plot(no_pipeline_df, max_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
     # ax.plot(no_pipeline_df, min_df / no_pipeline_df, color="green", linewidth=1, alpha=0.5)
-    ax.fill_between(no_pipeline_real, min_df / no_pipeline_real, max_df / no_pipeline_real, facecolor=real_color, alpha=0.5,
+    ax.fill_between(no_pipeline_real, min_df / no_pipeline_real, max_df / no_pipeline_real, facecolor=real_color,
+                    alpha=0.5,
                     label="Real execution min-max interval (5 repetitions)")
 
     # Plot sim
     ax.plot(no_pipeline_sim, simg_org_show[propname] / no_pipeline_sim, linewidth=2, color=wrench_color, label="WRENCH")
-    ax.plot(no_pipeline_sim, simg_ext_show[propname] / no_pipeline_sim, linewidth=2, color=wrench_cache_color, label="WRENCH-cache")
+    ax.plot(no_pipeline_sim, simg_ext_show[propname] / no_pipeline_sim, linewidth=2, color=wrench_cache_color,
+            label="WRENCH-cache")
 
     ax.set_title(title)
     ax.set_xlabel("Concurrent applications")
@@ -118,17 +122,17 @@ def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1, ste
         ax.set_ylabel("time (s)")
 
 
-def result_local(rep_no=1, step=1):
+def result_local(rep_no=1):
     for i in range(rep_no):
-        export_real_results("local/real_step5/%d/" % (i + 1), "aggregated.csv", step)
+        export_real_results("local/real_step5/%d/" % (i + 1), "aggregated.csv")
 
     export_simgrid_result("local/wrench/original/", "aggregated.csv")
     export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
     plt.rcParams.update({'font.size': 8})
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
 
-    suplot_prop(ax1, "local/real_step5/", "local/wrench/", "readtime", "Read time", True, rep_no=rep_no, step=step, xmax=31)
-    suplot_prop(ax2, "local/real_step5/", "local/wrench/", "writetime", "Write time", False, rep_no=rep_no, step=step, xmax=31)
+    suplot_prop(ax1, "local/real_step5/", "local/wrench/", "readtime", "Read time", True, rep_no=rep_no, xmax=31)
+    suplot_prop(ax2, "local/real_step5/", "local/wrench/", "writetime", "Write time", False, rep_no=rep_no, xmax=31)
 
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
@@ -174,44 +178,42 @@ def run_time():
     local_cache_df = pd.read_csv("local/wrench/run_time_pagecache.csv")
     nfs_cache_df = pd.read_csv("nfs/wrench/run_time_pagecache.csv")
 
-    fig, ax1 = plt.subplots(figsize=(5,5), ncols=1, nrows=1)
+    fig, ax1 = plt.subplots(figsize=(5, 5), ncols=1, nrows=1)
     plt.rcParams.update({'font.size': 8})
 
     from scipy import stats
-
 
     ax1.set_ylim(top=2)
     s = 10
 
     # WRENCH original
-    slope, intercept, r_value, p_value, std_err = stats.linregress(org_df["no_pipeline"],org_df["run_time"])
+    slope, intercept, r_value, p_value, std_err = stats.linregress(org_df["no_pipeline"], org_df["run_time"])
     print(f'WRENCH original: p={p_value}')
     ax1.scatter(local_org_df["no_pipeline"], local_org_df["run_time"],
-                label = "WRENCH (local)", s=s, color=wrench_color)
+                label="WRENCH (local)", s=s, color=wrench_color)
     ax1.scatter(nfs_org_df["no_pipeline"], nfs_org_df["run_time"],
                 label="WRENCH (NFS)", s=s, color=wrench_color, facecolor="none")
-    ax1.plot(org_df["no_pipeline"], intercept+slope*org_df["no_pipeline"], lw=1, color=wrench_color)
+    ax1.plot(org_df["no_pipeline"], intercept + slope * org_df["no_pipeline"], lw=1, color=wrench_color)
     plt.text(20, 0.1, f'y={round(slope,2)}x+{round(intercept,2)}', color=wrench_color)
 
     # WRENCH-cache Local I/Os
     slope, intercept, r_value, p_value, std_err = stats.linregress(local_cache_df["no_pipeline"],
                                                                    local_cache_df["run_time"])
     print(f'WRENCH-cache local: p={p_value}')
-    ax1.plot(local_cache_df["no_pipeline"], intercept+slope*local_cache_df["no_pipeline"],
+    ax1.plot(local_cache_df["no_pipeline"], intercept + slope * local_cache_df["no_pipeline"],
              color=wrench_cache_color, lw=1)
     ax1.scatter(local_cache_df["no_pipeline"], local_cache_df["run_time"],
                 label="WRENCH-cache (local)", s=s, color=wrench_cache_color)
     plt.text(17, 1, f'y={round(slope,2)}x{round(intercept,2)}', color=wrench_cache_color)
 
-
     # WRENCH-cache NFS
     slope, intercept, r_value, p_value, std_err = stats.linregress(nfs_cache_df["no_pipeline"],
                                                                    nfs_cache_df["run_time"])
     print(f'WRENCH-cache NFS: p={p_value}')
-    ax1.plot(nfs_cache_df["no_pipeline"], intercept+slope*nfs_cache_df["no_pipeline"],
+    ax1.plot(nfs_cache_df["no_pipeline"], intercept + slope * nfs_cache_df["no_pipeline"],
              color=wrench_cache_color, lw=1, linestyle='dotted')
     ax1.scatter(nfs_cache_df["no_pipeline"], nfs_cache_df["run_time"],
-                label = "WRENCH-cache (NFS)", s=s, color=wrench_cache_color, facecolor="none")
+                label="WRENCH-cache (NFS)", s=s, color=wrench_cache_color, facecolor="none")
     plt.text(27, 0.8, f'y={round(slope,2)}x{round(intercept,2)}', color=wrench_cache_color)
 
     plt.xlabel("Concurrent applications")
@@ -220,4 +222,3 @@ def run_time():
 
     plt.savefig("figures/simulation_time.pdf", format="pdf")
     plt.savefig("figures/simulation_time.svg", format="svg")
-

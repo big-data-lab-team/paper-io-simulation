@@ -22,7 +22,7 @@ plot_cache.plot_cache_v2()
 os.chdir("../multi")
 import result.multi.process_result as multi_result
 # Generate figures of experiment with local file system
-multi_result.result_local(rep_no=5, step=5)
+multi_result.result_local(rep_no=5)
 # Generate figures of experiment with NFS
 multi_result.result_nfs(rep_no=5)
 # runtime plots
