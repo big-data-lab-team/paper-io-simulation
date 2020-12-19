@@ -43,19 +43,23 @@ def aggregate_result(folder, no_pipeline):
     return no_pipeline, makespan, readtime, writetime
 
 
-def export_real_results(folder, filename):
+def export_real_results(folder, filename, missing_points=False):
     """
     Export aggregated results for each repetition of read execution
     :param folder:
     :param filename: aggregated results file
     :param step: increment step of number of pipelines
+    :param missing_points: true if not all numbers of pipelines are run, this is the case of local storage (Exp2)
     :return:
     """
     file = "%s%s" % (folder, filename)
     with open(file, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["no_pipeline", "makespan", "readtime", "writetime"])
-        no_pipelines = [1] + list(range(6, 17)) + [21, 26, 31]
+        if missing_points:
+            no_pipelines = [1] + list(range(6, 17)) + [21, 26, 31]
+        else:
+            no_pipelines = list(range(1, 33))
         for i in no_pipelines:
             writer.writerow(list(aggregate_result(folder, i)))
 
@@ -124,7 +128,7 @@ def suplot_prop(ax, real_dir, wrench_dir, propname, title, ylabel, rep_no=1, xma
 
 def result_local(rep_no=1):
     for i in range(rep_no):
-        export_real_results("local/real_step5/%d/" % (i + 1), "aggregated.csv")
+        export_real_results("local/real_step5/%d/" % (i + 1), "aggregated.csv", missing_points=True)
 
     export_simgrid_result("local/wrench/original/", "aggregated.csv")
     export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
