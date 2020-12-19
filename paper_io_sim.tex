@@ -839,20 +839,20 @@
 
             The page cache model notably reduced \wrench's simulation error
             for concurrent applications executed with local I/Os
-            (Figure~\ref{fig:multi_local}). For reads, \wrench-cache still
-            slightly overestimated reality, due to the discrepancy between
-            simulated and real read bandwidths mentioned before. For
-            writes, \wrench-cache correctly retrieves the plateau ending at
-            \tristan{x} concurrent applications in real life, corresponding
-            to the limit beyond which the page cache was saturated with
-            dirty data and needed flushing.
+            (Figure~\ref{fig:multi_local}). For reads, \wrench-cache
+            slightly overestimated runtime, due to the discrepancy between
+            simulated and real read bandwidths mentioned before. 
+            For writes, \wrench-cache
+            retrieved a plateau similar to the one observed in the real
+            execution, marking the limit beyond which the page cache was
+            saturated with dirty data and needed flushing.
 
             \begin{figure}[b]
                 \begin{subfigure}{0.95\linewidth}
                     \centering
                     \includegraphics[width=\linewidth]{result/nighres/figures/nighres_errors.pdf}
                 \end{subfigure}
-                \caption{Real application results (\textit{Exp 4}) \tristan{increase font size}}
+                \caption{Real application results (\textit{Exp 4})}
                 \label{fig:nighres}
                 \end{figure}
         \subsection{Remote storage (Exp 3)}
