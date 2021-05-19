@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
 
-def plot_cache(ax, real_file, sim_file, patterns, ylabel, color_real="#90C987", color_wrench="#1965B0"):
+def plot_cache(ax, real_file, sim_file, patterns, ylabel, title, color_real="#90C987", color_wrench="#1965B0", ):
     index = ["file_1", "file_2", "file_3", "file_4"]
     columns = ["Read 1", "Write 1", "Read 2", "Write 2", "Read 3", "Write 3"]
 
@@ -34,6 +34,7 @@ def plot_cache(ax, real_file, sim_file, patterns, ylabel, color_real="#90C987", 
     x_axis.label.set_visible(False)
     ax.set_xlim(left=-0.5)
     ax.set_ylim(top=180)
+    ax.set_title(title)
 
 
 def plot_cache_v2():
@@ -45,11 +46,13 @@ def plot_cache_v2():
     color_wrench = "#1965B0"
 
     fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.8, wspace=0.1)
-    plt.rcParams.update({'font.size': 9})
+    plt.subplots_adjust(left=0.07, bottom=0.1, right=0.95, top=0.8, wspace=0.15, hspace=0.3)
+    plt.rcParams.update({'font.size': 10})
 
-    plot_cache(ax1, "fincore/real_20gb.csv", "fincore/sim_20gb.csv", patterns, ylabel=True)
-    plot_cache(ax2, "fincore/real_100gb.csv", "fincore/sim_100gb.csv", patterns, ylabel=False)
+    plot_cache(ax1, "fincore/real_20gb.csv", "fincore/sim_20gb.csv", patterns, ylabel=False, title="20 GB")
+    # plot_cache(ax1[1], "fincore/real_50gb.csv", "fincore/sim_50gb.csv", patterns, ylabel=False, title="50 GB")
+    # plot_cache(ax2[0], "fincore/real_75gb.csv", "fincore/sim_75gb.csv", patterns, ylabel=False, title="75 GB")
+    plot_cache(ax2, "fincore/real_100gb.csv", "fincore/sim_100gb.csv", patterns, ylabel=False, title="100 GB")
 
     legend_elements = [Patch(facecolor=color_real),
                        Patch(facecolor=color_wrench),
@@ -58,11 +61,8 @@ def plot_cache_v2():
                        Patch(facecolor='w', hatch="///", edgecolor='k'),
                        Patch(facecolor='w', hatch="\\\\\\", edgecolor='k')]
 
-    ax1.set_title("20 GB")
-    ax2.set_title("100 GB")
-
+    fig.text(0.015, 0.45, 'memory (GB)', va='center', rotation='vertical')
     plt.legend(legend_elements, envs + files, ncol=6, loc='upper center', bbox_to_anchor=(-0.1, 1.3))
-    plt.savefig("figures/cached_files.svg", format="svg")
-    plt.savefig("figures/cached_files.pdf", format="pdf")
-
-    # plt.show()
+    plt.savefig("figures/cached_files_v2.svg", format="svg")
+    plt.savefig("figures/cached_files_v2.pdf", format="pdf")
+    plt.show()

@@ -29,8 +29,8 @@ mm = MemoryManager(268600, 268600, read_bw=4812, write_bw=4812)
 storage = Storage(450000, read_bw=465, write_bw=465)
 kernel = IOManager(mm, storage, dirty_ratio=0.4)
 
-input_size = 100000
-compute_time = 155
+input_size = 75000
+compute_time = 110
 
 file1 = File("file1", input_size, input_size)
 file2 = File("file2", input_size, input_size)
@@ -76,7 +76,7 @@ plot_sim.plot_pysim_log(mm.get_log(), task_time, "input = %d MB \nmem_rb = %d MB
                                            "disk_rb = %d MBps\ndisk_wb = %d MBps"
                       % (input_size, mm.read_bw, mm.write_bw,
                      storage.read_bw, storage.write_bw),
-                      xmin=0, xmax=1300, ymin=-10000, ymax=280000)
+                      xmin=0, xmax=800, ymin=-10000, ymax=280000)
 
-export_mem(mm.get_log(), "export/%dgb_sim_mem.csv" % (input_size / 1000))
-export_time(tasks, "export/%dgb_sim_time.csv" % (input_size / 1000))
+export_mem(mm.get_log(), "export_v2/%dgb_sim_mem.csv" % (input_size / 1000))
+export_time(tasks, "export_v2/%dgb_sim_time.csv" % (input_size / 1000))

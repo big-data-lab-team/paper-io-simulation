@@ -41,17 +41,21 @@ def plot_task_error(ax, size, ylabel):
                       ("WRENCH-cache", wrench_ext_error, '#1965B0'))
     ax.set_title("%d GB" % size)
 
+
 def plot_error():
     fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.8, wspace=0.1)
-    plt.rcParams.update({'font.size': 9})
+    plt.rcParams.update({'font.size': 10})
 
-    plot_task_error(ax1, 20, ylabel=True)
-    plot_task_error(ax2, 100, ylabel=False)
+    plot_task_error(ax1[0], 20, ylabel=False)
+    plot_task_error(ax1[1], 50, ylabel=False)
+    plot_task_error(ax2[0], 75, ylabel=False)
+    plot_task_error(ax2[1], 100, ylabel=False)
 
-    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.12, 1.25), ncol=3)
+    fig.text(0.01, 0.5, 'memory (GB)', va='center', rotation='vertical')
 
-    plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
+    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.12, 2.6), ncol=3)
+    plt.subplots_adjust(left=0.07, bottom=0.075, right=0.97, top=0.85, wspace=0.2, hspace=0.3)
+
+    plt.savefig("figures/single_errors_v2.svg", format="svg", bbox_extra_artists=(lgd,))
+    plt.savefig("figures/single_errors_v2.pdf", format="pdf", bbox_extra_artists=(lgd,))
     # plt.show()

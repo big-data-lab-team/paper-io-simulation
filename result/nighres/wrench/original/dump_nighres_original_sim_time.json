@@ -4,244 +4,244 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 1110.2705887641753,
-                    "start": 837.8197382774199
+                    "end": 1110.270588763382,
+                    "start": 837.8197382766266
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "host01",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 837.185516651613,
+                        "end": 837.1855166508197,
                         "id": "sub001_sess1_left_cerebrum_xmask-lcrwm.nii",
-                        "start": 836.9741094430112
+                        "start": 836.9741094422175
                     },
                     {
-                        "end": 837.3969238602153,
+                        "end": 837.396923859422,
                         "id": "sub001_sess1_left_cerebrum_xproba-lcrbg.nii",
-                        "start": 837.185516651613
+                        "start": 837.1855166508197
                     },
                     {
-                        "end": 837.6083310688176,
+                        "end": 837.6083310680243,
                         "id": "sub001_sess1_left_cerebrum_xproba-lcrgm.nii",
-                        "start": 837.3969238602153
+                        "start": 837.396923859422
                     },
                     {
-                        "end": 837.8197382774199,
+                        "end": 837.8197382766266,
                         "id": "sub001_sess1_left_cerebrum_xproba-lcrwm.nii",
-                        "start": 837.6083310688176
+                        "start": 837.6083310680243
                     }
                 ],
                 "task_id": "cruise_cortex_extraction",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 1111.9618464322582,
-                    "start": 836.9741094430112
+                    "end": 1111.9618464321993,
+                    "start": 836.9741094422175
                 },
                 "write": [
                     {
-                        "end": 1110.4819959727774,
+                        "end": 1110.4819959719841,
                         "id": "sub001_sess1_left_cerebrum_cruise-avg.nii",
-                        "start": 1110.2705887641753
+                        "start": 1110.270588763382
                     },
                     {
-                        "end": 1110.6934031813796,
+                        "end": 1110.6934031805863,
                         "id": "sub001_sess1_left_cerebrum_cruise-cgb.nii",
-                        "start": 1110.4819959727774
+                        "start": 1110.4819959719841
                     },
                     {
-                        "end": 1110.9048103899818,
+                        "end": 1110.9048103891885,
                         "id": "sub001_sess1_left_cerebrum_cruise-cortex.nii",
-                        "start": 1110.6934031813796
+                        "start": 1110.6934031805863
                     },
                     {
-                        "end": 1111.1162175978495,
+                        "end": 1111.1162175977906,
                         "id": "sub001_sess1_left_cerebrum_cruise-gwb.nii",
-                        "start": 1110.9048103899818
+                        "start": 1110.9048103891885
                     },
                     {
-                        "end": 1111.3276248064517,
+                        "end": 1111.3276248063928,
                         "id": "sub001_sess1_left_cerebrum_cruise-pcsf.nii",
-                        "start": 1111.1162175978495
+                        "start": 1111.1162175977906
                     },
                     {
-                        "end": 1111.5390320150539,
+                        "end": 1111.539032014995,
                         "id": "sub001_sess1_left_cerebrum_cruise-pgm.nii",
-                        "start": 1111.3276248064517
+                        "start": 1111.3276248063928
                     },
                     {
-                        "end": 1111.750439223656,
+                        "end": 1111.7504392235971,
                         "id": "sub001_sess1_left_cerebrum_cruise-pwm.nii",
-                        "start": 1111.5390320150539
+                        "start": 1111.539032014995
                     },
                     {
-                        "end": 1111.9618464322582,
+                        "end": 1111.9618464321993,
                         "id": "sub001_sess1_left_cerebrum_cruise-thick.nii",
-                        "start": 1111.750439223656
+                        "start": 1111.7504392235971
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 835.0714445656446,
-                    "start": 759.3111301010755
+                    "end": 835.0714445647969,
+                    "start": 759.3111301002278
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "host01",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 756.5628439591401,
+                        "end": 756.5628439582906,
                         "id": "sub001_sess1_mgdm-dist.nii",
-                        "start": 756.3514367505378
+                        "start": 756.3514367496883
                     },
                     {
-                        "end": 757.831283425807,
+                        "end": 757.8312834249581,
                         "id": "sub001_sess1_mgdm-lbls.nii",
-                        "start": 756.5628439591401
+                        "start": 756.5628439582906
                     },
                     {
-                        "end": 759.0997228924732,
+                        "end": 759.0997228916256,
                         "id": "sub001_sess1_mgdm-mems.nii",
-                        "start": 757.831283425807
+                        "start": 757.8312834249581
                     },
                     {
-                        "end": 759.3111301010755,
+                        "end": 759.3111301002278,
                         "id": "sub001_sess1_mgdm-seg.nii",
-                        "start": 759.0997228924732
+                        "start": 759.0997228916256
                     }
                 ],
                 "task_id": "extract_brain_region",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 836.9741094430112,
-                    "start": 756.3514367505378
+                    "end": 836.9741094422175,
+                    "start": 756.3514367496883
                 },
                 "write": [
                     {
-                        "end": 835.2828517742469,
+                        "end": 835.2828517733992,
                         "id": "sub001_sess1_left_cerebrum_xlvl-lcrbg.nii",
-                        "start": 835.0714445656446
+                        "start": 835.0714445647969
                     },
                     {
-                        "end": 835.4942589828491,
+                        "end": 835.4942589820015,
                         "id": "sub001_sess1_left_cerebrum_xlvl-lcrgm.nii",
-                        "start": 835.2828517742469
+                        "start": 835.2828517733992
                     },
                     {
-                        "end": 835.7056661914514,
+                        "end": 835.7056661906038,
                         "id": "sub001_sess1_left_cerebrum_xlvl-lcrwm.nii",
-                        "start": 835.4942589828491
+                        "start": 835.4942589820015
                     },
                     {
-                        "end": 835.9170734000537,
+                        "end": 835.9170733992061,
                         "id": "sub001_sess1_left_cerebrum_xmask-lcrbg.nii",
-                        "start": 835.7056661914514
+                        "start": 835.7056661906038
                     },
                     {
-                        "end": 836.1284806086021,
+                        "end": 836.1284806078083,
                         "id": "sub001_sess1_left_cerebrum_xmask-lcrgm.nii",
-                        "start": 835.9170734000537
+                        "start": 835.9170733992061
                     },
                     {
-                        "end": 836.3398878172044,
+                        "end": 836.3398878164106,
                         "id": "sub001_sess1_left_cerebrum_xmask-lcrwm.nii",
-                        "start": 836.1284806086021
+                        "start": 836.1284806078083
                     },
                     {
-                        "end": 836.5512950258067,
+                        "end": 836.5512950250129,
                         "id": "sub001_sess1_left_cerebrum_xproba-lcrbg.nii",
-                        "start": 836.3398878172044
+                        "start": 836.3398878164106
                     },
                     {
-                        "end": 836.762702234409,
+                        "end": 836.7627022336152,
                         "id": "sub001_sess1_left_cerebrum_xproba-lcrgm.nii",
-                        "start": 836.5512950258067
+                        "start": 836.5512950250129
                     },
                     {
-                        "end": 836.9741094430112,
+                        "end": 836.9741094422175,
                         "id": "sub001_sess1_left_cerebrum_xproba-lcrwm.nii",
-                        "start": 836.762702234409
+                        "start": 836.7627022336152
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 753.3917433997074,
-                    "start": 139.10503647526892
+                    "end": 753.3917433991488,
+                    "start": 139.10503647471032
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "host01",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 138.8936292666671,
+                        "end": 138.89362926610806,
                         "id": "sub001_sess1_strip-t1map.nii",
-                        "start": 138.68222205806484
+                        "start": 138.6822220575058
                     },
                     {
-                        "end": 139.10503647526892,
+                        "end": 139.10503647471032,
                         "id": "sub001_sess1_strip-t1w.nii",
-                        "start": 138.8936292666671
+                        "start": 138.89362926610806
                     }
                 ],
                 "task_id": "mgdm_segmentation",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 756.3514367505378,
-                    "start": 138.68222205806484
+                    "end": 756.3514367496883,
+                    "start": 138.6822220575058
                 },
                 "write": [
                     {
-                        "end": 753.6031506083096,
+                        "end": 753.6031506077511,
                         "id": "sub001_sess1_mgdm-dist.nii",
-                        "start": 753.3917433997074
+                        "start": 753.3917433991488
                     },
                     {
-                        "end": 754.8715900752692,
+                        "end": 754.8715900744186,
                         "id": "sub001_sess1_mgdm-lbls.nii",
-                        "start": 753.6031506083096
+                        "start": 753.6031506077511
                     },
                     {
-                        "end": 756.1400295419355,
+                        "end": 756.140029541086,
                         "id": "sub001_sess1_mgdm-mems.nii",
-                        "start": 754.8715900752692
+                        "start": 754.8715900744186
                     },
                     {
-                        "end": 756.3514367505378,
+                        "end": 756.3514367496883,
                         "id": "sub001_sess1_mgdm-seg.nii",
-                        "start": 756.1400295419355
+                        "start": 756.140029541086
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 137.83659322309683,
+                    "end": 137.8365932230968,
                     "start": 0.6342216258067708
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "host01",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -265,29 +265,29 @@
                 "task_id": "mp2rage_skullstripping",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 138.68222205806484,
+                    "end": 138.6822220575058,
                     "start": 1.1084536082474228e-18
                 },
                 "write": [
                     {
-                        "end": 138.04800043225808,
+                        "end": 138.04800043169905,
                         "id": "sub001_sess1_strip-inv2.nii",
-                        "start": 137.83659322309683
+                        "start": 137.8365932230968
                     },
                     {
-                        "end": 138.25940764086033,
+                        "end": 138.2594076403013,
                         "id": "sub001_sess1_strip-mask.nii",
-                        "start": 138.04800043225808
+                        "start": 138.04800043169905
                     },
                     {
-                        "end": 138.47081484946258,
+                        "end": 138.47081484890356,
                         "id": "sub001_sess1_strip-t1map.nii",
-                        "start": 138.25940764086033
+                        "start": 138.2594076403013
                     },
                     {
-                        "end": 138.68222205806484,
+                        "end": 138.6822220575058,
                         "id": "sub001_sess1_strip-t1w.nii",
-                        "start": 138.47081484946258
+                        "start": 138.47081484890356
                     }
                 ]
             }
