@@ -771,8 +771,8 @@
             \centering
                \includegraphics[width=\linewidth]{result/single/figures/single_errors_v2.pdf}
                \vspace*{-0.7cm}
-               \caption{Relative simulation errors (absolute values)}
-               \vspace*{0.5cm}
+               \caption{Relative simulation errors (absolute values)\\ Left: 20-GB files. Right: 100-GB files.}
+                \vspace*{0.2cm}
                \label{fig:single_error}
             \end{subfigure}
         \begin{subfigure}{\linewidth}
@@ -781,14 +781,14 @@
             %    Lines represent memory usage along pipeline execution time.}
                \includegraphics[width=\linewidth]{result/single/figures/single_memprof_v2.pdf}
                \vspace*{-0.7cm}
-               \caption{Memory profiles}
-               \vspace*{0.5cm}
+               \caption{Memory profiles\\ From top to bottom: real execution, Python prototype, WRENCH cache. Left: 20-GB files. Right: 100-GB files.}
+               \vspace*{0.2cm}
                \label{fig:single_memprof}
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
-               \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files_v2.pdf}
-               \caption{Page cache content after each I/O operation}
+               \includegraphics[width=\linewidth]{result/single/figures/cached_files_v2.pdf}
+               \caption{Page cache content after each I/O operation\\Left: 20-GB files. Right: 100-GB files.}
             %    \textcolor{red}{Update real results of 20GB}}
                \label{fig:single_cache}
         \end{subfigure}
