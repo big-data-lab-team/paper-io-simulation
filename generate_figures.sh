@@ -8,7 +8,7 @@ function die(){
     exit 1
 }
 type inkscape &>/dev/null || die "Cannot find inkscape"
-for folder in figures result/single/figures result/multi/figures
+for folder in figures result/single/figures result/multi/figures result/nighres/figures
 do
     for i in $folder/*.svg
     do
