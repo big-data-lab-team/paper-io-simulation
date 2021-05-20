@@ -46,10 +46,8 @@ def plot_error():
     fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
     plt.rcParams.update({'font.size': 10})
 
-    plot_task_error(ax1[0], 20, ylabel=False)
-    plot_task_error(ax1[1], 50, ylabel=False)
-    plot_task_error(ax2[0], 75, ylabel=False)
-    plot_task_error(ax2[1], 100, ylabel=False)
+    plot_task_error(ax1, 20, ylabel=False)
+    plot_task_error(ax2, 100, ylabel=False)
 
     fig.text(0.01, 0.5, 'memory (GB)', va='center', rotation='vertical')
 
