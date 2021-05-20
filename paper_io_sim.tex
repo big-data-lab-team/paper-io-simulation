@@ -174,8 +174,8 @@
         Page cache offsets the cost of disk I/O by enabling I/O to occur directly from memory.
         When a file is first loaded into memory, the file is read from disk and loaded into the page cache as
         a series of pages. Subsequent reads to any of the file pages located in memory will result in
-        a \textit{cache hit}, meaning the I/O can occur directly from without disk involvement.
-        Any accessed page not loaded in memory results in a \textit{cache miss}, resulting in
+        a cache hit, meaning the I/O can occur directly from without disk involvement.
+        Any accessed page not loaded in memory results in a cache miss, resulting in
         the page being read directly from disk.
         
         Written pages can also contribute to future application cache hits. When use of page cache
@@ -199,7 +199,7 @@
         be copied (flushed) to storage prior to eviction. When sufficient memory is
         being occupied, the flushing process is synchronous. However, even when
         there is sufficient available memory, written data will be flushed to disk
-        at a predefined interval through a process known as \textit{periodical flushing}.
+        at a predefined interval through a process known as periodical flushing.
         Periodical flushing only flushes ``expired" dirty pages, that is, pages that
         have remained dirty in the
         page cache longer than an expiration time configured in the kernel.
@@ -253,7 +253,7 @@
         applications, its simulation is rarely considered in the above
         frameworks.  Most frameworks merely simulate I/O operations
         based on storage bandwidths and capacities.  The SIMCAN
-        framework does models page caching by storing data accessed on
+        framework does model page caching by storing data accessed on
         disk in a block cache~\cite{nunez2012simcan}.  Page cache is
         also modeled in iCanCloud through a component that manages
         memory accesses and cached data~\cite{nunez2012icancloud}.
@@ -314,7 +314,7 @@
            Applications send file read or write requests to the
            I/O Controller that orchestrates flushing, eviction, cache
            and disk accesses with the Memory Manager. Concurrent accesses to storage
-           devices (memory and disk) are simulated using existing models.}
+           devices (memory and disk) are simulated using the existing SimGrid models.}
            \label{fig:interaction}
     \end{figure}
 
@@ -324,7 +324,7 @@
     implements flushing, eviction, and cached I/Os synchronously, whereas
     the second one, which operates in the background, periodically searches for
     expired dirty data in LRU lists and flushes this data to disk. We
-    use existing storage simulation models~\cite{lebre2015} to simulate disk and
+    rely on the existing SimGrid storage simulation models~\cite{lebre2015} to simulate disk and
     memory, characterized by their storage capacity, read and write
     bandwidths, and latency. These models account for
     bandwidth sharing between concurrent memory or disk accesses.
@@ -367,11 +367,11 @@
     \subsubsection{Reads and writes}
 
     Our simulation model supports chunk-by-chunk file accesses
-    with a user-defined chunk size. However, for simplicity, we assume that file pages are
+    with a user-defined chunk size. However, since file access pattern models are currently not available in SimGrid, we assume that file pages are
     accessed in a round-robin fashion rather than fully randomly.
     Therefore, when a file is read, cached data is read only after all uncached data was read, and data from the inactive list is read
-    before data from the active list
-    (data reads occur from left to right in Figure~\ref{fig:read_order}).
+    before data from the active list. Such an access pattern is commonly encountered in scientific data processing, where 
+    applications often read data files entirely and possibly multiple times. 
     When a chunk of \emph{uncached} data is read, a new clean block is created
     and appended to the inactive list.
     When a chunk of \emph{cached} data is read, one or more existing data blocks in the LRU lists are accessed.
@@ -555,7 +555,9 @@
     The above model describes page cache in writeback
     mode. Our model also includes a write function in writethrough mode,
     which simply simulates a disk write with the amount of data passed in,
-    performs cache eviction if needed and adds the written data to the cache.
+    performs cache eviction if needed and adds the written data to the
+    cache. The read function remains unchanged between the writeback and
+    writethrough modes.
 
         \subsection{Implementation}
 
@@ -579,10 +581,12 @@
                 \item $b_w$ is the write bandwidth of the device
             \end{itemize}
 
-            This prototype does not simulate  bandwidth sharing and thus does not support
-            concurrency: it is limited to single-threaded applications running on systems
-            with a single-core CPU. We used this prototype for a first validation of our simulation
-            model against a real sequential application running on a real system.
+            This prototype does not simulate  bandwidth sharing and thus
+            does not support concurrency: it is limited to single-threaded
+            applications running on systems with a single-core CPU. We used
+            this prototype for a first validation of our simulation model
+            against a real sequential application running on a real system,
+            and as a way to detect potential bugs in our implementation.
             The Python 3.7 source code is available at
             \url{https://github.com/big-data-lab-team/paper-io-simulation/tree/master/exp/pysim}.
 
@@ -617,15 +621,15 @@
         simulation model, and a real one, representative of neuroimaging
         data processing.
 
-        Experiments are run on a dedicated cluster at
+        Experiments were run on a dedicated cluster at
         Concordia University, with one login node, 9 compute nodes, and 4
         storage nodes connected with a 25 Gbps network. Each
         compute node has 2 $\times$ 16-core Intel(R) Xeon(R) Gold 6130 CPU
         @ 2.10GHz, 250~GiB of RAM, 6 $\times$ SSDs of 450~GiB each with the XFS
         file system, 378~GiB of tmpfs, 126~GiB of devtmpfs file system,
-        CentOS~8.1 and NFS version 4. We use the \texttt{atop}
+        CentOS~8.1 and NFS version 4. We used the \texttt{atop}
         and \texttt{collectl} tools to monitor and collect memory status
-        and disk throughput. We clear the page
+        and disk throughput. We cleared the page
         cache before each application run to ensure comparable
         conditions.
 
@@ -652,10 +656,10 @@
         numbered by ascending access times (File 1 is the file read by Task 1, etc).
          The anonymous memory used by the application
         is released after each task, which we also simulate in the Python
-        prototype and in \wrench-cache. As our focus is on I/O rather than compute, we measure
+        prototype and in \wrench-cache. As our focus is on I/O rather than compute, we measured
         application task CPU times on a cluster node
-        (Table~\ref{table:cputime}), and use these durations in our
-        simulations. For the Python prototype, we inject CPU times
+        (Table~\ref{table:cputime}), and used these durations in our
+        simulations. For the Python prototype, we injected CPU times
         directly into the simulation. For \wrench and \wrench-cache, we
         determined the corresponding number of flops on a 1~Gflops CPU
         and used these values in the simulation. The simulated
@@ -670,18 +674,18 @@
         In the second experiment (\textit{Exp~2}), we run
         \emph{concurrent} instances of the application on a single node,
         all application instances operating on different files of size 3~GB
-        stored in the same local disk. We vary the number of concurrent
+        stored in the same local disk. We varied the number of concurrent
         application instances from 1 to 32 since cluster nodes have 32 CPU
         cores.
         In the third experiment (\textit{Exp~3}), we use the same
         configuration as the previous one, albeit reading and writing
         on a 50-GiB NFS-mounted partition of a 450-GiB remote disk of
-        another compute node. As is commonly configured in HPC
-        environments to avoid data loss, there is no client write cache
-        and the server cache is configured as writethrough instead of
-        writeback. NFS client and server read caches are enabled. 
-        Therefore, all the writes happen at disk bandwidth, but
-        reads can benefit from cache hits.
+        another compute node. NFS client and server read caches were enabled, however, as is commonly configured in HPC
+        environments to avoid data loss, there was no client write cache
+        and the server cache was configured as writethrough instead of
+        writeback.
+        Therefore, all the writes happened at disk bandwidth, but
+        reads could benefit from cache hits.
 
         The real application is a workflow of the Nighres
         toolbox~\cite{huntenburg2018nighres}, which implements cortical
@@ -693,7 +697,7 @@
         documentation at
         \url{https://nighres.readthedocs.io/en/latest/auto_examples/example_02_cortical_depth_estimation.html}.
         The application is implemented as a Python script that calls Java
-        image-processing routines. We use Python 3.6, Java 8, and Nighres
+        image-processing routines. We used Python 3.6, Java 8, and Nighres
         1.3.0. We patched the application to remove lazy data loading and
         data compression, which made CPU time difficult to separate from
         I/O time, and to capture task CPU times to inject in the
@@ -739,7 +743,7 @@
                 \label{table:benchmark}
                 \end{table}
 
-        We use the real application in the fourth experiment
+        We used the real application in the fourth experiment
         (\textit{Exp~4}), which runs on a single cluster node 
         using a single local disk, to process data from
         participant 0027430 in the dataset of the Max Planck Institute for
@@ -748,7 +752,7 @@
         parameters in Table~\ref{table:nighres_stats}.
 
 
-        To calibrate the simulators, we benchmark the
+        To calibrate the simulators, we benchmarked the
         memory, local disk, remote disk (NFS), and network bandwidths
         (Table~\ref{table:benchmark}). Since \simgrid, and thus \wrench, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
@@ -766,7 +770,7 @@
         \centering
         \begin{subfigure}{\linewidth}
             \centering
-               \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/single_errors_v2.pdf}
                \vspace*{-0.7cm}
                \caption{Relative simulation errors (absolute values)}
                \vspace*{0.5cm}
@@ -776,7 +780,7 @@
             \centering
             %    Gray shades represent task phases (read, compute and write).
             %    Lines represent memory usage along pipeline execution time.}
-               \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/single_memprof_v2.pdf}
                \vspace*{-0.7cm}
                \caption{Memory profiles}
                \vspace*{0.5cm}
@@ -784,8 +788,8 @@
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
-               \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files.pdf}
-               \caption{Cache contents \emph{after} application I/O operations}
+               \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files_v2.pdf}
+               \caption{Page cache content after each I/O operation}
             %    \textcolor{red}{Update real results of 20GB}}
                \label{fig:single_cache}
         \end{subfigure}
@@ -806,51 +810,44 @@
         as it only involved uncached data. Results with files of 50~GB and 75~GB
         showed similar behaviors and are not reported for brevity.
 
-        \wrench simulation errors were substantially lower with 100~GB
+        \wrench simulation errors are substantially lower with 100~GB
         files than with 20~GB files, due to the fact that part of the
-        100~GB file needs to be read and written to disk, the only storage
-        device in \wrench, as it does not fit in cache. Conversely,
-        simulation errors of the Python prototype and \wrench-cache are higher with
-        100~GB files than with 20~GB files, due to idiosyncrasies in the kernel
-        flushing and eviction strategies that could not be easily modeled.
+        100~GB file needs to be read and written to disk as it does not fit in cache. Disk models are
+        identical in WRENCH and WRENCH-cache.
 
         Simulated memory profiles are highly consistent with the real ones
         (Figure~\ref{fig:single_memprof}). With 20~GB files, memory profiles almost exactly match the
-        real ones, although dirty data seems to be flushing faster in real
+        real ones, although for some reason dirty data seems to be flushing faster in real
         life than in simulation, a behavior also
         observed with 100~GB files. With 100~GB files, used memory reaches
         total memory during the first write, triggering dirty data
         flushing, and drops back to cached memory when application tasks
         release anonymous memory. Simulated cached memory is highly
-        consistent with real values, except toward the end of Read 3 where
-        it slightly increases in simulation but not in reality. This
-        occurs because after Write 2 File 3 is only partially
-        cached in simulation whereas it is entirely cached in the real
-        system. In all cases, dirty data remains under the dirty ratio as
+        consistent with real values. In all cases, dirty data remains under the dirty ratio as
         expected. The Python prototype and \wrench-cache exhibit nearly
         identical memory profiles, which reinforces the confidence in our
         implementations.
 
-        The content of the simulated memory cache is also highly
-        consistent with reality (Figure~\ref{fig:single_cache}). With 20~GB
-        files, the simulated cache content exactly match reality, since
-        all files fit in page cache. With 100~GB files, a slight
-        discrepancy is observed after Write 2, which explains the
-        simulation error previously mentioned in Read 3. Indeed, in the real
-        execution File 3 is entirely cached after Write 2, whereas
-        in the simulated execution only part of it is cached. This is because
-        the Linux kernel tends to not evict pages that
-        belong to files being currently written (File 3 in this case),
-        which we cannot easily reproduce in our model.
+        The content of the simulated memory cache is also highly consistent
+        with reality (Figure~\ref{fig:single_cache}), showing that the
+        previous observations were not incidental.
 
             \begin{figure*}
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
+                    \includegraphics[width=0.8\linewidth]{result/multi/figures/multi_local.pdf}
                 \end{subfigure}
                 \caption{Concurrent results with 3~GB files (\textit{Exp 2})}
                 \label{fig:multi_local}
             \end{figure*}
+            \begin{figure*}
+                \begin{subfigure}{\linewidth}
+                    \centering
+                    \includegraphics[width=0.8\linewidth]{result/multi/figures/multi_nfs.pdf}
+                \end{subfigure}
+                \caption{NFS results with 3~GB files (\textit{Exp 3})}
+                \label{fig:multi_nfs}
+                \end{figure*}
         \subsection{Concurrent applications (Exp 2)}
 
             The page cache model notably reduces \wrench's simulation error
@@ -863,14 +860,6 @@
             execution between 1 and 10 concurrent executions. The plateau marks the limit beyond which the page cache is
             saturated with dirty data and needed flushing.
 
-            \begin{figure}[b]
-                \begin{subfigure}{0.95\linewidth}
-                    \centering
-                    \includegraphics[width=\linewidth]{result/nighres/figures/nighres_errors.pdf}
-                \end{subfigure}
-                \caption{Real application results (\textit{Exp 4})}
-                \label{fig:nighres}
-                \end{figure}
 
         \subsection{Remote storage (Exp 3)}
 
@@ -884,7 +873,6 @@
             applications since before this threshold most reads result in cache
             hits.
 
-
         \subsection{Real application (Exp 4)}
 
         Similar to the synthetic application, simulation error for the real application is
@@ -893,37 +881,33 @@
         from 337~\% in \wrench to 47~\% in \wrench-cache. 
         The first read happens entirely from disk and is thus 
         very accurately simulated by both \wrench and \wrench-cache.
+    
+        \begin{figure}[b]
+                \centering
+                \includegraphics[width=0.95\linewidth]{result/nighres/figures/nighres_errors.pdf}
+            \caption{Real application results (\textit{Exp 4})}
+            \label{fig:nighres}
+            \end{figure}
 
-            \begin{figure*}
-                \begin{subfigure}{\linewidth}
-                    \centering
-                    \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
-                \end{subfigure}
-                \caption{NFS results with 3~GB files (\textit{Exp 3})}
-                \label{fig:multi_nfs}
-                \end{figure*}
-    
-            \begin{figure}
-                \begin{subfigure}{\columnwidth}
-                    \centering
-                    \includegraphics[width=\linewidth]{result/multi/figures/simulation_time.pdf}
-                \end{subfigure}
-                \caption{Simulation time comparison. \wrench-cache scales
-                linearly with the number of concurrent applications, albeit
-                with a higher overhead than \wrench.}
-                \label{fig:multi_time}
-                \end{figure}
-    
         \subsection{Simulation time}
 
         As is the case for \wrench, simulation time with \wrench-cache scales
         linearly with the number of concurrent applications
-        (Figure~\ref{fig:multi_time}, p \textless $10^{-24}$). However, the page
+        (Figure~\ref{fig:multi_time}, p \textless $10^{-17}$). However, the page
         cache model substantially increases simulation time by
         application, as can be seen by comparing regression slopes in
         Figure~\ref{fig:multi_time}. Interestingly, \wrench-cache is faster with 
         NFS I/Os than with local I/Os, most likely due to the use of writethrough
         cache in NFS, which bypasses flushing operations.
+
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.95\linewidth]{result/multi/figures/simulation_time.pdf}
+            \caption{Simulation time comparison. \wrench-cache scales
+            linearly with the number of concurrent applications, albeit
+            with a higher overhead than \wrench.}
+            \label{fig:multi_time}
+            \end{figure}
 
     \section{Conclusion}
     \label{discussion}
@@ -964,11 +948,13 @@
     % Simulation results could be made even more accurate by a deeper
     % investigation of page cache flushing and eviction order. 
 
-        \section{Acknowledgments}
-The computing platform used in the experiments was obtained with funding
-from the Canada Foundation for Innovation. This work was partially supported
-by NSF contracts \#1923539 and \#1923621.
+    \section{Acknowledgments}
+    The computing platform used in the experiments was obtained with funding
+    from the Canada Foundation for Innovation. This work was partially supported
+    by NSF contracts \#1923539 and \#1923621.
+    
 
+\clearpage
 \bibliographystyle{IEEEtran}
 \bibliography{citation}
 

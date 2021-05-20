@@ -186,10 +186,11 @@ def run_time():
 
     from scipy import stats
 
-    ax1.set_ylim(top=2)
+    ax1.set_ylim(top=0.4)
     s = 10
 
     # WRENCH original
+    print(org_df)
     slope, intercept, r_value, p_value, std_err = stats.linregress(org_df["no_pipeline"], org_df["run_time"])
     print(f'WRENCH original: p={p_value}')
     ax1.scatter(local_org_df["no_pipeline"], local_org_df["run_time"],
@@ -197,7 +198,7 @@ def run_time():
     ax1.scatter(nfs_org_df["no_pipeline"], nfs_org_df["run_time"],
                 label="WRENCH (NFS)", s=s, color=wrench_color, facecolor="none")
     ax1.plot(org_df["no_pipeline"], intercept + slope * org_df["no_pipeline"], lw=1, color=wrench_color)
-    plt.text(20, 0.1, f'y={round(slope,2)}x+{round(intercept,2)}', color=wrench_color)
+    plt.text(20, 0.025, f'y={round(slope,3)}x+{round(intercept,3)}', color=wrench_color)
 
     # WRENCH-cache Local I/Os
     slope, intercept, r_value, p_value, std_err = stats.linregress(local_cache_df["no_pipeline"],
@@ -207,7 +208,7 @@ def run_time():
              color=wrench_cache_color, lw=1)
     ax1.scatter(local_cache_df["no_pipeline"], local_cache_df["run_time"],
                 label="WRENCH-cache (local)", s=s, color=wrench_cache_color)
-    plt.text(17, 1, f'y={round(slope,2)}x{round(intercept,2)}', color=wrench_cache_color)
+    plt.text(15, 0.2, f'y={round(slope,3)}x{round(intercept,3)}', color=wrench_cache_color)
 
     # WRENCH-cache NFS
     slope, intercept, r_value, p_value, std_err = stats.linregress(nfs_cache_df["no_pipeline"],
@@ -217,7 +218,7 @@ def run_time():
              color=wrench_cache_color, lw=1, linestyle='dotted')
     ax1.scatter(nfs_cache_df["no_pipeline"], nfs_cache_df["run_time"],
                 label="WRENCH-cache (NFS)", s=s, color=wrench_cache_color, facecolor="none")
-    plt.text(27, 0.8, f'y={round(slope,2)}x{round(intercept,2)}', color=wrench_cache_color)
+    plt.text(25, 0.13, f'y={round(slope,3)}x{round(intercept,3)}', color=wrench_cache_color)
 
     plt.xlabel("Concurrent applications")
     plt.ylabel("Simulation time (seconds)")
