@@ -582,8 +582,7 @@
             \end{itemize}
 
             This prototype does not simulate  bandwidth sharing and thus
-            does not support concurrency: it is limited to single-threaded
-            applications running on systems with a single-core CPU. We used
+            does not support concurrency. We used
             this prototype for a first validation of our simulation model
             against a real sequential application running on a real system,
             and as a way to detect potential bugs in our implementation.
@@ -626,7 +625,7 @@
         storage nodes connected with a 25 Gbps network. Each
         compute node has 2 $\times$ 16-core Intel(R) Xeon(R) Gold 6130 CPU
         @ 2.10GHz, 250~GiB of RAM, 6 $\times$ SSDs of 450~GiB each with the XFS
-        file system, 378~GiB of tmpfs, 126~GiB of devtmpfs file system,
+        file system (no RAID enabled), 378~GiB of tmpfs, 126~GiB of devtmpfs file system,
         CentOS~8.1 and NFS version 4. We used the \texttt{atop}
         and \texttt{collectl} tools to monitor and collect memory status
         and disk throughput. We cleared the page
@@ -835,7 +834,7 @@
             \begin{figure*}
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=0.8\linewidth]{result/multi/figures/multi_local.pdf}
+                    \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
                 \end{subfigure}
                 \caption{Concurrent results with 3~GB files (\textit{Exp 2})}
                 \label{fig:multi_local}
@@ -843,7 +842,7 @@
             \begin{figure*}
                 \begin{subfigure}{\linewidth}
                     \centering
-                    \includegraphics[width=0.8\linewidth]{result/multi/figures/multi_nfs.pdf}
+                    \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
                 \end{subfigure}
                 \caption{NFS results with 3~GB files (\textit{Exp 3})}
                 \label{fig:multi_nfs}

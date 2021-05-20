@@ -49,7 +49,7 @@ def plot_error():
     plot_task_error(ax1, 20, ylabel=False)
     plot_task_error(ax2, 100, ylabel=False)
 
-    fig.text(0.01, 0.5, 'memory (GB)', va='center', rotation='vertical')
+    fig.text(0.01, 0.5, 'error (%)', va='center', rotation='vertical')
 
     lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.12, 2.6), ncol=3)
     plt.subplots_adjust(left=0.07, bottom=0.075, right=0.97, top=0.85, wspace=0.2, hspace=0.3)
