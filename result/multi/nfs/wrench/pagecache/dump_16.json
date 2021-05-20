@@ -4,20 +4,20 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_0_0",
                         "start": 1.1084536082474228e-18
                     }
@@ -32,7 +32,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_0_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -46,7 +46,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -60,12 +60,12 @@
                 "task_id": "task_0_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_0_2",
                         "start": 244.0117211489447
                     }
@@ -74,55 +74,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_0_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_0_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_0_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_10_0",
                         "start": 4.433814432989691e-18
                     }
@@ -137,7 +137,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_10_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -151,7 +151,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -165,12 +165,12 @@
                 "task_id": "task_10_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_10_2",
                         "start": 244.0117211489447
                     }
@@ -179,55 +179,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_10_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_10_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_10_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_11_0",
                         "start": 7.75917525773196e-18
                     }
@@ -242,7 +242,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_11_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -256,7 +256,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -270,12 +270,12 @@
                 "task_id": "task_11_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_11_2",
                         "start": 244.0117211489447
                     }
@@ -284,55 +284,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_11_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_11_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_11_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_12_0",
                         "start": 1.1084536082474228e-17
                     }
@@ -347,7 +347,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_12_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -361,7 +361,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -375,12 +375,12 @@
                 "task_id": "task_12_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_12_2",
                         "start": 244.0117211489447
                     }
@@ -389,55 +389,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_12_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_12_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_12_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_13_0",
                         "start": 1.4409896907216497e-17
                     }
@@ -452,7 +452,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_13_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -466,7 +466,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -480,12 +480,12 @@
                 "task_id": "task_13_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_13_2",
                         "start": 244.0117211489447
                     }
@@ -494,55 +494,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_13_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_13_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_13_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_14_0",
                         "start": 1.7735257731958765e-17
                     }
@@ -557,7 +557,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_14_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -571,7 +571,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -585,12 +585,12 @@
                 "task_id": "task_14_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_14_2",
                         "start": 244.0117211489447
                     }
@@ -599,55 +599,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_14_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_14_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_14_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_15_0",
                         "start": 2.1060618556701034e-17
                     }
@@ -662,7 +662,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_15_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -676,7 +676,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -690,12 +690,12 @@
                 "task_id": "task_15_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_15_2",
                         "start": 244.0117211489447
                     }
@@ -704,55 +704,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_15_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_15_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_15_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_1_0",
                         "start": 2.4385979381443302e-17
                     }
@@ -767,7 +767,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_1_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -781,7 +781,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -795,12 +795,12 @@
                 "task_id": "task_1_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_1_2",
                         "start": 244.0117211489447
                     }
@@ -809,55 +809,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_1_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_1_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_1_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_2_0",
                         "start": 2.771134020618557e-17
                     }
@@ -872,7 +872,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_2_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -886,7 +886,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -900,12 +900,12 @@
                 "task_id": "task_2_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_2_2",
                         "start": 244.0117211489447
                     }
@@ -914,55 +914,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_2_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_2_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_2_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_3_0",
                         "start": 3.103670103092784e-17
                     }
@@ -977,7 +977,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_3_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -991,7 +991,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -1005,12 +1005,12 @@
                 "task_id": "task_3_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_3_2",
                         "start": 244.0117211489447
                     }
@@ -1019,55 +1019,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_3_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_3_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_3_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_4_0",
                         "start": 3.436206185567011e-17
                     }
@@ -1082,7 +1082,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_4_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -1096,7 +1096,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -1110,12 +1110,12 @@
                 "task_id": "task_4_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_4_2",
                         "start": 244.0117211489447
                     }
@@ -1124,55 +1124,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_4_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_4_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_4_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_5_0",
                         "start": 3.7687422680412376e-17
                     }
@@ -1187,7 +1187,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_5_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -1201,7 +1201,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -1215,12 +1215,12 @@
                 "task_id": "task_5_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_5_2",
                         "start": 244.0117211489447
                     }
@@ -1229,55 +1229,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_5_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_5_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_5_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_6_0",
                         "start": 4.1012783505154644e-17
                     }
@@ -1292,7 +1292,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_6_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -1306,7 +1306,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -1320,12 +1320,12 @@
                 "task_id": "task_6_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_6_2",
                         "start": 244.0117211489447
                     }
@@ -1334,55 +1334,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_6_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_6_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_6_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_7_0",
                         "start": 4.433814432989691e-17
                     }
@@ -1397,7 +1397,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_7_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -1411,7 +1411,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -1425,12 +1425,12 @@
                 "task_id": "task_7_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_7_2",
                         "start": 244.0117211489447
                     }
@@ -1439,55 +1439,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_7_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_7_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_7_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_8_0",
                         "start": 4.766350515463918e-17
                     }
@@ -1502,7 +1502,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_8_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -1516,7 +1516,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -1530,12 +1530,12 @@
                 "task_id": "task_8_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_8_2",
                         "start": 244.0117211489447
                     }
@@ -1544,55 +1544,55 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_8_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_8_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_8_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             },
             {
                 "color": "",
                 "compute": {
-                    "end": 113.17551650846349,
-                    "start": 108.77551650846348
+                    "end": 113.1755165001995,
+                    "start": 108.7755165001995
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 108.77551650846348,
+                        "end": 108.7755165001995,
                         "id": "file_9_0",
                         "start": 5.098886597938145e-17
                     }
@@ -1607,7 +1607,7 @@
                     {
                         "end": 221.6190572516854,
                         "id": "file_9_1",
-                        "start": 113.17551650846349
+                        "start": 113.1755165001995
                     }
                 ]
             },
@@ -1621,7 +1621,7 @@
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
@@ -1635,12 +1635,12 @@
                 "task_id": "task_9_1",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 352.4552619078652,
+                    "end": 352.4552618719101,
                     "start": 221.6190572516854
                 },
                 "write": [
                     {
-                        "end": 352.4552619078652,
+                        "end": 352.4552618719101,
                         "id": "file_9_2",
                         "start": 244.0117211489447
                     }
@@ -1649,35 +1649,35 @@
             {
                 "color": "",
                 "compute": {
-                    "end": 374.84792580512527,
-                    "start": 370.4479258051253
+                    "end": 374.8479257691702,
+                    "start": 370.44792576917024
                 },
                 "execution_host": {
                     "cores": 32,
                     "flop_rate": 1000000000.0,
                     "hostname": "compute_host",
-                    "memory": 268000000000.0
+                    "memory_manager_service": 268000000000.0
                 },
                 "failed": -1.0,
                 "num_cores_allocated": 1,
                 "read": [
                     {
-                        "end": 370.4479258051253,
+                        "end": 370.44792576917024,
                         "id": "file_9_2",
-                        "start": 352.4552619078652
+                        "start": 352.4552618719101
                     }
                 ],
                 "task_id": "task_9_2",
                 "terminated": -1.0,
                 "whole_task": {
-                    "end": 483.291466564045,
-                    "start": 352.4552619078652
+                    "end": 483.2914664921349,
+                    "start": 352.4552618719101
                 },
                 "write": [
                     {
-                        "end": 483.291466564045,
+                        "end": 483.2914664921349,
                         "id": "file_9_3",
-                        "start": 374.84792580512527
+                        "start": 374.8479257691702
                     }
                 ]
             }

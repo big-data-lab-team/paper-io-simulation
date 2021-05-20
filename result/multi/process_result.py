@@ -132,8 +132,8 @@ def result_local(rep_no=1):
 
     export_simgrid_result("local/wrench/original/", "aggregated.csv")
     export_simgrid_result("local/wrench/pagecache/", "aggregated.csv")
-    plt.rcParams.update({'font.size': 8})
-    fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
+    plt.rcParams.update({'font.size': 10})
+    fig, (ax1, ax2) = plt.subplots(figsize=(10, 6), ncols=2, nrows=1)
 
     suplot_prop(ax1, "local/real_step5/", "local/wrench/", "readtime", "Read time", True, rep_no=rep_no, xmax=31)
     suplot_prop(ax2, "local/real_step5/", "local/wrench/", "writetime", "Write time", False, rep_no=rep_no, xmax=31)
@@ -141,11 +141,10 @@ def result_local(rep_no=1):
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
 
-    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.18), ncol=4)
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.4)
-    plt.savefig("figures/multi_local.pdf", format="pdf")
-    plt.savefig("figures/multi_local.svg", format="svg")
-
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.25), ncol=4)
+    plt.subplots_adjust(left=0.1, bottom=0.15, right=0.95, top=0.75, wspace=0.4)
+    plt.savefig("figures/multi_local_v2.pdf", format="pdf")
+    plt.savefig("figures/multi_local_v2.svg", format="svg")
     # plt.show()
 
 
@@ -155,8 +154,8 @@ def result_nfs(rep_no=1):
 
     export_simgrid_result("nfs/wrench/original/", "aggregated.csv")
     export_simgrid_result("nfs/wrench/pagecache/", "aggregated.csv")
-    plt.rcParams.update({'font.size': 8})
-    fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), ncols=2, nrows=1)
+    plt.rcParams.update({'font.size': 10})
+    fig, (ax1, ax2) = plt.subplots(figsize=(10, 6), ncols=2, nrows=1)
 
     suplot_prop(ax1, "nfs/real/", "nfs/wrench/", "readtime", "Read time", True, rep_no=rep_no)
     suplot_prop(ax2, "nfs/real/", "nfs/wrench/", "writetime", "Write time", False, rep_no=rep_no)
@@ -164,10 +163,10 @@ def result_nfs(rep_no=1):
     ax1.set_ylim(bottom=0, top=1500)
     ax2.set_ylim(bottom=0, top=1500)
 
-    plt.legend(loc='upper center', bbox_to_anchor=(-0.1, 1.2), ncol=4)
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.4)
-    plt.savefig("figures/multi_nfs.pdf", format="pdf")
-    plt.savefig("figures/multi_nfs.svg", format="svg")
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.25), ncol=4)
+    plt.subplots_adjust(left=0.1, bottom=0.15, right=0.95, top=0.75, wspace=0.4)
+    plt.savefig("figures/multi_nfs_v2.pdf", format="pdf")
+    plt.savefig("figures/multi_nfs_v2.svg", format="svg")
 
     # plt.show()
 
@@ -226,3 +225,4 @@ def run_time():
 
     plt.savefig("figures/simulation_time.pdf", format="pdf")
     plt.savefig("figures/simulation_time.svg", format="svg")
+    # plt.show()

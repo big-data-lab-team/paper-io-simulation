@@ -2,6 +2,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def parse_time_real(logfile, sum_file):
     with open(logfile, "r") as logfile:
         log = json.load(logfile)
@@ -144,7 +145,6 @@ def plot_error():
             wrench_cache_arr.append(wrench_cache[task_id]["read"])
             wrench_cache_arr.append(wrench_cache[task_id]["write"])
 
-
     # print("WRENCH Read errors:")
     # print(abs(np.array(reads_wrench) - np.array(reads_real)) / np.array(reads_real) % 100)
     # print("WRENCH-cache Read errors:")
@@ -156,19 +156,22 @@ def plot_error():
     # print(abs(np.array(writes_wrench_cache) - np.array(writes_real)) / np.array(writes_real)% 100)
 
     plt.rcParams.update({'font.size': 12})
-    fig, ax = plt.subplots(figsize=(9, 4))
+    fig, ax = plt.subplots(figsize=(9, 5))
     wrench_error = abs(np.array(wrench_arr) - np.array(real_arr)) / np.array(real_arr) * 100
     wrench_cache_error = abs(np.array(wrench_cache_arr) - np.array(real_arr)) / np.array(real_arr) * 100
 
     labels = ["Read 1", "Write 1", "Read 2", "Write 2", "Read 3", "Write 3", "Read 4", "Write 4"]
     # labels = ["Read 1", "Read 2", "Read 3",  "Read 4"]
     # labels = ["Write 1", "Write 2", "Write 3",  "Write 4"]
-    grouped_bar_chart(ax, labels, "", "error (%)",  ("WRENCH", wrench_error, '#994F88'),
+    grouped_bar_chart(ax, labels, "", "error (%)", ("WRENCH", wrench_error, '#994F88'),
                       ("WRENCH-cache", wrench_cache_error, '#1965B0'))
-    lgd = plt.legend(loc='upper center', bbox_to_anchor=(0.55, 1), ncol=2)
+    lgd = plt.legend(loc='upper center', bbox_to_anchor=(0.5, 0.95), ncol=2)
 
-    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.85, wspace=0.3)
+    plt.ylim(top=800)
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.9, wspace=0.3)
 
-    plt.savefig("figures/nighres_errors.svg", format="svg", bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig("figures/nighres_errors.pdf", format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.title("Nighres workflow simulation errors")
+
+    plt.savefig("figures/nighres_errors_v2.svg", format="svg", bbox_extra_artists=(lgd,))
+    plt.savefig("figures/nighres_errors_v2.pdf", format="pdf", bbox_extra_artists=(lgd,))
     # plt.show()

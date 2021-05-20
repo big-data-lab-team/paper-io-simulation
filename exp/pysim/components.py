@@ -92,6 +92,16 @@ class MemoryManager:
         active = [blk for blk in self.active if blk.filename == filename]
         return inactive + active
 
+    def cache_content(self):
+        block_list = self.inactive + self.active
+        cache = dict()
+        for block in block_list:
+            if block.filename in cache.keys():
+                cache[block.filename] += block.size / 1000
+            else:
+                cache[block.filename] = block.size / 1000
+        print(cache)
+
     def get_available_memory(self):
         return self.free + self.cache - self.dirty
 
@@ -238,12 +248,19 @@ class MemoryManager:
         return flushed
 
     def evict(self, amount, exclude_file=None):
-
         if amount <= 0:
             return 0
 
+        inactive_evicted = self.evict_list(self.inactive, amount, exclude_file)
+        active_evicted = 0
+        if inactive_evicted < amount:
+            active_evicted = self.evict_list(self.active, amount, exclude_file)
+
+        return inactive_evicted + active_evicted
+
+    def evict_list(self, lru_list, amount, exclude_file=None):
         evicted = 0
-        for block in self.inactive[:]:
+        for block in lru_list[:]:
             if exclude_file is not None and block.filename == exclude_file:
                 continue
             if block.dirty:
@@ -258,7 +275,7 @@ class MemoryManager:
                 break
             else:
                 evicted += block.size
-                self.inactive.remove(block)
+                lru_list.remove(block)
 
         self.free += evicted
         self.cache -= evicted
@@ -308,7 +325,6 @@ class MemoryManager:
             if block.dirty and (exclude_file is None or block.filename != exclude_file):
                 if flushed + block.size <= amount:
                     block.dirty = False
-                    self.dirty -= block.size
                     flushed += block.size
                 elif flushed < amount < flushed + block.size:
                     blk_flushed = amount - flushed
@@ -317,9 +333,10 @@ class MemoryManager:
                     lru_list.insert(i, flushed_block)
 
                     flushed += blk_flushed
-                    self.dirty -= blk_flushed
                 else:
                     break
+
+        self.dirty -= flushed
         return flushed
 
     def balance_lru_lists(self):
@@ -543,6 +560,9 @@ class IOManager:
         while remaining > 0:
             runtime, cached_amt = self.read_chunk(file, cached_amt, chunk_size, runtime)
             remaining -= min(chunk_size, remaining)
+
+        self.memory.cache_content()
+
         return runtime
 
     def write(self, file, run_time=0):
@@ -561,7 +581,7 @@ class IOManager:
             # max_free_amt = remaining_dirty * self.memory.write_bw / (self.memory.write_bw - self.storage.write_bw)
 
             # evict and calculate the amount of data written to cache with memory bandwidth
-            self.evict(min(file.size, remaining_dirty) - self.memory.free)
+            self.evict(min(file.size, remaining_dirty) - self.memory.free, file.name)
             mem_bw_amt = min(file.size, self.memory.free)
 
             mem_bw_write_time = mem_bw_amt / self.memory.write_bw
@@ -583,10 +603,10 @@ class IOManager:
             # flush as much as we can because dirty data is full now
             # because now flushing and cache write can be concurrent,
             # it does not take time
-            self.flush(disk_bw_amt)
+            self.flush(disk_bw_amt, file.name)
 
             # evict as much as we can to get more free memory for written file
-            self.memory.evict(disk_bw_amt - self.memory.free)
+            self.memory.evict(disk_bw_amt - self.memory.free, file.name)
 
             # amount of data written and remained in cache after all remaining data is written
             # In case free memory is less than remaining amount, data is written, flushed and evicted right away
@@ -609,12 +629,13 @@ class IOManager:
         return run_time
 
     def write_file_in_chunk(self, file, chunk_size, run_time=0):
-
+        print("Writing %s" % file.name)
         remaining = file.size
         while remaining > 0:
             run_time = self.write_chunk(file.name, chunk_size, run_time)
             remaining -= chunk_size
 
+        self.memory.cache_content()
         return run_time
 
     def write_chunk(self, filename, chunk_size, run_time=0):
@@ -631,7 +652,7 @@ class IOManager:
         mem_bw_amt = 0
 
         if remaining_dirty > 0:
-            self.evict(min(chunk_size, remaining_dirty) - self.memory.free)
+            self.evict(min(chunk_size, remaining_dirty) - self.memory.free, filename)
             mem_bw_amt = min(chunk_size, self.memory.free)
 
             mem_bw_write_time = mem_bw_amt / self.memory.write_bw
@@ -645,16 +666,14 @@ class IOManager:
             self.memory.add_log(run_time)
 
         disk_bw_amt = chunk_size - mem_bw_amt
-        if disk_bw_amt > 0:
-            self.flush(disk_bw_amt)
-            self.memory.evict(disk_bw_amt - self.memory.free)
+        while disk_bw_amt > 0:
+            flushing_time = self.flush(disk_bw_amt)
+            run_time += flushing_time
+            self.memory.evict(disk_bw_amt - self.memory.free, filename)
 
             to_cache_amt = min(self.memory.free, disk_bw_amt)
-
-            disk_bw_write_time = self.storage.write(disk_bw_amt)
-
-            run_time += disk_bw_write_time
             self.memory.write(filename, amount=to_cache_amt, time=run_time)
+            disk_bw_amt -= to_cache_amt
 
             self.memory.add_log(run_time)
 

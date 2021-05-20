@@ -17,3 +17,9 @@ There is only one log file for each input file size named `<file_size_gb>gb_sim_
 - Log files from the WRENCH-cache simulator should be place in `wrench/pagecache/` directory.
 There are 2 log files for each input file size: `<file_size_gb>gb_sim_mem.csv` 
 and `<file_size_gb>gb_sim_time.csv`
+
+### Summary
+Average simulation errors of simulators with 4 input sizes:
+- Python: 36.11%
+- Original WRENCH: 327.79%
+- WRENCH-cache: 31.54%
