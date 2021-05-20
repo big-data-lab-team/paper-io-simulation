@@ -21,6 +21,7 @@ def grouped_bar_chart(ax, labels, xlabel, ylabel, *argv):
 
 def plot_task_error(ax, size, ylabel):
     labels = ["Read 1", "Write 1", "Read 2", "Write 2", "Read 3", "Write 3"]
+    ax.set_yscale('log')
 
     # atop_file =     "log/cluster/100gb/atop_mem.log"
     real_time_log = "real/%dgb/timestamps.csv" % size
@@ -44,16 +45,15 @@ def plot_task_error(ax, size, ylabel):
 
 def plot_error():
     fig, (ax1, ax2) = plt.subplots(figsize=(11, 3), ncols=2, nrows=1)
-    plt.rcParams.update({'font.size': 10})
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.8, wspace=0.1)
+    plt.rcParams.update({'font.size': 9})
 
-    plot_task_error(ax1, 20, ylabel=False)
+    plot_task_error(ax1, 20, ylabel=True)
     plot_task_error(ax2, 100, ylabel=False)
 
-    fig.text(0.01, 0.5, 'error (%)', va='center', rotation='vertical')
-
-    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.12, 2.6), ncol=3)
-    plt.subplots_adjust(left=0.07, bottom=0.075, right=0.97, top=0.85, wspace=0.2, hspace=0.3)
+    lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.12, 1.25), ncol=3)
 
     plt.savefig("figures/single_errors_v2.svg", format="svg", bbox_extra_artists=(lgd,))
     plt.savefig("figures/single_errors_v2.pdf", format="pdf", bbox_extra_artists=(lgd,))
+    plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
     # plt.show()
