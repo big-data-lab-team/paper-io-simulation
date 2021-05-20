@@ -16,6 +16,9 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{multirow}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{cite}
 
 % Fix link colors
 \hypersetup{
@@ -289,9 +292,8 @@
 	to extend, and because it builds on \simgrid's scalable and
 	validated simulation models.
 
-    \section{Methods}
+    \section{Page Cache Simulation Model}
     \label{method}
-    \todo[inline]{HC: Personally, I would actually make this subsection a section, and rename the previous section from "Methods" to "Page Cache Simulation Model". I've never loved the "Methods" title for section, although I know it is standard practice for many authors. }
 
     We separate our simulation model in two components, the I/O
     Controller and the Memory Manager, which together simulate
@@ -600,10 +602,10 @@
             applications distributed on multiple hosts, network transfers, 
             and multi-threading. 
 
-        \subsection{Experimental Methodology}
+        \section{Experimental Methodology}
 
-        \todo[inline]{HC: I've renamed this subsection from "Experiments" to "Experimental Methodology", as otherwise I was expecting results in there.  Not a big deal.}
-        \todo[inline]{HC: I find it strange to have the experimental methodology section be a subsection of the "Methods" section, and then have the results in a new section. So I would actually make the "Experimental Methodology" a section, instead of a subsection.  The flow would be: introduction; background and related work; methods; experimental methodology; results; conclusion. Again not a big deal, just a thought.}
+        % \todo[inline]{HC: I've renamed this subsection from "Experiments" to "Experimental Methodology", as otherwise I was expecting results in there.  Not a big deal.}
+        % \todo[inline]{HC: I find it strange to have the experimental methodology section be a subsection of the "Methods" section, and then have the results in a new section. So I would actually make the "Experimental Methodology" a section, instead of a subsection.  The flow would be: introduction; background and related work; methods; experimental methodology; results; conclusion. Again not a big deal, just a thought.}
 
 
 
@@ -760,16 +762,13 @@
     \section{Results}
     \label{results}
 
-
-    \todo[inline]{HC: Not sure what "Absolute relative simulation errors" means in the caption of Figure~\ref{fig:single_error}. I assume it's a typo and you just mean "Relative"?}
-
     \begin{figure*}
         \centering
         \begin{subfigure}{\linewidth}
             \centering
                \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
                \vspace*{-0.7cm}
-               \caption{Absolute relative simulation errors}
+               \caption{Relative simulation errors (absolute values)}
                \vspace*{0.5cm}
                \label{fig:single_error}
             \end{subfigure}
@@ -796,15 +795,15 @@
 
         \subsection{Single-threaded execution (Exp 1)}
 
-        \todo[inline]{Henri: In the paragraph below I would remove the ``The first read was ... data." sentence.}
+        % \todo[inline]{Henri: In the paragraph below I would remove the ``The first read was ... data." sentence.}
 
         The page cache simulation model drastically reduces I/O simulation
-        errors in each application task (Figure~\ref{fig:single_error}). The first read was not impacted
-        as it only involved uncached data. Errors were reduced from an average
+        errors in each application task (Figure~\ref{fig:single_error}). Errors were reduced from an average
         of 345\% in the original \wrench to 46\% in the Python prototype and
         39\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
         significantly overestimated read and write times, due to the lack
-        of page cache simulation. Results with files of 50~GB and 75~GB
+        of page cache simulation. Consistently, the first read was not impacted
+        as it only involved uncached data. Results with files of 50~GB and 75~GB
         showed similar behaviors and are not reported for brevity.
 
         \wrench simulation errors were substantially lower with 100~GB
@@ -854,16 +853,14 @@
             \end{figure*}
         \subsection{Concurrent applications (Exp 2)}
 
-            \todo[inline]{HC: I don't really see a plateau in Figure~\ref{fig:multi_local}}
-
             The page cache model notably reduces \wrench's simulation error
             for concurrent applications executed with local I/Os
-            (Figure~\ref{fig:multi_local}). For reads, \wrench-cache
+            (Figure~\ref{fig:multi_local}). For reads (Figure~\ref{fig:multi_local}-left), \wrench-cache
             slightly overestimates runtime, due to the aforementioned discrepancy between
             simulated and real read bandwidths.
-            For writes, \wrench-cache results show a
+            For writes (Figure~\ref{fig:multi_local}-right), \wrench-cache results show a
             plateau similar to the one observed in the real
-            execution, marking the limit beyond which the page cache is
+            execution between 1 and 10 concurrent executions. The plateau marks the limit beyond which the page cache is
             saturated with dirty data and needed flushing.
 
             \begin{figure}[b]
