@@ -172,6 +172,6 @@ def plot_error():
 
     plt.title("Nighres workflow simulation errors")
 
-    plt.savefig("figures/nighres_errors_v2.svg", format="svg", bbox_extra_artists=(lgd,))
-    plt.savefig("figures/nighres_errors_v2.pdf", format="pdf", bbox_extra_artists=(lgd,))
+    plt.savefig("figures/nighres_errors.svg", format="svg", bbox_extra_artists=(lgd,))
+    plt.savefig("figures/nighres_errors.pdf", format="pdf", bbox_extra_artists=(lgd,))
     # plt.show()

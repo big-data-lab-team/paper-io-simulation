@@ -63,6 +63,6 @@ def plot_cache_v2():
 
     fig.text(0.015, 0.45, 'memory (GB)', va='center', rotation='vertical')
     plt.legend(legend_elements, envs + files, ncol=6, loc='upper center', bbox_to_anchor=(-0.1, 1.3))
-    plt.savefig("figures/cached_files_v2.svg", format="svg")
-    plt.savefig("figures/cached_files_v2.pdf", format="pdf")
-    plt.show()
+    plt.savefig("figures/cached_files.svg", format="svg")
+    plt.savefig("figures/cached_files.pdf", format="pdf")
+    # plt.show()
