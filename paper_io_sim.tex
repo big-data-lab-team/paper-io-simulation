@@ -772,7 +772,7 @@
         \centering
         \begin{subfigure}{\linewidth}
             \centering
-               \includegraphics[width=\linewidth]{result/single/figures/single_errors_v2.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
                \vspace*{-0.7cm}
                \caption{Relative simulation errors (absolute values)\\ Left: 20-GB files. Right: 100-GB files.}
                 \vspace*{0.2cm}
@@ -782,7 +782,7 @@
             \centering
             %    Gray shades represent task phases (read, compute and write).
             %    Lines represent memory usage along pipeline execution time.}
-               \includegraphics[width=\linewidth]{result/single/figures/single_memprof_v2.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
                \vspace*{-0.7cm}
                \caption{Memory profiles\\ From top to bottom: real execution, Python prototype, WRENCH cache. Left: 20-GB files. Right: 100-GB files.}
                \vspace*{0.2cm}
@@ -790,7 +790,7 @@
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
-               \includegraphics[width=\linewidth]{result/single/figures/cached_files_v2.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/cached_files.pdf}
                \caption{Page cache content after each I/O operation\\Left: 20-GB files. Right: 100-GB files.}
             %    \textcolor{red}{Update real results of 20GB}}
                \label{fig:single_cache}
@@ -805,8 +805,8 @@
 
         The page cache simulation model drastically reduces I/O simulation
         errors in each application task (Figure~\ref{fig:single_error}). Errors were reduced from an average
-        of 345\% in the original \wrench to 46\% in the Python prototype and
-        39\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
+        of 328\% in the original \wrench to 36\% in the Python prototype and
+        32\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
         significantly overestimated read and write times, due to the lack
         of page cache simulation. Consistently, the first read was not impacted
         as it only involved uncached data. Results with files of 50~GB and 75~GB
