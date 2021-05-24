@@ -78,5 +78,5 @@ plot_sim.plot_pysim_log(mm.get_log(), task_time, "input = %d MB \nmem_rb = %d MB
                      storage.read_bw, storage.write_bw),
                       xmin=0, xmax=800, ymin=-10000, ymax=280000)
 
-export_mem(mm.get_log(), "export_v2/%dgb_sim_mem.csv" % (input_size / 1000))
-export_time(tasks, "export_v2/%dgb_sim_time.csv" % (input_size / 1000))
+export_mem(mm.get_log(), "export/%dgb_sim_mem.csv" % (input_size / 1000))
+export_time(tasks, "export/%dgb_sim_time.csv" % (input_size / 1000))

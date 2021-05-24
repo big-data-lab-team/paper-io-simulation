@@ -143,8 +143,8 @@ def result_local(rep_no=1):
 
     plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.25), ncol=4)
     plt.subplots_adjust(left=0.1, bottom=0.15, right=0.95, top=0.75, wspace=0.4)
-    plt.savefig("figures/multi_local_v2.pdf", format="pdf")
-    plt.savefig("figures/multi_local_v2.svg", format="svg")
+    plt.savefig("figures/multi_local.pdf", format="pdf")
+    plt.savefig("figures/multi_local.svg", format="svg")
     # plt.show()
 
 
@@ -165,8 +165,8 @@ def result_nfs(rep_no=1):
 
     plt.legend(loc='upper center', bbox_to_anchor=(-0.2, 1.25), ncol=4)
     plt.subplots_adjust(left=0.1, bottom=0.15, right=0.95, top=0.75, wspace=0.4)
-    plt.savefig("figures/multi_nfs_v2.pdf", format="pdf")
-    plt.savefig("figures/multi_nfs_v2.svg", format="svg")
+    plt.savefig("figures/multi_nfs.pdf", format="pdf")
+    plt.savefig("figures/multi_nfs.svg", format="svg")
 
     # plt.show()
 

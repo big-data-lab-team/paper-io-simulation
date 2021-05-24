@@ -206,8 +206,8 @@ def compare_plot(input_sizes=[20, 100], makespan=[165, 1300]):
     #          rotation=-90)
     # fig.text(0.91, 0.14, 'WRENCH-cache', fontsize=14, color='white', bbox={'pad': 5, 'color': '#1965B0'}, rotation=-90)
 
-    plt.savefig("figures/single_memprof_v2.svg", format="svg", bbox_inches='tight')
-    plt.savefig("figures/single_memprof_v2.pdf", format="pdf", bbox_inches='tight')
+    plt.savefig("figures/single_memprof.svg", format="svg", bbox_inches='tight')
+    plt.savefig("figures/single_memprof.pdf", format="pdf", bbox_inches='tight')
     # plt.show()
 
 
