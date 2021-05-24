@@ -413,8 +413,11 @@
     The cache eviction simulation also runs in
     the main thread. It frees up the page cache by traversing and deleting
     least recently used clean data blocks in the inactive list.
+    In case the amount evictable memory in the inactive list is insufficient 
+    (the inactive list is empty or a file being opened is residing in the inactive list), 
+    blocks in the active list are considered for eviction. 
     The amount of data to evict is passed as a parameter and data blocks are deleted
-    from the inactive list until the evicted data reaches the required amount,
+    from the lists until the evicted data reaches the required amount,
     or until there is no clean block left in the list.
     If the last evicted block does not have to be entirely evicted, the block is split into two blocks,
     and only one of them is evicted.
@@ -596,8 +599,8 @@
             concurrent accesses to page cache LRU lists by the two Memory
             Manager threads. For the experiments, we used
             \wrench 1.6 at commit
-            \href{https://github.com/wrench-project/wrench/tree/67185374330d2c4bf274fce222c937e838df5b03}{6718537433},
-            which uses \simgrid 3.25, available at
+            \href{https://github.com/dohoangdzung/wrench/tree/cefc0bf739d015b2329a62750a9d70085b65a3ae}{cefc0bf739},
+            which uses \simgrid 3.26, available at
             \url{https://framagit.org/simgrid/simgrid}. Our implementation
             is now part of \wrench's master branch and available to
             users in the 1.8 release. \wrench provides a full \simgrid-based simulation 
@@ -769,7 +772,7 @@
         \centering
         \begin{subfigure}{\linewidth}
             \centering
-               \includegraphics[width=\linewidth]{result/single/figures/single_errors_v2.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/single_errors.pdf}
                \vspace*{-0.7cm}
                \caption{Relative simulation errors (absolute values)\\ Left: 20-GB files. Right: 100-GB files.}
                 \vspace*{0.2cm}
@@ -779,7 +782,7 @@
             \centering
             %    Gray shades represent task phases (read, compute and write).
             %    Lines represent memory usage along pipeline execution time.}
-               \includegraphics[width=\linewidth]{result/single/figures/single_memprof_v2.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/single_memprof.pdf}
                \vspace*{-0.7cm}
                \caption{Memory profiles\\ From top to bottom: real execution, Python prototype, WRENCH cache. Left: 20-GB files. Right: 100-GB files.}
                \vspace*{0.2cm}
@@ -787,7 +790,7 @@
         \end{subfigure}
         \begin{subfigure}{\linewidth}
             \centering
-               \includegraphics[width=\linewidth]{result/single/figures/cached_files_v2.pdf}
+               \includegraphics[width=\linewidth]{result/single/figures/cached_files.pdf}
                \caption{Page cache content after each I/O operation\\Left: 20-GB files. Right: 100-GB files.}
             %    \textcolor{red}{Update real results of 20GB}}
                \label{fig:single_cache}
@@ -802,8 +805,8 @@
 
         The page cache simulation model drastically reduces I/O simulation
         errors in each application task (Figure~\ref{fig:single_error}). Errors were reduced from an average
-        of 345\% in the original \wrench to 46\% in the Python prototype and
-        39\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
+        of 328\% in the original \wrench to 36\% in the Python prototype and
+        32\% in \wrench-cache. Unsurprisingly, the original \wrench simulator
         significantly overestimated read and write times, due to the lack
         of page cache simulation. Consistently, the first read was not impacted
         as it only involved uncached data. Results with files of 50~GB and 75~GB

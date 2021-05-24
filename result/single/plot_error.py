@@ -53,7 +53,7 @@ def plot_error():
 
     lgd = plt.legend(loc='upper center', bbox_to_anchor=(-0.12, 1.3), ncol=3)
 
-    plt.savefig("figures/single_errors_v2.svg", format="svg", bbox_extra_artists=(lgd,))
-    plt.savefig("figures/single_errors_v2.pdf", format="pdf", bbox_extra_artists=(lgd,))
+    plt.savefig("figures/single_errors.svg", format="svg", bbox_extra_artists=(lgd,))
+    plt.savefig("figures/single_errors.pdf", format="pdf", bbox_extra_artists=(lgd,))
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.7, wspace=0.3)
     # plt.show()
