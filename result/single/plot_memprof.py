@@ -146,7 +146,7 @@ def sim_subplot(subplot_ax, sim_time_file, sim_mem_file, title, bar_alpha=0.4, l
 def single_plot(input_size=20, makespan=165):
     fig, axes = plt.subplots(figsize=(9, 9), ncols=1, nrows=3)
     plt.subplots_adjust(top=0.85, hspace=0.3)
-    plt.rcParams.update({'font.size': 9})
+    plt.rcParams.update({'font.size': 10})
 
     compare_size([axes[0], axes[1], axes[2]],
                  real_time_file="real/%dgb/timestamps.csv" % input_size,
@@ -169,7 +169,7 @@ def single_plot(input_size=20, makespan=165):
 def compare_plot(input_sizes=[20, 100], makespan=[165, 1300]):
     fig, axes = plt.subplots(figsize=(15, 9), ncols=2, nrows=3)
     plt.subplots_adjust(hspace=0.3, wspace=0.1)
-    plt.rcParams.update({'font.size': 9})
+    plt.rcParams.update({'font.size': 10})
 
     real_condition_desc = "memory read bw = 6860 MBps\nmemory write bw = 2764 MBps\ndisk read bw = 510 MBps\ndisk write bw = 420 MBps"
     py_condition_desc = "memory bw = 4812MBps\ndisk bw = 465 MBps"
@@ -217,7 +217,7 @@ def compare_full():
 
     fig = plt.figure(figsize=(12, 16))
     outer = gridspec.GridSpec(ncols=2, nrows=2, wspace=0.15, hspace=0.2, left=0.05, right=0.95, bottom=0.1, top=0.9, figure=fig)
-    plt.rcParams.update({'font.size': 11})
+    plt.rcParams.update({'font.size': 10})
 
     # real_condition_desc = "memory read bw = 6860 MBps\nmemory write bw = 2764 MBps\ndisk read bw = 510 MBps\ndisk write bw = 420 MBps"
     # py_condition_desc = "memory bw = 4812MBps\ndisk bw = 465 MBps"
