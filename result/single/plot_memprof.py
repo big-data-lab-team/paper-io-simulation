@@ -199,7 +199,7 @@ def compare_plot(input_sizes=[20, 100], makespan=[165, 1300]):
 
     # fig.text(0.32, 0.06, 'time (s)', ha='center', fontsize=12)
     # fig.text(0.73, 0.06, 'time (s)', ha='center', fontsize=12)
-    # fig.text(0.08, 0.45, 'memory (GB)', va='center', rotation='vertical', fontsize=12)
+    fig.text(0.08, 0.5, 'memory (GB)', va='center', rotation='vertical', fontsize=12)
     # fig.text(0.91, 0.7, 'Real execution', fontsize=14, color='white', bbox={'pad': 5, 'color': '#90C987'},
     #          rotation=-90)
     # fig.text(0.91, 0.41, 'Python prototype', fontsize=14, color='white', bbox={'pad': 5, 'color': '#7BAFDE'},
