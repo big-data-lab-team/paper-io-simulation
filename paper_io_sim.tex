@@ -805,8 +805,25 @@
         \end{figure*}
 
 
+        \begin{figure*}[h!]
+            \centering
+            \begin{subfigure}{0.95\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
+            \end{subfigure}
+            \caption{Concurrent results with 3~GB files, 5 repetitions (\textit{Exp 2})}
+            \label{fig:multi_local}
+        \end{figure*}
         \subsection{Single-threaded execution (Exp 1)}
-
+        \begin{figure*}[h!]
+            \centering
+            \begin{subfigure}{0.95\linewidth}
+                \centering
+                \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
+            \end{subfigure}
+            \caption{NFS results with 3~GB files, 5 repetitions (\textit{Exp 3})}
+            \label{fig:multi_nfs}
+            \end{figure*}
         % \todo[inline]{Henri: In the paragraph below I would remove the ``The first read was ... data." sentence.}
 
         The page cache simulation model drastically reduced I/O simulation
@@ -840,22 +857,7 @@
         with reality (Figure~\ref{fig:single_cache}), showing that the
         previous observations were not incidental.
 
-            \begin{figure*}
-                \begin{subfigure}{\linewidth}
-                    \centering
-                    \includegraphics[width=\linewidth]{result/multi/figures/multi_local.pdf}
-                \end{subfigure}
-                \caption{Concurrent results with 3~GB files, 5 repetitions (\textit{Exp 2})}
-                \label{fig:multi_local}
-            \end{figure*}
-            \begin{figure*}
-                \begin{subfigure}{\linewidth}
-                    \centering
-                    \includegraphics[width=\linewidth]{result/multi/figures/multi_nfs.pdf}
-                \end{subfigure}
-                \caption{NFS results with 3~GB files, 5 repetitions (\textit{Exp 3})}
-                \label{fig:multi_nfs}
-                \end{figure*}
+     
         \subsection{Concurrent applications (Exp 2)}
 
             The page cache model notably reduced \wrench's simulation error
@@ -890,7 +892,7 @@
         The first read happened entirely from disk and was thus 
         very accurately simulated by both \wrench and \wrench-cache.
     
-        \begin{figure}[b]
+        \begin{figure}[h!]
                 \centering
                 \includegraphics[width=0.95\linewidth]{result/nighres/figures/nighres_errors.pdf}
             \caption{Real application results (\textit{Exp 4})}
@@ -908,14 +910,7 @@
         NFS I/Os than with local I/Os, most likely due to the use of writethrough
         cache in NFS, which bypasses flushing operations.
 
-        \begin{figure}
-            \centering
-            \includegraphics[width=0.95\linewidth]{result/multi/figures/simulation_time.pdf}
-            \caption{Simulation time comparison. \wrench-cache scaled
-            linearly with the number of concurrent applications, albeit
-            with a higher overhead than \wrench.}
-            \label{fig:multi_time}
-            \end{figure}
+
 
     \section{Conclusion}
     \label{discussion}
@@ -944,7 +939,14 @@
     specific hardware architectures~\cite{hayot2020performance}. We expect
     page cache simulation to drastically reduce the simulation error in all
     these scenarios, with substantial consequences on study conclusions.
-
+    \begin{figure}[t]
+        \centering
+        \includegraphics[width=0.95\linewidth]{result/multi/figures/simulation_time.pdf}
+        \caption{Simulation time comparison. \wrench-cache scaled
+        linearly with the number of concurrent applications, albeit
+        with a higher overhead than \wrench.}
+        \label{fig:multi_time}
+        \end{figure}
     Relevant extensions to this work include more
     accurate descriptions of anonymous memory usage in applications, 
     which strongly affects I/O times through writeback caching. File access patterns
@@ -960,7 +962,7 @@
     from the Canada Foundation for Innovation. This work was partially supported
     by NSF contracts \#1923539 and \#1923621.
 
-\bibliographystyle{IEEEtran}
+    \bibliographystyle{IEEEtran}
 \bibliography{citation}
 
 \end{document}
