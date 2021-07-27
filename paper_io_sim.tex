@@ -180,7 +180,7 @@
         Page cache offsets the cost of disk I/O by enabling I/O to occur directly from memory.
         When a file is first loaded into memory, the file is read from disk and loaded into the page cache as
         a series of pages. Subsequent reads to any of the file pages located in memory will result in
-        a cache hit, meaning the I/O can occur directly from without disk involvement.
+        a cache hit, meaning the I/O can occur directly from memory without disk involvement.
         Any accessed page not loaded in memory results in a cache miss, resulting in
         the page being read directly from disk.
         
@@ -288,7 +288,7 @@
         builds on top of \simgrid to provide higher-level simulation
         abstractions, so that simulators of complex applications and
         systems can be implemented with a few hundred lines of code. 
-        Neither \wrench nor \simgrid simulate page cache simulation.
+        Neither \wrench nor \simgrid simulate page cache mechanisms.
 
 
 	In this study, we implement a page cache simulation model in the
@@ -351,7 +351,7 @@
     \begin{figure}
            \centering
            \includegraphics[width=\columnwidth]{figures/lru_lists.pdf}
-           \caption{Model of page cache LRU lists with data blocks.}
+           \caption{Model of page cache LRU lists with data blocks. Grey blocks identify dirty data.}
            \label{fig:lrulist}
     \end{figure}
 
@@ -507,7 +507,7 @@
     Algorithm~\ref{alg:read}. First, we calculate the amount of uncached
     data that needs to be read from disk, and the remaining amount is read
     from cache (line 7-8). The amount of memory required to read the chunk
-    is calculated, corresponding to a copy of the chunk in anonymous memory
+    is calculated, corresponding to a copy of the chunk in anonymous memory --- the memory that is not backed by any file ---
     and a copy of the chunk in cache (line 9).
     If there is not enough available memory, the Memory Manager is called
     to flush dirty data (line 10). If necessary, flushing is complemented by
@@ -763,7 +763,8 @@
         memory, local disk, remote disk (NFS), and network bandwidths
         (Table~\ref{table:benchmark}). Since \simgrid, and thus \wrench, currently only supports
         symmetrical bandwidths, we use the mean of the read and write
-        bandwidth values in our experiments.
+        bandwidth values in our experiments. We aso used symmetrical bandwidths in the Python prototype 
+        to facilitate comparison with \wrench-cache.
 
 
             % Finally, because \wrench simulates applications base on network-communication,
